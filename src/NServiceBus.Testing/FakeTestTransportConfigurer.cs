@@ -5,6 +5,11 @@ namespace NServiceBus.Testing
 
     class FakeTestTransportConfigurer : ConfigureTransport
     {
+        protected override bool RequiresConnectionString
+        {
+            get { return false; }
+        }
+
         protected override void Configure(FeatureConfigurationContext context, string connectionString)
         {
         }

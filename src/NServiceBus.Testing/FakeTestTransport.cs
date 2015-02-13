@@ -4,5 +4,9 @@ namespace NServiceBus.Testing
 
     class FakeTestTransport : TransportDefinition
     {
+        protected override void Configure(BusConfiguration config)
+        {
+            config.EnableFeature<FakeTestTransportConfigurer>();
+        }
     }
 }

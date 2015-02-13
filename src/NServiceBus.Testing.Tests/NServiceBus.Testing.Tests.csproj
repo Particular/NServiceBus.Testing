@@ -45,7 +45,7 @@
   <ItemGroup>
     <Reference Include="NServiceBus.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NServiceBus.5.0.1\lib\net45\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.5.2.0\lib\net45\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
@@ -59,6 +59,7 @@
       <Link>Invocations.cs</Link>
     </Compile>
     <Compile Include="BaseTests.cs" />
+    <Compile Include="Issue20.cs" />
     <Compile Include="Issue508.cs" />
     <Compile Include="InvocationTests.cs" />
     <Compile Include="Issue_933.cs" />
