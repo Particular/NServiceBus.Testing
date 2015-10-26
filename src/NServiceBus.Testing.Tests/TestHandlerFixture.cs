@@ -15,12 +15,11 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailAssertingDoNotContinueDispatchingCurrentMessageToHandlersWasCalled()
         {
-            Test.Handler<EmptyHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
                 .ExpectDoNotContinueDispatchingCurrentMessageToHandlers()
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -32,12 +31,11 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailAssertingSendToSitesWasCalled()
         {
-            Test.Handler<EmptyHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
                 .ExpectSendToSites<TestMessage>((m, a) => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -69,23 +67,21 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailAssertingDeferWasCalledWithTimeSpan()
         {
             var timespan = TimeSpan.FromMinutes(10);
-            Test.Handler<EmptyHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
                 .ExpectDefer<TestMessage>((m, t) => t == timespan)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailAssertingDeferWasCalledWithDateTime()
         {
             var datetime = DateTime.Now;
-            Test.Handler<EmptyHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
                 .ExpectDefer<TestMessage>((m, t) => t == datetime)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -107,34 +103,31 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailAssertingDeferWasNotCalledWithTimeSpan()
         {
             var timespan = TimeSpan.FromMinutes(10);
-            Test.Handler<DeferringTimeSpanHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<DeferringTimeSpanHandler>()
                 .WithExternalDependencies(h => h.Defer = timespan)
                 .ExpectNotDefer<TestMessage>((m, t) => t == timespan)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailAssertingDeferWasNotCalledWithDateTime()
         {
             var datetime = DateTime.Now;
-            Test.Handler<DeferringDateTimeHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<DeferringDateTimeHandler>()
                 .WithExternalDependencies(h => h.Defer = datetime)
                 .ExpectNotDefer<TestMessage>((m, t) => t == datetime)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailAssertingHandleCurrentMessageLaterWasCalled()
         {
-            Test.Handler<EmptyHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
                 .ExpectHandleCurrentMessageLater()
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -155,12 +148,11 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectNotPublishWhenPublishing()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
+            Assert.Throws<Exception>(() => Test.Handler<PublishingHandler<Publish1>>()
                 .ExpectNotPublish<Publish1>(m => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -190,23 +182,21 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectNotPublishWhenPublishingAndCheckingPredicate()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
+            Assert.Throws<Exception>(() => Test.Handler<PublishingHandler<Publish1>>()
                 .WithExternalDependencies(h => h.ModifyPublish = m => m.Data = "Data")
                 .ExpectNotPublish<Publish1>(m => m.Data == "Data")
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectPublishWhenPublishingAndCheckingPredicateThatFails()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
+            Assert.Throws<Exception>(() => Test.Handler<PublishingHandler<Publish1>>()
                 .WithExternalDependencies(h => h.ModifyPublish = m => m.Data = "NotData")
                 .ExpectPublish<Publish1>(m => m.Data == "Data")
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -219,12 +209,11 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectPublishIfNotPublishing()
         {
-            Test.Handler<EmptyHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
                 .ExpectPublish<Publish1>(m => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -244,21 +233,19 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectSendIfNotSending()
         {
-            Test.Handler<EmptyHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
                 .ExpectSend<Send1>(m => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectSendIfSendingWithoutMatch()
         {
-            Test.Handler<SendingHandler<Publish1>>()
+            Assert.Throws<Exception>(() => Test.Handler<SendingHandler<Publish1>>()
                 .ExpectSend<Send1>(m => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -270,12 +257,11 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectNotSendIfSending()
         {
-            Test.Handler<SendingHandler<Send1>>()
+            Assert.Throws<Exception>(() => Test.Handler<SendingHandler<Send1>>()
                 .ExpectNotSend<Send1>(m => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -287,12 +273,11 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectNotSendLocalIfSendingLocal()
         {
-            Test.Handler<SendingLocalHandler<Send1>>()
+            Assert.Throws<Exception>(() => Test.Handler<SendingLocalHandler<Send1>>()
                 .ExpectNotSendLocal<Send1>(m => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -304,12 +289,11 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectPublishIfPublishWrongMessageType()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
+            Assert.Throws<Exception>(() => Test.Handler<PublishingHandler<Publish1>>()
                 .ExpectPublish<Publish2>(m => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -384,23 +368,21 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectForwardCurrentMessageToIfMessageNotForwarded()
         {
-            Test.Handler<NotForwardingMessageHandler>()
+            Assert.Throws<Exception>(() => Test.Handler<NotForwardingMessageHandler>()
                 .ExpectForwardCurrentMessageTo(dest => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
         {
             var handler = new ForwardingMessageHandler("someOtherDestination");
 
-            Test.Handler(handler)
+            Assert.Throws<Exception>(() => Test.Handler(handler)
                 .ExpectForwardCurrentMessageTo(dest => dest == "expectedDestination")
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
@@ -423,15 +405,14 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        [ExpectedException]
         public void ShouldFailExpectNotForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
         {
             const string forwardingDestination = "expectedDestination";
             var handler = new ForwardingMessageHandler(forwardingDestination);
 
-            Test.Handler(handler)
+            Assert.Throws<Exception>(() => Test.Handler(handler)
                 .ExpectNotForwardCurrentMessageTo(dest => dest == forwardingDestination)
-                .OnMessage<TestMessage>();
+                .OnMessage<TestMessage>());
         }
 
         [Test]
