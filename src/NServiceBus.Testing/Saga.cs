@@ -189,6 +189,24 @@ namespace NServiceBus.Testing
         }
 
         /// <summary>
+        /// Check that the saga doesn't forward a message to the given destination.
+        /// </summary>
+        public Saga<T> ExpectNotForwardCurrentMessageTo(Func<string, bool> check)
+        {
+            expectedInvocations.Add(new ExpectedNotForwardCurrentMessageToInvocation { Check = check });
+            return this;
+        }
+
+        /// <summary>
+        /// Check that the saga forwards a message to the given destination.
+        /// </summary>
+        public Saga<T> ExpectForwardCurrentMessageTo(Func<string, bool> check)
+        {
+            expectedInvocations.Add(new ExpectedForwardCurrentMessageToInvocation { Check = check });
+            return this;
+        }
+
+        /// <summary>
         /// Check that the saga replies to the originator with the given message type.
         /// </summary>
         public Saga<T> ExpectReplyToOriginator<TMessage>(Func<TMessage, bool> check = null)

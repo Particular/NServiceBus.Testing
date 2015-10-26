@@ -383,6 +383,76 @@ namespace NServiceBus.Testing.Tests
             Assert.DoesNotThrow(() => Guid.Parse(handler.AssignedMessageId), "Message ID should be a valid GUID.");
         }
 
+        [Test]
+        [ExpectedException]
+        public void ShouldFailExpectForwardCurrentMessageToIfMessageNotForwarded()
+        {
+            Test.Handler<NotForwardingMessageHandler>()
+                .ExpectForwardCurrentMessageTo(dest => true)
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        [ExpectedException]
+        public void ShouldFailExpectForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
+        {
+            var handler = new ForwardingMessageHandler("someOtherDestination");
+
+            Test.Handler(handler)
+                .ExpectForwardCurrentMessageTo(dest => dest == "expectedDestination")
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
+        {
+            const string forwardingDestination = "expectedDestination";
+            var handler = new ForwardingMessageHandler(forwardingDestination);
+
+            Test.Handler(handler)
+                .ExpectForwardCurrentMessageTo(dest => dest == forwardingDestination)
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectNotForwardCurrentMessageToIfMessageNotForwarded()
+        {
+            Test.Handler<NotForwardingMessageHandler>()
+                .ExpectNotForwardCurrentMessageTo(dest => true)
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        [ExpectedException]
+        public void ShouldFailExpectNotForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
+        {
+            const string forwardingDestination = "expectedDestination";
+            var handler = new ForwardingMessageHandler(forwardingDestination);
+
+            Test.Handler(handler)
+                .ExpectNotForwardCurrentMessageTo(dest => dest == forwardingDestination)
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectNotForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
+        {
+            var handler = new ForwardingMessageHandler("someOtherDestination");
+
+            Test.Handler(handler)
+                .ExpectNotForwardCurrentMessageTo(dest => dest == "expectedDestination")
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ExpectForwardCurrentMessageToShouldSupportMultipleForwardedMessages()
+        {
+            Test.Handler<MultipleForwardingsMessageHandler>()
+                .ExpectForwardCurrentMessageTo(dest => dest == "dest1")
+                .ExpectForwardCurrentMessageTo(dest => dest == "dest2")
+                .ExpectNotForwardCurrentMessageTo(dest => dest == "dest3")
+                .OnMessage<TestMessage>();
+        }
 
         private class TestMessageImpl : TestMessage
         {
@@ -587,6 +657,40 @@ namespace NServiceBus.Testing.Tests
 
         }
 
+        public class NotForwardingMessageHandler : IHandleMessages<TestMessage>
+        {
+            public void Handle(TestMessage message)
+            {
+            }
+        }
+
+        public class ForwardingMessageHandler : IHandleMessages<TestMessage>
+        {
+            readonly string destination;
+
+            public ForwardingMessageHandler(string destination)
+            {
+                this.destination = destination;
+            }
+
+            public IBus Bus { get; set; }
+
+            public void Handle(TestMessage message)
+            {
+                Bus.ForwardCurrentMessageTo(destination);
+            }
+        }
+
+        public class MultipleForwardingsMessageHandler : IHandleMessages<TestMessage>
+        {
+            public IBus Bus { get; set; }
+
+            public void Handle(TestMessage message)
+            {
+                Bus.ForwardCurrentMessageTo("dest1");
+                Bus.ForwardCurrentMessageTo("dest2");
+            }
+        }
     }
 
     public class DataBusMessageHandler : IHandleMessages<MessageWithDataBusProperty>
