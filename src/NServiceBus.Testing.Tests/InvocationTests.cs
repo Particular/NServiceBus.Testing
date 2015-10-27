@@ -25,33 +25,30 @@
         }
 
         [Test]
-        [ExpectedException]
         public void PublishBasicNegativeCheck()
         {
             var i = new PublishInvocation<MessageA> {Message = new MessageA()};
             var exp = new ExpectedPublishInvocation<MessageA> {Check = m => false};
 
-            exp.Validate(i);
+            Assert.Throws<Exception>(() => exp.Validate(i));
         }
 
         [Test]
-        [ExpectedException]
         public void PublishValueNegativeCheck()
         {
             var i = new PublishInvocation<MessageA> {Message = new MessageA {Value = 2}};
             var exp = new ExpectedPublishInvocation<MessageA> {Check = m => m.Value == 3};
 
-            exp.Validate(i);
+            Assert.Throws<Exception>(() => exp.Validate(i));
         }
 
         [Test]
-        [ExpectedException]
         public void PublishBasicNegativeType()
         {
             var i = new PublishInvocation<MessageA> {Message = new MessageA()};
             var exp = new ExpectedPublishInvocation<MessageB> {Check = m => true};
 
-            exp.Validate(i);
+            Assert.Throws<Exception>(() => exp.Validate(i));
         }
 
         [Test]
@@ -75,33 +72,30 @@
         }
 
         [Test]
-        [ExpectedException]
         public void NotPublishBasicNegative()
         {
             var i = new PublishInvocation<MessageA> {Message = new MessageA()};
             var exp = new ExpectedNotPublishInvocation<MessageA> {Check = m => true};
 
-            exp.Validate(i);
+            Assert.Throws<Exception>(() => exp.Validate(i));
         }
 
         [Test]
-        [ExpectedException]
         public void SendPublishMismatchOne()
         {
             var i = new SendInvocation<MessageA> {Message = new MessageA()};
             var exp = new ExpectedPublishInvocation<MessageA> {Check = m => true};
 
-            exp.Validate(i);
+            Assert.Throws<Exception>(() => exp.Validate(i));
         }
 
         [Test]
-        [ExpectedException]
         public void SendPublishMismatchTwo()
         {
             var i = new PublishInvocation<MessageA> {Message = new MessageA()};
             var exp = new ExpectedSendInvocation<MessageA> {Check = m => true};
 
-            exp.Validate(i);
+            Assert.Throws<Exception>(() => exp.Validate(i));
         }
 
         [Test]
@@ -133,23 +127,21 @@
         }
 
         [Test]
-        [ExpectedException]
         public void SendToSitesBasicNegativeCheck()
         {
             var i = new SendToSitesInvocation<MessageA> { Message = new MessageA() , Value = new[] { "SiteA" } };
             var exp = new ExpectedSendToSitesInvocation<MessageA> { Check = (m, a) => false };
 
-            exp.Validate(i);
+            Assert.Throws<Exception>(() => exp.Validate(i));
         }
 
         [Test]
-        [ExpectedException]
         public void NotSendToSitesBasicNegative()
         {
             var i = new SendToSitesInvocation<MessageA> { Message = new MessageA(), Value = new[] { "SiteA" } };
             var exp = new ExpectedNotSendToSitesInvocation<MessageA> { Check = (m, a) => true };
 
-            exp.Validate(i);
+            Assert.Throws<Exception>(() => exp.Validate(i));
         }
 
         [Test]
