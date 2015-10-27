@@ -155,7 +155,7 @@
         }
 
         /// <summary>
-        /// Check that the handler sends a message of the given type to sites
+        /// Check that the handler sends a message of the given type to sites.
         /// </summary>
         public Handler<T> ExpectSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
         {
@@ -164,7 +164,7 @@
         }
 
         /// <summary>
-        /// Check that the handler doesn't send a message of the given type to sites
+        /// Check that the handler doesn't send a message of the given type to sites.
         /// </summary>
         public Handler<T> ExpectNotSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
         {
@@ -173,7 +173,7 @@
         }
 
         /// <summary>
-        /// Check that the handler defers a message of the given type
+        /// Check that the handler defers a message of the given type.
         /// </summary>
         public Handler<T> ExpectDefer<TMessage>(Func<TMessage, TimeSpan, bool> check)
         {
@@ -182,7 +182,7 @@
         }
 
         /// <summary>
-        /// Check that the handler defers a message of the given type
+        /// Check that the handler defers a message of the given type.
         /// </summary>
         public Handler<T> ExpectDefer<TMessage>(Func<TMessage, DateTime, bool> check)
         {
@@ -191,7 +191,7 @@
         }
 
         /// <summary>
-        /// Check that the handler doesn't defer a message of the given type
+        /// Check that the handler doesn't defer a message of the given type.
         /// </summary>
         public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, TimeSpan, bool> check)
         {
@@ -200,11 +200,29 @@
         }
 
         /// <summary>
-        /// Check that the handler doesn't defer a message of the given type
+        /// Check that the handler doesn't defer a message of the given type.
         /// </summary>
         public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, DateTime, bool> check)
         {
             expectedInvocations.Add(new ExpectedNotDeferMessageInvocation<TMessage, DateTime> { Check = check });
+            return this;
+        }
+
+        /// <summary>
+        /// Check that the handler doesn't forward a message to the given destination.
+        /// </summary>
+        public Handler<T> ExpectNotForwardCurrentMessageTo(Func<string, bool> check)
+        {
+            expectedInvocations.Add(new ExpectedNotForwardCurrentMessageToInvocation{ Check = check });
+            return this;
+        }
+
+        /// <summary>
+        /// Check that the handler forwards a message to the given destination.
+        /// </summary>
+        public Handler<T> ExpectForwardCurrentMessageTo(Func<string, bool> check)
+        {
+            expectedInvocations.Add(new ExpectedForwardCurrentMessageToInvocation { Check = check });
             return this;
         }
 

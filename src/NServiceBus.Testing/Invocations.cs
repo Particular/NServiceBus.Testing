@@ -119,6 +119,14 @@
     class ReplyInvocation<M> : MessageInvocation<M> { }
 
     class ForwardCurrentMessageToInvocation : SingleValueInvocation<string> { }
+    class ExpectedForwardCurrentMessageToInvocation : SingleValueExpectedInvocation<ForwardCurrentMessageToInvocation, string> { }
+    class ExpectedNotForwardCurrentMessageToInvocation : SingleValueExpectedInvocation<ForwardCurrentMessageToInvocation, string>
+    {
+        public ExpectedNotForwardCurrentMessageToInvocation()
+        {
+            Negate = true;
+        }
+    }
 
     class ExpectedReturnInvocation<T> : SingleValueExpectedInvocation<ReturnInvocation<T>, T> { }
     class ReturnInvocation<T> : SingleValueInvocation<T> { }

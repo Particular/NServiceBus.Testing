@@ -112,7 +112,6 @@
                 .When(s => s.Handle(new SubmitOrder { Total = total, IsRemoteOrder = true }));
         }
 
-
         [Test]
         public void DiscountTestWithSpecificTimeout()
         {
@@ -131,12 +130,45 @@
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
                 .When(s => s.Handle(new SubmitOrder {Total = 200}));
         }
+
         [Test]
         public void TestNullReferenceException()
         {
             Test.Initialize();
             var saga = new MySaga();
             Assert.DoesNotThrow(() => Test.Saga(saga));
+        }
+
+        [Test]
+        public void ShouldFailExpectForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
+        {
+            Assert.Throws<Exception>(() => Test.Saga<MySaga>()
+                .ExpectForwardCurrentMessageTo(dest => dest == "expectedDestination")
+                .When(s => s.Handle(new StartsSaga())));
+        }
+
+        [Test]
+        public void ShouldPassExpectForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
+        {
+            Test.Saga<MySaga>()
+                .ExpectForwardCurrentMessageTo(dest => dest == "forwardingDestination")
+                .When(s => s.Handle(new StartsSaga()));
+        }
+
+        [Test]
+        public void ShouldFailExpectNotForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
+        {
+            Assert.Throws<Exception>(() => Test.Saga<MySaga>()
+                .ExpectNotForwardCurrentMessageTo(dest => dest == "forwardingDestination")
+                .When(s => s.Handle(new StartsSaga())));
+        }
+
+        [Test]
+        public void ShouldPassExpectNotForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
+        {
+            Test.Saga<MySaga>()
+                .ExpectNotForwardCurrentMessageTo(dest => dest == "expectedDestination")
+                .When(s => s.Handle(new StartsSaga()));
         }
     }
 
@@ -198,6 +230,7 @@
             ReplyToOriginator(new ResponseToOriginator());
             Bus.Publish<Event>();
             Bus.Send<Command>(null);
+            Bus.ForwardCurrentMessageTo("forwardingDestination");
             RequestTimeout(TimeSpan.FromDays(7), message);
         }
 
