@@ -22,6 +22,22 @@
         }
 
         [Test]
+        public void MySagaWithConstructorDependency()
+        {
+            var instance = new MySagaWithConstructorDependency(null);
+
+            Test.Saga(instance)
+                .ExpectReplyToOriginator<ResponseToOriginator>()
+                .ExpectTimeoutToBeSetIn<StartsSaga>((state, span) => span == TimeSpan.FromDays(7))
+                .ExpectPublish<Event>()
+                .ExpectSend<Command>()
+                .When(s => s.Handle(new StartsSaga()))
+                .ExpectPublish<Event>()
+                .WhenSagaTimesOut()
+                .AssertSagaCompletionIs(true);
+        }
+
+        [Test]
         public void MySagaWithActions()
         {
             Test.Saga<MySaga>()
@@ -243,6 +259,19 @@
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
         {
         }
+    }
+
+    public interface IDependency
+    {
+    }
+
+    public class MySagaWithConstructorDependency : MySaga
+    {
+
+        public MySagaWithConstructorDependency(IDependency dependency)
+        {
+        }
+
     }
 
     public class MySagaData : IContainSagaData
