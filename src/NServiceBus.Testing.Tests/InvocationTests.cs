@@ -171,6 +171,20 @@
 
             exp.Validate(i);
         }
+
+        [Test]
+        public void RunAllInvocations()
+        {
+            int invocationCount = 0;
+
+            var i = new PublishInvocation<MessageA> { Message = new MessageA() };
+            var j = new PublishInvocation<MessageA> { Message = new MessageA() };
+            var exp = new ExpectedPublishInvocation<MessageA> { Check = m => { invocationCount++;  return true; } };
+
+            exp.Validate(i, j);
+
+            Assert.That(() => invocationCount, Is.EqualTo(2));
+        }
     }
 
     public class MessageA

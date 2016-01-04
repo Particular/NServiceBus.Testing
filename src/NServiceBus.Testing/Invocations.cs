@@ -16,12 +16,14 @@
         public void Validate(params ActualInvocation[] invocations)
         {
             var calls = invocations.Where(i => typeof(T) == i.GetType());
-            var success = calls.Any(c =>
-                                         {
-                                             var result = Validate(c as T);
-                                             
-                                             return result;
-                                         });
+
+            var callResults = calls.Select(c =>
+            {
+                var result = Validate(c as T);
+                return result;
+            }).ToArray(); // Force enumeration
+
+            var success = callResults.Any(result => result);
 
             if ((!success && !Negate) || (Negate && success))
                 throw new Exception(string.Format("{0} not fulfilled.\nCalls made:\n{1}", filter(GetType()), string.Join("\n", invocations.Select(i => filter(i.GetType())))));
