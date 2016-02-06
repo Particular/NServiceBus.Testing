@@ -358,6 +358,10 @@ namespace NServiceBus.Testing
         /// </summary>
         public Saga<T> AssertSagaData<TSagaData>(Func<TSagaData, bool> check) where TSagaData : IContainSagaData
         {
+            if (!(saga.Entity is TSagaData))
+            {
+                throw new Exception($"Assert failed. Saga data type provided `{typeof(TSagaData)}` is not matching the actual saga type `{saga.Entity.GetType()}`");
+            }
             if (check((TSagaData)saga.Entity))
             {
                 return this;
