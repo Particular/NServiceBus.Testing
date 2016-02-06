@@ -354,6 +354,18 @@ namespace NServiceBus.Testing
         }
 
         /// <summary>
+        /// Assert that the saga data contains satisfies the predicate
+        /// </summary>
+        public Saga<T> AssertSagaData<TSagaData>(Func<TSagaData, bool> check) where TSagaData : IContainSagaData
+        {
+            if (check((TSagaData)saga.Entity))
+            {
+                return this;
+            }
+            throw new Exception("Assert failed. Saga data did not contain the expected values.");
+        }
+
+        /// <summary>
         /// Verifies that the saga is setting the specified timeout
         /// </summary>
         public Saga<T> ExpectTimeoutToBeSetIn<TMessage>(Func<TMessage, TimeSpan, bool> check = null)
