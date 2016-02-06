@@ -54,10 +54,10 @@
             Test.Saga<DiscountPolicy>()
                 .ExpectSend<ProcessOrder>(m => m.Total == total)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When(s => s.Handle(new SubmitOrder {Total = total}))
-                .ExpectSend<ProcessOrder>(m => m.Total == total*(decimal) 0.9)
+                .When(s => s.Handle(new SubmitOrder { Total = total }))
+                .ExpectSend<ProcessOrder>(m => m.Total == total * (decimal)0.9)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When(s => s.Handle(new SubmitOrder {Total = total}));
+                .When(s => s.Handle(new SubmitOrder { Total = total }));
         }
 
         [Test]
@@ -78,11 +78,11 @@
             Test.Saga<DiscountPolicy>()
                 .ExpectSend<ProcessOrder>(m => m.Total == total)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When(s => s.Handle(new SubmitOrder {Total = total}))
+                .When(s => s.Handle(new SubmitOrder { Total = total }))
                 .WhenSagaTimesOut()
                 .ExpectSend<ProcessOrder>(m => m.Total == total)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When(s => s.Handle(new SubmitOrder {Total = total}));
+                .When(s => s.Handle(new SubmitOrder { Total = total }));
         }
 
 
@@ -94,7 +94,7 @@
             Test.Saga<DiscountPolicy>()
                 .ExpectSendToDestination<ProcessOrder>((m, a) => m.Total == total && a.Queue == "remote.orderQueue")
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When(s => s.Handle(new SubmitOrder {Total = total, IsRemoteOrder = true}));
+                .When(s => s.Handle(new SubmitOrder { Total = total, IsRemoteOrder = true }));
         }
 
         [Test]
@@ -103,7 +103,7 @@
             decimal total = 100;
 
             Test.Saga<DiscountPolicy>()
-                .ExpectSendToDestination<ProcessOrder>((m, a) => 
+                .ExpectSendToDestination<ProcessOrder>((m, a) =>
                 {
                     Assert.That(() => m.Total, Is.EqualTo(total));
                     Assert.That(() => a.Queue, Is.EqualTo("remote.orderQueue"));
@@ -118,17 +118,17 @@
             Test.Saga<DiscountPolicy>()
                 .ExpectSend<ProcessOrder>(m => m.Total == 500)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When(s => s.Handle(new SubmitOrder {Total = 500}))
+                .When(s => s.Handle(new SubmitOrder { Total = 500 }))
                 .ExpectSend<ProcessOrder>(m => m.Total == 400)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When(s => s.Handle(new SubmitOrder {Total = 400}))
-                .ExpectSend<ProcessOrder>(m => m.Total == 300*(decimal) 0.9)
+                .When(s => s.Handle(new SubmitOrder { Total = 400 }))
+                .ExpectSend<ProcessOrder>(m => m.Total == 300 * (decimal)0.9)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When(s => s.Handle(new SubmitOrder {Total = 300}))
+                .When(s => s.Handle(new SubmitOrder { Total = 300 }))
                 .WhenSagaTimesOut()
                 .ExpectSend<ProcessOrder>(m => m.Total == 200)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When(s => s.Handle(new SubmitOrder {Total = 200}));
+                .When(s => s.Handle(new SubmitOrder { Total = 200 }));
         }
 
         [Test]
@@ -172,14 +172,26 @@
         }
 
         [Test]
-        public void ShouldPassAssertSagaData()
+        public void ShouldPassAssertSagaData_specifying_saga_data_type()
         {
             var orderId = Guid.NewGuid();
             var customerId = Guid.NewGuid();
             Test.Saga<DiscountPolicy>()
                 .AssertSagaData<DiscountPolicyData>(state => state.RunningTotal == 0M)
-                .When(s => s.Handle(new SubmitOrder {CustomerId = customerId, OrderId = orderId, Total = 123.99M}))
+                .When(s => s.Handle(new SubmitOrder { CustomerId = customerId, OrderId = orderId, Total = 123.99M }))
                 .AssertSagaData<DiscountPolicyData>(state => state.CustomerId == customerId && state.RunningTotal == 123.99M);
+        }
+
+        [Test]
+        public void ShouldPassAssertSagaData_without_specifying_saga_data_type()
+        {
+            var customerId = Guid.NewGuid();
+            Test.Saga<DiscountPolicy, DiscountPolicyData>()
+                .AssertSagaData(state => state.RunningTotal == 0M)
+                .When(s => s.Handle(new SubmitOrder { CustomerId = customerId, OrderId = Guid.NewGuid(), Total = 123.99M }))
+                .AssertSagaData(state => state.CustomerId == customerId && state.RunningTotal == 123.99M)
+                .When(s => s.Handle(new SubmitOrder { CustomerId = customerId, OrderId = Guid.NewGuid(), Total = 100.00M }))
+                .AssertSagaData(state => state.CustomerId == customerId && state.RunningTotal == 223.99M);
         }
     }
 
@@ -216,7 +228,7 @@
     {
         public class MySagaDataWithInterface : ContainSagaData
         {
-            
+
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaDataWithInterface> mapper)
@@ -263,7 +275,7 @@
         public string OriginalMessageId { get; set; }
     }
 
-    public interface StartsSagaWithInterface: IEvent
+    public interface StartsSagaWithInterface : IEvent
     {
         string Foo { get; set; }
     }
@@ -334,7 +346,7 @@
                                        {
                                            m.CustomerId = Data.CustomerId;
                                            m.OrderId = message.OrderId;
-                                           m.Total = message.Total*(decimal) 0.9;
+                                           m.Total = message.Total * (decimal)0.9;
                                        });
         }
 

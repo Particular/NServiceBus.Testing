@@ -5,6 +5,275 @@ namespace NServiceBus.Testing
     using Saga;
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TSaga"></typeparam>
+    /// <typeparam name="TSagaData"></typeparam>
+    public class Saga<TSaga, TSagaData> : Saga<TSaga> where TSaga : Saga, new()
+                                        where TSagaData : IContainSagaData, new()
+    {
+        internal Saga(TSaga saga, StubBus bus) : base(saga, bus)
+        {
+            Data = (TSagaData) saga.Entity;
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> When(Action<TSaga> sagaIsInvoked)
+        {
+            return (Saga<TSaga, TSagaData>) base.When(sagaIsInvoked);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> WithExternalDependencies(Action<TSaga> actionToSetUpExternalDependencies)
+        {
+            return (Saga<TSaga, TSagaData>) base.WithExternalDependencies(actionToSetUpExternalDependencies);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> WhenReceivesMessageFrom(string client)
+        {
+            return (Saga<TSaga, TSagaData>) base.WhenReceivesMessageFrom(client);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> SetIncomingHeader(string key, string value)
+        {
+            return (Saga<TSaga, TSagaData>) base.SetIncomingHeader(key, value);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> SetMessageId(string messageId)
+        {
+            return (Saga<TSaga, TSagaData>) base.SetMessageId(messageId);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectSend<TMessage>(Func<TMessage, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectSend(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectSend<TMessage>(Action<TMessage> check)
+        {
+            return (Saga<TSaga, TSagaData>)base.ExpectSend(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectNotSend<TMessage>(Func<TMessage, bool> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectNotSend(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectNotSend<TMessage>(Action<TMessage> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectNotSend(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectReply<TMessage>(Func<TMessage, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectReply(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectSendLocal<TMessage>(Func<TMessage, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectSendLocal(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectSendLocal<TMessage>(Action<TMessage> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectSendLocal(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectNotSendLocal<TMessage>(Func<TMessage, bool> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectNotSendLocal(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectNotSendLocal<TMessage>(Action<TMessage> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectNotSendLocal(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectSendToDestination<TMessage>(Func<TMessage, Address, bool> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectSendToDestination(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectSendToDestination<TMessage>(Action<TMessage, Address> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectSendToDestination(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectNotForwardCurrentMessageTo(Func<string, bool> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectNotForwardCurrentMessageTo(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectForwardCurrentMessageTo(Func<string, bool> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectForwardCurrentMessageTo(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectReplyToOriginator<TMessage>(Func<TMessage, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectReplyToOriginator(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectReplyToOriginator<TMessage>(Action<TMessage> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectReplyToOriginator(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectPublish<TMessage>(Func<TMessage, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectPublish(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectPublish<TMessage>(Action<TMessage> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectPublish(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectNotPublish<TMessage>(Func<TMessage, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectNotPublish(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectNotPublish<TMessage>(Action<TMessage> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectNotPublish(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectHandleCurrentMessageLater()
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectHandleCurrentMessageLater();
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> WhenHandling<TMessage>(Action<TMessage> initializeMessage = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.WhenHandling(initializeMessage);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> WhenSagaTimesOut()
+        {
+            return (Saga<TSaga, TSagaData>) base.WhenSagaTimesOut();
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> AssertSagaCompletionIs(bool complete)
+        {
+            return (Saga<TSaga, TSagaData>) base.AssertSagaCompletionIs(complete);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectTimeoutToBeSetIn<TMessage>(Func<TMessage, TimeSpan, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectTimeoutToBeSetIn(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectNoTimeoutToBeSetIn<TMessage>(Func<TMessage, TimeSpan, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectNoTimeoutToBeSetIn(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectTimeoutToBeSetIn<TMessage>(Action<TMessage, TimeSpan> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectTimeoutToBeSetIn(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectTimeoutToBeSetAt(check);
+        }
+
+        /// <summary>
+        /// </summary>
+        public new Saga<TSaga, TSagaData> ExpectNoTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectNoTimeoutToBeSetAt(check);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="check"></param>
+        /// <typeparam name="TMessage"></typeparam>
+        /// <returns></returns>
+        public new Saga<TSaga, TSagaData> ExpectTimeoutToBeSetAt<TMessage>(Action<TMessage, DateTime> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.ExpectTimeoutToBeSetAt(check);
+        }
+
+        /// <summary>
+        /// Saga data
+        /// </summary>
+        private TSagaData Data { get; set; }
+
+        /// <summary>
+        /// Assert that the saga data contains satisfies the predicate
+        /// </summary>
+        public Saga<TSaga, TSagaData> AssertSagaData(Func<TSagaData, bool> check)
+        {
+            return (Saga<TSaga, TSagaData>) base.AssertSagaData(check);
+        }
+    }
+
+    /// <summary>
     /// Saga unit testing framework.
     /// </summary>
     public class Saga<T> where T : Saga, new()
