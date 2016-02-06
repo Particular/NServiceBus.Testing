@@ -356,7 +356,7 @@ namespace NServiceBus.Testing
         /// <summary>
         /// Assert that the saga data contains satisfies the predicate
         /// </summary>
-        public Saga<T> AssertSagaData<TSagaData>(Func<TSagaData, bool> check) where TSagaData : IContainSagaData
+        public Saga<T> AssertSagaData<TSagaData>(Func<TSagaData, bool> check) where TSagaData : IContainSagaData, new()
         {
             if (!(saga.Entity is TSagaData))
             {
