@@ -116,6 +116,35 @@
         }
 
         /// <summary>
+        /// Begin the test script for a saga of of type T and saga data of type TSagaData
+        /// </summary>
+        public static Saga<T, TSagaData> Saga<T, TSagaData>() where T : Saga, new()
+                                                              where TSagaData : IContainSagaData, new()
+        {
+            var saga = (T)Activator.CreateInstance(typeof(T));
+
+            bus = new StubBus(messageCreator);
+
+            saga.Bus = Bus;
+
+            var prop = typeof(T).GetProperty("Data");
+
+            if (prop != null)
+            {
+                var sagaData = Activator.CreateInstance(prop.PropertyType) as IContainSagaData;
+
+                saga.Entity = sagaData;
+
+                if (saga.Entity != null)
+                {
+                    saga.Entity.Id = Guid.NewGuid();
+                }
+            }
+
+            return new Saga<T, TSagaData>(saga, bus);
+        }
+
+        /// <summary>
         ///     Begin the test script for a saga of type T while specifying the saga id.
         /// </summary>
         public static Saga<T> Saga<T>(Guid sagaId) where T : Saga, new()
