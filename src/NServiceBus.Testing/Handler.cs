@@ -10,7 +10,6 @@
     /// </summary>
     public class Handler<T>
     {
-        private readonly StubBus bus;
         private readonly T handler;
         private IDictionary<string, string> incomingHeaders = new Dictionary<string, string>();
         private IList<IExpectedInvocation> expectedInvocations = new List<IExpectedInvocation>();
@@ -18,10 +17,9 @@
         /// <summary>
         /// Creates a new instance of the handler tester.
         /// </summary>
-        internal Handler(T handler, StubBus bus)
+        internal Handler(T handler)
         {
             this.handler = handler;
-            this.bus = bus;
         }
 
         /// <summary>
@@ -112,7 +110,7 @@
         /// <summary>
         /// Check that the handler sends the given message type to the appropriate destination.
         /// </summary>
-        public Handler<T> ExpectSendToDestination<TMessage>(Func<TMessage, Address, bool> check)
+        public Handler<T> ExpectSendToDestination<TMessage>(Func<TMessage, string, bool> check)
         {
             expectedInvocations.Add(new ExpectedSendToDestinationInvocation<TMessage> { Check = check });
             return this;
@@ -240,8 +238,7 @@
         /// </summary>
         public void OnMessage<TMessage>(string messageId, Action<TMessage> initializeMessage = null)
         {
-            var msg = bus.CreateInstance(initializeMessage);
-            OnMessage(msg, messageId);
+            OnMessage(messageId, messageId);
         }
 
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
@@ -259,30 +256,30 @@
         /// </summary>
         public void OnMessage<TMessage>(TMessage message, string messageId)
         {
-            var context = new MessageContext { Id = messageId, ReturnAddress = "client", Headers = incomingHeaders };
-            bus.CurrentMessageContext = context;
+            //var context = new MessageContext { Id = messageId, ReturnAddress = "client", Headers = incomingHeaders };
+            //bus.CurrentMessageContext = context;
 
-            foreach (var keyValuePair in incomingHeaders)
-            {
-                bus.SetHeaderAction(message, keyValuePair.Key, keyValuePair.Value);
-            }
+            //foreach (var keyValuePair in incomingHeaders)
+            //{
+            //    bus.SetHeaderAction(message, keyValuePair.Key, keyValuePair.Value);
+            //}
 
-            ExtensionMethods.CurrentMessageBeingHandled = message;
+            //ExtensionMethods.CurrentMessageBeingHandled = message;
 
-            try
-            {
-                var method = GetMessageHandler(handler.GetType(), typeof(TMessage));
-                method.Invoke(handler, new object[] {message});
-            }
-            catch (TargetInvocationException e)
-            {
-                throw e.InnerException;
-            }
+            //try
+            //{
+            //    var method = GetMessageHandler(handler.GetType(), typeof(TMessage));
+            //    method.Invoke(handler, new object[] {message});
+            //}
+            //catch (TargetInvocationException e)
+            //{
+            //    throw e.InnerException;
+            //}
 
-            bus.ValidateAndReset(expectedInvocations);
-            expectedInvocations.Clear();
+            //bus.ValidateAndReset(expectedInvocations);
+            //expectedInvocations.Clear();
 
-            ExtensionMethods.CurrentMessageBeingHandled = null;
+            //ExtensionMethods.CurrentMessageBeingHandled = null;
         }
 
         private static MethodInfo GetMessageHandler(Type targetType, Type messageType)

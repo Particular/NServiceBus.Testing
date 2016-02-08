@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Testing.Tests
 {
+    using System.Threading.Tasks;
     using NUnit.Framework;
 
     [TestFixture]
@@ -27,12 +28,12 @@
 
         public class MyCommandHandler : IHandleMessages<MyCommand>
         {
-            public IBus Bus { get; set; }
-
-            public void Handle(MyCommand message)
+            public Task Handle(MyCommand message, IMessageHandlerContext context)
             {
-                message.Header1 = Bus.GetMessageHeader(message, "Key1");
-                message.Header2 = Bus.GetMessageHeader(message, "Key2");
+                message.Header1 = context.MessageHeaders["Key1"];
+                message.Header2 = context.MessageHeaders["Key2"];
+
+                return Task.FromResult(0);
             }
         }
     }

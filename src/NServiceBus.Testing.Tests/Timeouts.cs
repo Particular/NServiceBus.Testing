@@ -2,7 +2,6 @@
 {
     using System;
     using NUnit.Framework;
-    using Saga;
 
     [TestFixture]
     public class Timeouts : BaseTests

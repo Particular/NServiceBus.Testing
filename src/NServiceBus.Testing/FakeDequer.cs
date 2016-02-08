@@ -1,24 +1,23 @@
 namespace NServiceBus.Testing
 {
     using System;
+    using System.Threading.Tasks;
     using Transports;
-    using Unicast.Transport;
 
-    class FakeDequer : IDequeueMessages
+    class FakeDequer : IPushMessages
     {
-        public void Init(Address address, TransactionSettings transactionSettings, Func<TransportMessage, bool> tryProcessMessage, Action<TransportMessage, Exception> endProcessMessage)
+        public Task Init(Func<PushContext, Task> pipe, CriticalError criticalError, PushSettings settings)
         {
-
+            return Task.FromResult(0);
         }
 
-        public void Start(int maximumConcurrencyLevel)
+        public void Start(PushRuntimeSettings limitations)
         {
-
         }
 
-        public void Stop()
+        public Task Stop()
         {
-
+            return Task.FromResult(0);
         }
     }
 }

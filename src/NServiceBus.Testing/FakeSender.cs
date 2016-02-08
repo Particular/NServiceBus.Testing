@@ -1,13 +1,14 @@
 namespace NServiceBus.Testing
 {
+    using System.Threading.Tasks;
+    using NServiceBus.Extensibility;
     using Transports;
-    using Unicast;
 
-    class FakeSender : ISendMessages
+    class FakeSender : IDispatchMessages
     {
-        public void Send(TransportMessage message, SendOptions sendOptions)
+        public Task Dispatch(TransportOperations outgoingMessages, ContextBag context)
         {
-
+            return Task.FromResult(0);
         }
     }
 }

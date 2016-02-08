@@ -1,12 +1,13 @@
 namespace NServiceBus.Testing
 {
+    using System.Threading.Tasks;
     using Transports;
 
     class FakeQueueCreator : ICreateQueues
     {
-        public void CreateQueueIfNecessary(Address address, string account)
+        public Task CreateQueueIfNecessary(QueueBindings queueBindings, string identity)
         {
-            //no-op
+            return Task.FromResult(0);
         }
     }
 }
