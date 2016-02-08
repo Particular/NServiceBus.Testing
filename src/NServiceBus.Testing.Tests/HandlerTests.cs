@@ -1,10 +1,11 @@
 namespace NServiceBus.Testing.Tests
 {
     using System;
+    using System.Threading.Tasks;
     using NUnit.Framework;
 
     [TestFixture]
-    public class TestHandlerFixture : BaseTests
+    public class HandlerTests
     {
         [Test]
         public void ShouldAssertDoNotContinueDispatchingCurrentMessageToHandlersWasCalled()
@@ -43,7 +44,7 @@ namespace NServiceBus.Testing.Tests
         [Test]
         public void ShouldAssertDeferWasCalledWithDateTime()
         {
-            var datetime = DateTime.Now;
+            var datetime = DateTime.UtcNow;
             Test.Handler<DeferringDateTimeHandler>()
                 .WithExternalDependencies(h => h.Defer = datetime)
                 .ExpectDefer<TestMessage>((m, t) => t == datetime)
@@ -62,7 +63,7 @@ namespace NServiceBus.Testing.Tests
         [Test]
         public void ShouldFailAssertingDeferWasCalledWithDateTime()
         {
-            var datetime = DateTime.Now;
+            var datetime = DateTime.UtcNow;
             Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
                 .ExpectDefer<TestMessage>((m, t) => t == datetime)
                 .OnMessage<TestMessage>());
@@ -80,7 +81,7 @@ namespace NServiceBus.Testing.Tests
         [Test]
         public void ShouldAssertDeferWasNotCalledWithDateTime()
         {
-            var datetime = DateTime.Now;
+            var datetime = DateTime.UtcNow;
             Test.Handler<EmptyHandler>()
                 .ExpectNotDefer<TestMessage>((m, t) => t == datetime)
                 .OnMessage<TestMessage>();
@@ -99,7 +100,7 @@ namespace NServiceBus.Testing.Tests
         [Test]
         public void ShouldFailAssertingDeferWasNotCalledWithDateTime()
         {
-            var datetime = DateTime.Now;
+            var datetime = DateTime.UtcNow;
             Assert.Throws<Exception>(() => Test.Handler<DeferringDateTimeHandler>()
                 .WithExternalDependencies(h => h.Defer = datetime)
                 .ExpectNotDefer<TestMessage>((m, t) => t == datetime)
@@ -121,6 +122,22 @@ namespace NServiceBus.Testing.Tests
             Assert.IsFalse(handler.IsHandled);
             Test.Handler(handler).OnMessage<TestMessage>();
             Assert.IsTrue(handler.IsHandled);
+        }
+
+        [Test]
+        public void ShouldReplyWhenReceivingAMessage()
+        {
+            Test.Handler<ReplyingHandler>()
+                .ExpectReply<MyReply>(reply => reply != null)
+                .OnMessage(new MyRequest { ShouldReply = true });
+        }
+
+        [Test]
+        public void ShouldNotReplyWhenReceivingAWrongMessage()
+        {
+            Test.Handler<ReplyingHandler>()
+                .ExpectNotReply<MyReply>(reply => reply == null)
+                .OnMessage(new MyRequest { ShouldReply = false });
         }
 
         [Test]
@@ -249,6 +266,38 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
+        public void ShouldFailExpectSendLocalIfNotSendingLocal()
+        {
+            Assert.Throws<Exception>(() => Test.Handler<SendingHandler<Send1>>()
+                .ExpectSendLocal<Send1>(m => true)
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldPassExpectSendLocalIfSendingLocal()
+        {
+            Test.Handler<SendingLocalHandler<Send1>>()
+                .ExpectSendLocal<Send1>(m => true)
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldFailExpectSendLocalIfSendingLocalWithoutMatch()
+        {
+            Assert.Throws<Exception>(() => Test.Handler<SendingLocalHandler<Publish1>>()
+                .ExpectSendLocal<Send1>(m => true)
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldFailExpectSendLocalIfSendingLocalWithFailingCheck()
+        {
+            Assert.Throws<Exception>(() => Test.Handler<SendingLocalHandler<Send1>>()
+                .ExpectSendLocal<Send1>(m => false)
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
         public void ShouldPassExpectNotSendLocalIfNotSendingLocal()
         {
             Test.Handler<EmptyHandler>()
@@ -269,6 +318,14 @@ namespace NServiceBus.Testing.Tests
         {
             Test.Handler<SendingLocalHandler<Publish1>>()
                 .ExpectNotSendLocal<Send1>(m => true)
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectNotSendLocalIfSendingLocalWithFailingCheck()
+        {
+            Test.Handler<SendingLocalHandler<Send1>>()
+                .ExpectNotSendLocal<Send1>(m => false)
                 .OnMessage<TestMessage>();
         }
 
@@ -419,14 +476,46 @@ namespace NServiceBus.Testing.Tests
                 .OnMessage<TestMessage>();
         }
 
+        [Test]
+        public void SendMessageWithMultiIncomingHeaders()
+        {
+            var command = new MyCommand();
+
+            Test.Handler<MyCommandHandler>()
+                .SetIncomingHeader("Key1", "Header1")
+                .SetIncomingHeader("Key2", "Header2")
+                .OnMessage(command);
+
+            Assert.AreEqual("Header1", command.Header1);
+            Assert.AreEqual("Header2", command.Header2);
+        }
+
+        private class MyCommand : ICommand
+        {
+            public string Header1 { get; set; }
+            public string Header2 { get; set; }
+        }
+
+        private class MyCommandHandler : IHandleMessages<MyCommand>
+        {
+            public Task Handle(MyCommand message, IMessageHandlerContext context)
+            {
+                message.Header1 = context.MessageHeaders["Key1"];
+                message.Header2 = context.MessageHeaders["Key2"];
+
+                return Task.FromResult(0);
+            }
+        }
+
         private class TestMessageImpl : TestMessage
         {
         }
 
         public class EmptyHandler : IHandleMessages<TestMessage>
         {
-            public void Handle(TestMessage message)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
+                return Task.FromResult(0);
             }
         }
 
@@ -461,110 +550,90 @@ namespace NServiceBus.Testing.Tests
 
         public class DeferringTimeSpanHandler : IHandleMessages<TestMessage>
         {
-            public IBus Bus { get; set; }
             public TimeSpan Defer { get; set; }
 
-            public void Handle(TestMessage message)
+            public async Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.Defer(Defer, message);
+                var sendOptions = new SendOptions();
+                sendOptions.DelayDeliveryWith(Defer);
+
+                await context.Send(message, sendOptions);
             }
         }
 
         public class DeferringDateTimeHandler : IHandleMessages<TestMessage>
         {
-            public IBus Bus { get; set; }
             public DateTime Defer { get; set; }
 
-            public void Handle(TestMessage message)
+            public async Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.Defer(Defer, message);
+                var sendOptions = new SendOptions();
+                sendOptions.DoNotDeliverBefore(Defer);
+
+                await context.Send(message, sendOptions);
             }
         }
 
         public class PublishingManyHandler : IHandleMessages<Incoming>
         {
-            public IBus Bus { get; set; }
-            public void Handle(Incoming message)
+            public async Task Handle(Incoming message, IMessageHandlerContext context)
             {
-                Bus.Publish<Outgoing>(m =>
-                {
-                    m.Number = 1;
-                });
-                Bus.Publish<Outgoing>(m =>
-                {
-                    m.Number = 2;
-                });
+                await context.Publish<Outgoing>(m => { m.Number = 1; });
+
+                await context.Publish<Outgoing>(m => { m.Number = 2; });
             }
         }
 
         public class SendingManyWithDifferentMessagesHandler : IHandleMessages<Incoming>
         {
-            public IBus Bus { get; set; }
-
-            public void Handle(Incoming message)
+            public async Task Handle(Incoming message, IMessageHandlerContext context)
             {
-                Bus.Send<Outgoing>(m =>
-                {
-                    m.Number = 1;
-                });
-                Bus.Send<Outgoing2>(m =>
-                {
-                    m.Number = 2;
-                });
+                await context.Send<Outgoing>(m => { m.Number = 1; });
+
+                await context.Send<Outgoing2>(m => { m.Number = 2; });
             }
         }
 
         public class SendingManyHandler : IHandleMessages<Incoming>
         {
-            public IBus Bus { get; set; }
-
-            public void Handle(Incoming message)
+            public async Task Handle(Incoming message, IMessageHandlerContext context)
             {
-                Bus.Send<Outgoing>(m =>
-                {
-                    m.Number = 1;
-                });
+                await context.Send<Outgoing>(m => { m.Number = 1; });
 
-                Bus.Send<Outgoing>(m =>
-                {
-                    m.Number = 2;
-                });
+                await context.Send<Outgoing>(m => { m.Number = 2; });
             }
         }
 
         public class SendingHandler<TSend> : IHandleMessages<TestMessage>
             where TSend : IMessage
         {
-            public IBus Bus { get; set; }
-            public Action<TSend> ModifyPublish { get; set; }
+            public Action<TSend> ModifyPublish { get; set; } = m => { };
 
-            public void Handle(TestMessage message)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.Send(ModifyPublish);
+                return context.Send(ModifyPublish);
             }
         }
 
         public class SendingLocalHandler<TSend> : IHandleMessages<TestMessage>
             where TSend : IMessage
         {
-            public IBus Bus { get; set; }
-            public Action<TSend> ModifyPublish { get; set; }
+            public Action<TSend> ModifyMessage { get; set; } = m => { };
 
-            public void Handle(TestMessage message)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.SendLocal(ModifyPublish);
+                return context.SendLocal(ModifyMessage);
             }
         }
 
         public class PublishingHandler<TPublish> : IHandleMessages<TestMessage>
             where TPublish : IMessage
         {
-            public IBus Bus { get; set; }
-            public Action<TPublish> ModifyPublish { get; set; }
+            public Action<TPublish> ModifyPublish { get; set; } = m => { };
 
-            public void Handle(TestMessage message)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.Publish(ModifyPublish);
+                return context.Publish(ModifyPublish);
             }
         }
 
@@ -572,45 +641,43 @@ namespace NServiceBus.Testing.Tests
             where TPublish1 : IMessage
             where TPublish2 : IMessage
         {
-            public IBus Bus { get; set; }
-            public Action<TPublish1> ModifyPublish1 { get; set; }
-            public Action<TPublish2> ModifyPublish2 { get; set; }
+            public Action<TPublish1> ModifyPublish1 { get; set; } = m => { };
+            public Action<TPublish2> ModifyPublish2 { get; set; } = m => { };
 
-            public void Handle(TestMessage message)
+            public async Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.Publish(ModifyPublish1);
-                Bus.Publish(ModifyPublish2);
+                await context.Publish(ModifyPublish1);
+                await context.Publish(ModifyPublish2);
             }
         }
 
         public class DoNotContinueDispatchingCurrentMessageToHandlersHandler : IHandleMessages<TestMessage>
         {
-            public IBus Bus { get; set; }
-
-            public void Handle(TestMessage message)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.DoNotContinueDispatchingCurrentMessageToHandlers();
+                context.DoNotContinueDispatchingCurrentMessageToHandlers();
+
+                return Task.FromResult(0);
             }
         }
 
         public class HandleCurrentMessageLaterHandler : IHandleMessages<TestMessage>
         {
-            public IBus Bus { get; set; }
-
-            public void Handle(TestMessage message)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.HandleCurrentMessageLater();
+                return context.HandleCurrentMessageLater();
             }
         }
 
         public class ExplicitInterfaceImplementation : IHandleMessages<TestMessage>
         {
-
             public bool IsHandled { get; set; }
 
-            void IHandleMessages<TestMessage>.Handle(TestMessage message)
+            Task IHandleMessages<TestMessage>.Handle(TestMessage message, IMessageHandlerContext context)
             {
                 IsHandled = true;
+
+                return Task.FromResult(0);
             }
 
             // Unit test fails if this is uncommented; seems to me that this should
@@ -624,8 +691,9 @@ namespace NServiceBus.Testing.Tests
 
         public class NotForwardingMessageHandler : IHandleMessages<TestMessage>
         {
-            public void Handle(TestMessage message)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
+                return Task.FromResult(0);
             }
         }
 
@@ -638,31 +706,35 @@ namespace NServiceBus.Testing.Tests
                 this.destination = destination;
             }
 
-            public IBus Bus { get; set; }
-
-            public void Handle(TestMessage message)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.ForwardCurrentMessageTo(destination);
+                return context.ForwardCurrentMessageTo(destination);
             }
         }
 
         public class MultipleForwardingsMessageHandler : IHandleMessages<TestMessage>
         {
-            public IBus Bus { get; set; }
-
-            public void Handle(TestMessage message)
+            public async Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                Bus.ForwardCurrentMessageTo("dest1");
-                Bus.ForwardCurrentMessageTo("dest2");
+                await context.ForwardCurrentMessageTo("dest1");
+                await context.ForwardCurrentMessageTo("dest2");
+            }
+        }
+
+        public class ReplyingHandler : IHandleMessages<MyRequest>
+        {
+            public Task Handle(MyRequest message, IMessageHandlerContext context)
+            {
+                return message.ShouldReply ? context.Reply(new MyReply()) : Task.FromResult(0);
             }
         }
     }
 
     public class DataBusMessageHandler : IHandleMessages<MessageWithDataBusProperty>
     {
-        public void Handle(MessageWithDataBusProperty message)
+        public Task Handle(MessageWithDataBusProperty message, IMessageHandlerContext context)
         {
-
+            return Task.FromResult(0);
         }
     }
 
@@ -672,19 +744,18 @@ namespace NServiceBus.Testing.Tests
 
     public class MessageWithDataBusProperty : IMessage
     {
-        public DataBusProperty<byte[]> ALargeByteArray { get; set; }
     }
 
     public class TestMessageWithPropertiesHandler : IHandleMessages<TestMessageWithProperties>
     {
-        public IBus Bus { get; set; }
         public string ReceivedDummyValue;
         public string AssignedMessageId;
 
-        public void Handle(TestMessageWithProperties message)
+        public Task Handle(TestMessageWithProperties message, IMessageHandlerContext context)
         {
             ReceivedDummyValue = message.Dummy;
-            AssignedMessageId = Bus.CurrentMessageContext.Id;
+            AssignedMessageId = context.MessageId;
+            return Task.FromResult(0);
         }
     }
 

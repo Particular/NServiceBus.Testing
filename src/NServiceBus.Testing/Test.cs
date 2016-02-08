@@ -1,122 +1,32 @@
 ﻿namespace NServiceBus.Testing
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using DataBus.InMemory;
-    using Features;
-    using MessageInterfaces;
-    using NServiceBus.Unicast;
-    using Saga;
+    using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
 
     /// <summary>
-    ///     Entry class used for unit testing
+    /// Entry class used for unit testing
     /// </summary>
-    public static class Test
+    public class Test
     {
         /// <summary>
-        ///     Get the reference to the bus used for testing.
+        /// Begin the test script for a saga of type T.
         /// </summary>
-        public static IBus Bus
+        public static Saga<TSaga> Saga<TSaga>() where TSaga : Saga, new()
         {
-            get { return bus; }
+            return new Saga<TSaga>(new TSaga());
         }
 
         /// <summary>
-        ///     Initializes the testing infrastructure.
+        /// Begin the test script for the passed in saga instance.
+        /// Callers need to instantiate the saga's data class as well as give it an ID.
         /// </summary>
-        public static void Initialize(Action<BusConfiguration> customisations = null)
+        public static Saga<TSaga> Saga<TSaga>(TSaga saga) where TSaga : Saga, new()
         {
-            if (customisations == null)
-            {
-                customisations = o => {};
-            }
-
-            var configuration = new BusConfiguration();
-
-            configuration.EndpointName("UnitTests");
-            configuration.CustomConfigurationSource(testConfigurationSource);
-            configuration.DiscardFailedMessagesInsteadOfSendingToErrorQueue();
-            configuration.DisableFeature<Sagas>();
-            configuration.DisableFeature<Audit>();
-            configuration.UseTransport<FakeTestTransport>();
-            configuration.UsePersistence<InMemoryPersistence>();
-            configuration.RegisterEncryptionService(b => new FakeEncryptor());
-            configuration.RegisterComponents(r =>
-            {
-                r.ConfigureComponent<InMemoryDataBus>(DependencyLifecycle.SingleInstance);
-                r.ConfigureComponent<FakeQueueCreator>(DependencyLifecycle.InstancePerCall);
-                r.ConfigureComponent<FakeDequer>(DependencyLifecycle.InstancePerCall);
-                r.ConfigureComponent<FakeSender>(DependencyLifecycle.InstancePerCall);
-            });
-            customisations(configuration);
-
-            if (initialized)
-            {
-                return;
-            }
-
-            var bus = NServiceBus.Bus.Create(configuration);
-
-            var mapper = ((UnicastBus)bus).Builder.Build<IMessageMapper>();
-
-            messageCreator = mapper;
-
-            initialized = true;
-        }
-        
-        // ReSharper disable UnusedParameter.Global
-
-        /// <summary>
-        ///     Initializes the testing infrastructure specifying which assemblies to scan.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "6",
-            TreatAsErrorFromVersion = "5",
-            Replacement = "Initialize(Action<Configure.ConfigurationBuilder> customisations)")]
-        public static void Initialize(IEnumerable<Assembly> assemblies)
-        {
-            throw new NotImplementedException();
+            return new Saga<TSaga>(saga);
         }
 
         /// <summary>
-        ///     Initializes the testing infrastructure specifying which assemblies to scan.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "6",
-            TreatAsErrorFromVersion = "5",
-            Replacement = "Initialize(Action<Configure.ConfigurationBuilder> customisations)")]
-        public static void Initialize(params Assembly[] assemblies)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        ///     Initializes the testing infrastructure specifying which types to scan.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "6",
-            TreatAsErrorFromVersion = "5",
-            Replacement = "Initialize(Action<Configure.ConfigurationBuilder> customisations)")]
-        public static void Initialize(params Type[] types)
-        {
-            throw new NotImplementedException();
-        }
-        // ReSharper restore UnusedParameter.Global
-
-     
-
-        /// <summary>
-        ///     Begin the test script for a saga of type T.
-        /// </summary>
-        public static Saga<T> Saga<T>() where T : Saga, new()
-        {
-            return Saga<T>(Guid.NewGuid());
-        }
-
-        /// <summary>
-        ///     Begin the test script for a saga of type T while specifying the saga id.
+        /// Begin the test script for a saga of type T while specifying the saga id.
         /// </summary>
         public static Saga<T> Saga<T>(Guid sagaId) where T : Saga, new()
         {
@@ -140,75 +50,24 @@
         }
 
         /// <summary>
-        ///     Begin the test script for the passed in saga instance.
-        ///     Callers need to instantiate the saga's data class as well as give it an ID.
+        /// Specify a test for a message handler of type T for a given message of type TMessage.
         /// </summary>
-        public static Saga<T> Saga<T>(T saga) where T : Saga, new()
+        public static Handler<THandler> Handler<THandler>() where THandler : new()
         {
-            bus = new StubBus(messageCreator);
-
-            saga.Bus = Bus;
-
-            return new Saga<T>(saga, bus);
+            return Handler(new THandler());
         }
 
         /// <summary>
-        ///     Specify a test for a message handler of type T for a given message of type TMessage.
+        /// Specify a test for a message handler while supplying the instance to
+        /// test - injects the bus into a public property (if it exists).
         /// </summary>
-        public static Handler<T> Handler<T>() where T : new()
+        public static Handler<THandler> Handler<THandler>(THandler handler)
         {
-            var handler = (T)Activator.CreateInstance(typeof(T));
-
-            return Handler(handler);
+            return new Handler<THandler>(handler);
         }
 
         /// <summary>
-        ///     Specify a test for a message handler while supplying the instance to
-        ///     test - injects the bus into a public property (if it exists).
-        /// </summary>
-        public static Handler<T> Handler<T>(T handler)
-        {
-            Func<IBus, T> handlerCreator = b => handler;
-            var prop = typeof(T).GetProperties().FirstOrDefault(p => p.PropertyType == typeof(IBus));
-            if (prop != null)
-            {
-                handlerCreator = b =>
-                {
-                    prop.SetValue(handler, b, null);
-                    return handler;
-                };
-            }
-
-            return Handler(handlerCreator);
-        }
-
-        /// <summary>
-        ///     Specify a test for a message handler specifying a callback to create
-        ///     the handler and getting an instance of the bus passed in.
-        ///     Useful for handlers based on constructor injection.
-        /// </summary>
-        public static Handler<T> Handler<T>(Func<IBus, T> handlerCreationCallback)
-        {
-            bus = new StubBus(messageCreator);
-
-            var handler = handlerCreationCallback.Invoke(bus);
-
-            var isHandler = (from i in handler.GetType().GetInterfaces()
-                             let args = i.GetGenericArguments()
-                             where args.Length == 1
-                             where typeof(IHandleMessages<>).MakeGenericType(args[0]).IsAssignableFrom(i)
-                             select i).Any();
-
-            if (!isHandler)
-            {
-                throw new ArgumentException("The handler object created does not implement IHandleMessages<T>.", "handlerCreationCallback");
-            }
-
-            return new Handler<T>(handler, bus);
-        }
-
-        /// <summary>
-        ///     Instantiate a new message of type TMessage.
+        /// Instantiate a new message of type TMessage.
         /// </summary>
         public static TMessage CreateInstance<TMessage>()
         {
@@ -216,19 +75,27 @@
         }
 
         /// <summary>
-        ///     Instantiate a new message of type TMessage performing the given action
-        ///     on the created message.
+        /// Instantiate a new message of type TMessage performing the given action
+        /// on the created message.
         /// </summary>
         public static TMessage CreateInstance<TMessage>(Action<TMessage> action)
         {
             return messageCreator.CreateInstance(action);
         }
 
-        [ThreadStatic]
-        static StubBus bus;
+        /// <summary>
+        /// Specify a test for a message handler specifying a callback to create
+        /// the handler and getting an instance of the bus passed in.
+        /// Useful for handlers based on constructor injection.
+        /// </summary>
+        [ObsoleteEx(
+            RemoveInVersion = "7",
+            TreatAsErrorFromVersion = "6")]
+        public static Handler<T> Handler<T>(Func<IMessageSession, T> handlerCreationCallback)
+        {
+            throw new NotImplementedException();
+        }
 
-        static IMessageCreator messageCreator;
-        static readonly TestConfigurationSource testConfigurationSource = new TestConfigurationSource();
-        static bool initialized;
+        static IMessageCreator messageCreator = new MessageMapper();
     }
 }
