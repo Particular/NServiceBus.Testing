@@ -13,9 +13,11 @@
         /// <typeparam name="THandler"></typeparam>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public static Handler<THandler> Handler<THandler>()
+        public static Handler<THandler> Handler<THandler>() where THandler: new()
         {
-            throw new NotImplementedException();
+            var instance = new THandler();
+
+            return Handler(instance);
         }
 
         /// <summary>
@@ -27,7 +29,7 @@
         /// <exception cref="NotImplementedException"></exception>
         public static Handler<THandler> Handler<THandler>(THandler handler)
         {
-            throw new NotImplementedException();
+            return new Handler<THandler>(handler);
         }
 
         /// <summary>
@@ -38,16 +40,6 @@
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         public Test SetIncomingHeader(string key1, string header1)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public static Test Initialize()
         {
             throw new NotImplementedException();
         }

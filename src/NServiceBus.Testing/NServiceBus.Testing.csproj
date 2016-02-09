@@ -83,6 +83,7 @@
     <Compile Include="Saga.cs" />
     <Compile Include="StubBus.cs" />
     <Compile Include="Test.cs" />
+    <Compile Include="TestableMessageHandlerContext.cs" />
     <Compile Include="TestConfigurationSource.cs" />
     <Compile Include="TimeoutManager.cs" />
   </ItemGroup>

@@ -5,7 +5,7 @@ namespace NServiceBus.Testing.Tests
     using NUnit.Framework;
 
     [TestFixture]
-    public class TestHandlerFixture : BaseTests
+    public class TestHandlerFixture
     {
         [Test]
         public void ShouldAssertDoNotContinueDispatchingCurrentMessageToHandlersWasCalled()

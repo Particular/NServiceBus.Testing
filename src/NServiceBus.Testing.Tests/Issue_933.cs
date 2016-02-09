@@ -4,7 +4,7 @@
     using NUnit.Framework;
 
     [TestFixture]
-    public class Issue_933 : BaseTests
+    public class Issue_933
     {
         [Test]
         public void SendMessageWithMultiIncomingHeaders()
