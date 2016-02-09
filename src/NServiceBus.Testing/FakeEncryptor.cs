@@ -2,7 +2,7 @@ namespace NServiceBus.Testing
 {
     using Encryption;
 
-    class FakeEncryptor : IEncryptionService
+    public class FakeEncryptor : IEncryptionService
     {
         public EncryptedValue Encrypt(string value)
         {
