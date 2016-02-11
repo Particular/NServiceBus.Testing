@@ -1,359 +1,392 @@
-﻿//namespace NServiceBus.Testing.Tests
-//{
-//    using System;
-//    using NUnit.Framework;
-//    using Saga;
+﻿namespace NServiceBus.Testing.Tests
+{
+    using System;
+    using System.Threading.Tasks;
+    using NUnit.Framework;
 
-//    [TestFixture]
-//    class SagaTests : BaseTests
-//    {
-//        [Test]
-//        public void MySaga()
-//        {
-//            Test.Saga<MySaga>()
-//                .ExpectReplyToOriginator<ResponseToOriginator>()
-//                .ExpectTimeoutToBeSetIn<StartsSaga>((state, span) => span == TimeSpan.FromDays(7))
-//                .ExpectPublish<Event>()
-//                .ExpectSend<Command>()
-//                .When(s => s.Handle(new StartsSaga()))
-//                .ExpectPublish<Event>()
-//                .WhenSagaTimesOut()
-//                .AssertSagaCompletionIs(true);
-//        }
+    [TestFixture]
+    class SagaTests
+    {
+        [Test]
+        public void MySaga()
+        {
+            Test.Saga<MySaga>()
+                .ExpectReplyToOriginator<ResponseToOriginator>()
+                .ExpectTimeoutToBeSetIn<StartsSaga>((state, span) => span == TimeSpan.FromDays(7))
+                .ExpectPublish<Event>()
+                .ExpectSend<Command>()
+                .When((s, c) => s.Handle(new StartsSaga(), c))
+                .ExpectPublish<Event>()
+                .WhenSagaTimesOut()
+                .AssertSagaCompletionIs(true);
+        }
 
-//        [Test]
-//        public void MySagaWithActions()
-//        {
-//            Test.Saga<MySaga>()
-//                .ExpectTimeoutToBeSetIn<StartsSaga>(
-//                    (state, span) => Assert.That(() => span, Is.EqualTo(TimeSpan.FromDays(7))))
-//                .When(s => s.Handle(new StartsSaga()));
-//        }
+        [Test]
+        public void MySagaWithActions()
+        {
+            Test.Saga<MySaga>()
+                .ExpectTimeoutToBeSetIn<StartsSaga>((state, span) => Assert.That(() => span, Is.EqualTo(TimeSpan.FromDays(7))))
+                .When((s, c) => s.Handle(new StartsSaga(), c));
+        }
 
-//        [Test]
-//        public void SagaThatIsStartedWithInterface()
-//        {
-//            Test.Saga<MySagaWithInterface>()
-//                .ExpectSend<Command>()
-//                .WhenHandling<StartsSagaWithInterface>(m => m.Foo = "Hello");
-//        }
+        [Test]
+        public void SagaThatIsStartedWithInterface()
+        {
+            Test.Saga<MySagaWithInterface>()
+                .ExpectSend<Command>()
+                .WhenHandling<StartsSagaWithInterface>(m => m.Foo = "Hello");
+        }
 
-//        [Test]
-//        public void SagaThatDoesAReply()
-//        {
-//            Test.Saga<SagaThatDoesAReply>()
-//                .ExpectReply<MyReply>(reply => reply != null)
-//                .When(s => s.Handle(new MyRequest()));
-//        }
+        [Test]
+        public void SagaThatDoesAReply()
+        {
+            Test.Saga<SagaThatDoesAReply>()
+                .ExpectReply<MyReply>(reply => reply != null)
+                .When((s, c) => s.Handle(new MyRequest(), c));
+        }
 
-//        [Test]
-//        public void DiscountTest()
-//        {
-//            decimal total = 600;
+        [Test]
+        public void DiscountTest()
+        {
+            decimal total = 600;
 
-//            Test.Saga<DiscountPolicy>()
-//                .ExpectSend<ProcessOrder>(m => m.Total == total)
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder {Total = total}))
-//                .ExpectSend<ProcessOrder>(m => m.Total == total*(decimal) 0.9)
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder {Total = total}));
-//        }
+            // Todo: I'm not keen on this :/
+            Test.Saga<DiscountPolicy>()
+                .ExpectSend<ProcessOrder>(m => m.Total == total)
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder { Total = total }, c))
+                .ExpectSend<ProcessOrder>(m => m.Total == total * (decimal)0.9)
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder { Total = total }, c));
+        }
 
-//        [Test]
-//        public void DiscountTestWithActions()
-//        {
-//            decimal total = 600;
+        [Test]
+        public void DiscountTestWithActions()
+        {
+            decimal total = 600;
 
-//            Test.Saga<DiscountPolicy>()
-//                .ExpectSend<ProcessOrder>(m => Assert.That(() => m.Total, Is.EqualTo(total)))
-//                .When(s => s.Handle(new SubmitOrder { Total = total }));
-//        }
+            Test.Saga<DiscountPolicy>()
+                .ExpectSend<ProcessOrder>(m => Assert.That(() => m.Total, Is.EqualTo(total)))
+                .When((s, c) => s.Handle(new SubmitOrder { Total = total }, c));
+        }
 
-//        [Test]
-//        public void DiscountTestWithTimeout()
-//        {
-//            decimal total = 600;
+        [Test]
+        public void DiscountTestWithTimeout()
+        {
+            decimal total = 600;
 
-//            Test.Saga<DiscountPolicy>()
-//                .ExpectSend<ProcessOrder>(m => m.Total == total)
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder {Total = total}))
-//                .WhenSagaTimesOut()
-//                .ExpectSend<ProcessOrder>(m => m.Total == total)
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder {Total = total}));
-//        }
-
-
-//        [Test]
-//        public void RemoteOrder()
-//        {
-//            decimal total = 100;
-
-//            Test.Saga<DiscountPolicy>()
-//                .ExpectSendToDestination<ProcessOrder>((m, a) => m.Total == total && a.Queue == "remote.orderQueue")
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder {Total = total, IsRemoteOrder = true}));
-//        }
-
-//        [Test]
-//        public void RemoteOrderWithAssertions()
-//        {
-//            decimal total = 100;
-
-//            Test.Saga<DiscountPolicy>()
-//                .ExpectSendToDestination<ProcessOrder>((m, a) => 
-//                {
-//                    Assert.That(() => m.Total, Is.EqualTo(total));
-//                    Assert.That(() => a.Queue, Is.EqualTo("remote.orderQueue"));
-//                })
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder { Total = total, IsRemoteOrder = true }));
-//        }
-
-//        [Test]
-//        public void DiscountTestWithSpecificTimeout()
-//        {
-//            Test.Saga<DiscountPolicy>()
-//                .ExpectSend<ProcessOrder>(m => m.Total == 500)
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder {Total = 500}))
-//                .ExpectSend<ProcessOrder>(m => m.Total == 400)
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder {Total = 400}))
-//                .ExpectSend<ProcessOrder>(m => m.Total == 300*(decimal) 0.9)
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder {Total = 300}))
-//                .WhenSagaTimesOut()
-//                .ExpectSend<ProcessOrder>(m => m.Total == 200)
-//                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-//                .When(s => s.Handle(new SubmitOrder {Total = 200}));
-//        }
-
-//        [Test]
-//        public void TestNullReferenceException()
-//        {
-//            Test.Initialize();
-//            var saga = new MySaga();
-//            Assert.DoesNotThrow(() => Test.Saga(saga));
-//        }
-
-//        [Test]
-//        public void ShouldFailExpectForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
-//        {
-//            Assert.Throws<Exception>(() => Test.Saga<MySaga>()
-//                .ExpectForwardCurrentMessageTo(dest => dest == "expectedDestination")
-//                .When(s => s.Handle(new StartsSaga())));
-//        }
-
-//        [Test]
-//        public void ShouldPassExpectForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
-//        {
-//            Test.Saga<MySaga>()
-//                .ExpectForwardCurrentMessageTo(dest => dest == "forwardingDestination")
-//                .When(s => s.Handle(new StartsSaga()));
-//        }
-
-//        [Test]
-//        public void ShouldFailExpectNotForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
-//        {
-//            Assert.Throws<Exception>(() => Test.Saga<MySaga>()
-//                .ExpectNotForwardCurrentMessageTo(dest => dest == "forwardingDestination")
-//                .When(s => s.Handle(new StartsSaga())));
-//        }
-
-//        [Test]
-//        public void ShouldPassExpectNotForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
-//        {
-//            Test.Saga<MySaga>()
-//                .ExpectNotForwardCurrentMessageTo(dest => dest == "expectedDestination")
-//                .When(s => s.Handle(new StartsSaga()));
-//        }
-//    }
+            Test.Saga<DiscountPolicy>()
+                .ExpectSend<ProcessOrder>(m => m.Total == total)
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = total
+                }, c))
+                .WhenSagaTimesOut()
+                .ExpectSend<ProcessOrder>(m => m.Total == total)
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = total
+                }, c));
+        }
 
 
-//    public class SagaThatDoesAReply : Saga<SagaThatDoesAReply.SagaThatDoesAReplyData>,
-//        IHandleMessages<MyRequest>
-//    {
+        [Test]
+        public void RemoteOrder()
+        {
+            decimal total = 100;
 
-//        public class SagaThatDoesAReplyData : ContainSagaData
-//        {
-//        }
+            Test.Saga<DiscountPolicy>()
+                .ExpectSendToDestination<ProcessOrder>((m, a) => m.Total == total && a == "remote.orderQueue")
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = total,
+                    IsRemoteOrder = true
+                }, c));
+        }
 
-//        public void Handle(MyRequest myRequest)
-//        {
-//            Bus.Reply(new MyReply());
-//        }
+        [Test]
+        public void RemoteOrderWithAssertions()
+        {
+            decimal total = 100;
 
-//        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaThatDoesAReplyData> mapper)
-//        {
-//        }
-//    }
+            Test.Saga<DiscountPolicy>()
+                .ExpectSendToDestination<ProcessOrder>((m, a) =>
+                {
+                    Assert.That(() => m.Total, Is.EqualTo(total));
+                    Assert.That(() => a, Is.EqualTo("remote.orderQueue"));
+                })
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = total,
+                    IsRemoteOrder = true
+                }, c));
+        }
 
-//    public class MyRequest
-//    {
-//    }
+        [Test]
+        public void DiscountTestWithSpecificTimeout()
+        {
+            Test.Saga<DiscountPolicy>()
+                .ExpectSend<ProcessOrder>(m => m.Total == 500)
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = 500
+                }, c))
+                .ExpectSend<ProcessOrder>(m => m.Total == 400)
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = 400
+                }, c))
+                .ExpectSend<ProcessOrder>(m => m.Total == 300 * (decimal)0.9)
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = 300
+                }, c))
+                .WhenSagaTimesOut()
+                .ExpectSend<ProcessOrder>(m => m.Total == 200)
+                .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = 200
+                }, c));
+        }
+
+        [Test]
+        public void TestNullReferenceException()
+        {
+            var saga = new MySaga();
+            Assert.DoesNotThrow(() => Test.Saga(saga));
+        }
+
+        [Test]
+        public void ShouldFailExpectForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
+        {
+            Assert.Throws<Exception>(() => Test.Saga<MySaga>()
+                .ExpectForwardCurrentMessageTo(dest => dest == "expectedDestination")
+                .When((s, c) => s.Handle(new StartsSaga(), c)));
+        }
+
+        [Test]
+        public void ShouldPassExpectForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
+        {
+            Test.Saga<MySaga>()
+                .ExpectForwardCurrentMessageTo(dest => dest == "forwardingDestination")
+                .When((s, c) => s.Handle(new StartsSaga(), c));
+        }
+
+        [Test]
+        public void ShouldFailExpectNotForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
+        {
+            Assert.Throws<Exception>(() => Test.Saga<MySaga>()
+                .ExpectNotForwardCurrentMessageTo(dest => dest == "forwardingDestination")
+                .When((s, c) => s.Handle(new StartsSaga(), c)));
+        }
+
+        [Test]
+        public void ShouldPassExpectNotForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
+        {
+            Test.Saga<MySaga>()
+                .ExpectNotForwardCurrentMessageTo(dest => dest == "expectedDestination")
+                .When((s, c) => s.Handle(new StartsSaga(), c));
+        }
+    }
 
 
-//    public class MyReply
-//    {
-//    }
+    public class SagaThatDoesAReply : NServiceBus.Saga<SagaThatDoesAReply.SagaThatDoesAReplyData>,
+        IHandleMessages<MyRequest>
+    {
+        public Task Handle(MyRequest message, IMessageHandlerContext context)
+        {
+            return context.Reply(new MyReply());
+        }
 
-//    public class MySagaWithInterface : Saga<MySagaWithInterface.MySagaDataWithInterface>,
-//        IAmStartedByMessages<StartsSagaWithInterface>
-//    {
-//        public class MySagaDataWithInterface : ContainSagaData
-//        {
-            
-//        }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaThatDoesAReplyData> mapper)
+        {
+        }
 
-//        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaDataWithInterface> mapper)
-//        {
-//        }
+        public class SagaThatDoesAReplyData : ContainSagaData
+        {
+        }
+    }
 
-//        public void Handle(StartsSagaWithInterface message)
-//        {
-//            if (message.Foo == "Hello")
-//            {
-//                Bus.Send<Command>(null);
-//            }
-//        }
-//    }
+    public class MyRequest
+    {
+    }
 
-//    public class MySaga : Saga<MySagaData>,
-//                          IAmStartedByMessages<StartsSaga>,
-//                          IHandleTimeouts<StartsSaga>
-//    {
-//        public void Handle(StartsSaga message)
-//        {
-//            ReplyToOriginator(new ResponseToOriginator());
-//            Bus.Publish<Event>();
-//            Bus.Send<Command>(null);
-//            Bus.ForwardCurrentMessageTo("forwardingDestination");
-//            RequestTimeout(TimeSpan.FromDays(7), message);
-//        }
 
-//        public void Timeout(StartsSaga state)
-//        {
-//            Bus.Publish<Event>();
-//            MarkAsComplete();
-//        }
+    public class MyReply
+    {
+    }
 
-//        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
-//        {
-//        }
-//    }
+    public class MySagaWithInterface : NServiceBus.Saga<MySagaWithInterface.MySagaDataWithInterface>,
+        IAmStartedByMessages<StartsSagaWithInterface>
+    {
+        public Task Handle(StartsSagaWithInterface message, IMessageHandlerContext context)
+        {
+            if (message.Foo == "Hello")
+            {
+                context.Send<Command>(m => { });
+            }
 
-//    public class MySagaData : IContainSagaData
-//    {
-//        public Guid Id { get; set; }
-//        public string Originator { get; set; }
-//        public string OriginalMessageId { get; set; }
-//    }
+            return Task.FromResult(0);
+        }
 
-//    public interface StartsSagaWithInterface: IEvent
-//    {
-//        string Foo { get; set; }
-//    }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaDataWithInterface> mapper)
+        {
+        }
 
-//    public class StartsSaga : ICommand
-//    {
-//    }
+        public class MySagaDataWithInterface : ContainSagaData
+        {
+        }
+    }
 
-//    public class ResponseToOriginator : IMessage
-//    {
-//    }
+    public class MySaga : NServiceBus.Saga<MySagaData>,
+        IAmStartedByMessages<StartsSaga>,
+        IHandleTimeouts<StartsSaga>
+    {
+        public async Task Handle(StartsSaga message, IMessageHandlerContext context)
+        {
+            await ReplyToOriginator(context, new ResponseToOriginator());
+            await context.Publish<Event>();
+            await context.Send<StartsSaga>(s => { });
+            await context.ForwardCurrentMessageTo("forwardingDestination");
+            await RequestTimeout(context, TimeSpan.FromDays(7), message);
+        }
 
-//    public interface Event : IEvent
-//    {
-//    }
+        public Task Timeout(StartsSaga state, IMessageHandlerContext context)
+        {
+            context.Publish<Event>();
+            MarkAsComplete();
 
-//    public class Command : ICommand
-//    {
-//    }
+            return Task.FromResult(0);
+        }
 
-//    public class DiscountPolicy : Saga<DiscountPolicyData>,
-//                                  IAmStartedByMessages<SubmitOrder>,
-//                                  IHandleTimeouts<SubmitOrder>
-//    {
-//        public void Handle(SubmitOrder message)
-//        {
-//            Data.CustomerId = message.CustomerId;
-//            Data.RunningTotal += message.Total;
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
+        {
+        }
+    }
 
-//            if (message.IsRemoteOrder)
-//                ProcessExternalOrder(message);
-//            else if (Data.RunningTotal >= 1000)
-//                ProcessOrderWithDiscount(message);
-//            else
-//                ProcessOrder(message);
+    public class MySagaData : IContainSagaData
+    {
+        public Guid Id { get; set; }
+        public string Originator { get; set; }
+        public string OriginalMessageId { get; set; }
+    }
 
-//            RequestTimeout(TimeSpan.FromDays(7), message);
-//        }
+    public interface StartsSagaWithInterface : IEvent
+    {
+        string Foo { get; set; }
+    }
 
-//        private void ProcessExternalOrder(SubmitOrder message)
-//        {
-//            Bus.Send<ProcessOrder>("remote.orderQueue", m =>
-//                                                            {
-//                                                                m.CustomerId = Data.CustomerId;
-//                                                                m.OrderId = message.OrderId;
-//                                                                m.Total = message.Total;
-//                                                            });
-//        }
+    public class StartsSaga : ICommand
+    {
+    }
 
-//        public void Timeout(SubmitOrder state)
-//        {
-//            Data.RunningTotal -= state.Total;
-//        }
+    public class ResponseToOriginator : IMessage
+    {
+    }
 
-//        private void ProcessOrder(SubmitOrder message)
-//        {
-//            Bus.Send<ProcessOrder>(m =>
-//                                       {
-//                                           m.CustomerId = Data.CustomerId;
-//                                           m.OrderId = message.OrderId;
-//                                           m.Total = message.Total;
-//                                       });
-//        }
+    public interface Event : IEvent
+    {
+    }
 
-//        private void ProcessOrderWithDiscount(SubmitOrder message)
-//        {
-//            Bus.Send<ProcessOrder>(m =>
-//                                       {
-//                                           m.CustomerId = Data.CustomerId;
-//                                           m.OrderId = message.OrderId;
-//                                           m.Total = message.Total*(decimal) 0.9;
-//                                       });
-//        }
+    public class Command : ICommand
+    {
+    }
 
-//        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DiscountPolicyData> mapper)
-//        {
-//        }
-//    }
+    public class DiscountPolicy : NServiceBus.Saga<DiscountPolicyData>,
+        IAmStartedByMessages<SubmitOrder>,
+        IHandleTimeouts<SubmitOrder>
+    {
+        public async Task Handle(SubmitOrder message, IMessageHandlerContext context)
+        {
+            Data.CustomerId = message.CustomerId;
+            Data.RunningTotal += message.Total;
 
-//    public class SubmitOrder : IMessage
-//    {
-//        public Guid OrderId { get; set; }
-//        public Guid CustomerId { get; set; }
-//        public decimal Total { get; set; }
-//        public bool IsRemoteOrder { get; set; }
-//    }
+            if (message.IsRemoteOrder)
+            {
+                await ProcessExternalOrder(message, context);
+            }
+            else if (Data.RunningTotal >= 1000)
+            {
+                await ProcessOrderWithDiscount(message, context);
+            }
+            else
+            {
+                await ProcessOrder(message, context);
+            }
 
-//    public class ProcessOrder : IMessage
-//    {
-//        public Guid OrderId { get; set; }
-//        public Guid CustomerId { get; set; }
-//        public decimal Total { get; set; }
-//    }
+            await RequestTimeout(context, TimeSpan.FromDays(7), message);
+        }
 
-//    public class DiscountPolicyData : IContainSagaData
-//    {
-//        public Guid Id { get; set; }
-//        public string Originator { get; set; }
-//        public string OriginalMessageId { get; set; }
+        public Task Timeout(SubmitOrder state, IMessageHandlerContext context)
+        {
+            Data.RunningTotal -= state.Total;
+            return Task.FromResult(0);
+        }
 
-//        public Guid CustomerId { get; set; }
-//        public decimal RunningTotal { get; set; }
-//    }
-//}
+        private Task ProcessExternalOrder(SubmitOrder message, IMessageHandlerContext context)
+        {
+            return context.Send<ProcessOrder>("remote.orderQueue", m =>
+            {
+                m.CustomerId = Data.CustomerId;
+                m.OrderId = message.OrderId;
+                m.Total = message.Total;
+            });
+        }
+
+        private Task ProcessOrder(SubmitOrder message, IMessageHandlerContext context)
+        {
+            return context.Send<ProcessOrder>(m =>
+            {
+                m.CustomerId = Data.CustomerId;
+                m.OrderId = message.OrderId;
+                m.Total = message.Total;
+            });
+        }
+
+        private Task ProcessOrderWithDiscount(SubmitOrder message, IMessageHandlerContext context)
+        {
+            return context.Send<ProcessOrder>(m =>
+            {
+                m.CustomerId = Data.CustomerId;
+                m.OrderId = message.OrderId;
+                m.Total = message.Total * (decimal)0.9;
+            });
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DiscountPolicyData> mapper)
+        {
+        }
+    }
+
+    public class SubmitOrder : IMessage
+    {
+        public Guid OrderId { get; set; }
+        public Guid CustomerId { get; set; }
+        public decimal Total { get; set; }
+        public bool IsRemoteOrder { get; set; }
+    }
+
+    public class ProcessOrder : IMessage
+    {
+        public Guid OrderId { get; set; }
+        public Guid CustomerId { get; set; }
+        public decimal Total { get; set; }
+    }
+
+    public class DiscountPolicyData : IContainSagaData
+    {
+        public Guid CustomerId { get; set; }
+        public decimal RunningTotal { get; set; }
+        public Guid Id { get; set; }
+        public string Originator { get; set; }
+        public string OriginalMessageId { get; set; }
+    }
+}

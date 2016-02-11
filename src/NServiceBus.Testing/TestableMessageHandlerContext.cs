@@ -2,38 +2,56 @@ namespace NServiceBus.Testing
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
+    using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
     using NServiceBus.Persistence;
+    using NServiceBus.Testing.ExpectedInvocations;
 
     internal class TestableMessageHandlerContext : IMessageHandlerContext
     {
+        IMessageCreator messageCreator = new MessageMapper();
+
+        public List<InvokedMessage> SentMessages { get; } = new List<InvokedMessage>();
+
+        public List<InvokedMessage> PublishedMessages { get; } = new List<InvokedMessage>();
+        
+        public IList<InvokedMessage> RepliedMessages { get; set; } = new List<InvokedMessage>();
+
+        IList<ActualInvocation> actualInvocations = new List<ActualInvocation>();
+        
         public IDictionary<string, string> IncomingHeaders { get; } = new Dictionary<string, string>();
 
-        public IList<IExpectedInvocation> ExpectedInvocations { get; } = new List<IExpectedInvocation>();
-        IList<ActualInvocation> actualInvocations = new List<ActualInvocation>();
+        public IList<ExpectedInvocation> ExpectedInvocations { get; } = new List<ExpectedInvocation>();
 
-        public ContextBag Extensions { get; } = new ContextBag();
+        public string MessageId { get; }
+
+        public string ReplyToAddress { get; }
+
+        public IReadOnlyDictionary<string, string> MessageHeaders { get; }
         
+        public ContextBag Extensions { get; } = new ContextBag();
+
         public Task Send(object message, SendOptions options)
         {
-            throw new NotImplementedException();
+            SentMessages.Add(new InvokedMessage(message, options));
+            return Task.FromResult(0);
         }
 
         public Task Send<T>(Action<T> messageConstructor, SendOptions options)
         {
-            throw new NotImplementedException();
+            return Send(messageCreator.CreateInstance(messageConstructor), options);
         }
-
+        
         public Task Publish(object message, PublishOptions options)
         {
-            throw new NotImplementedException();
+            PublishedMessages.Add(new InvokedMessage(message, options));
+            return Task.FromResult(0);
         }
 
         public Task Publish<T>(Action<T> messageConstructor, PublishOptions publishOptions)
         {
-            throw new NotImplementedException();
+            return Publish(messageCreator.CreateInstance(messageConstructor), publishOptions);
         }
 
         public Task Subscribe(Type eventType, SubscribeOptions options)
@@ -48,22 +66,25 @@ namespace NServiceBus.Testing
 
         public Task Reply(object message, ReplyOptions options)
         {
-            throw new NotImplementedException();
+            RepliedMessages.Add(new InvokedMessage(message, options));
+            return Task.FromResult(0);
         }
 
         public Task Reply<T>(Action<T> messageConstructor, ReplyOptions options)
         {
-            throw new NotImplementedException();
+            return Reply(messageCreator.CreateInstance(messageConstructor), options);
         }
 
         public Task ForwardCurrentMessageTo(string destination)
         {
-            throw new NotImplementedException();
+            actualInvocations.Add(new ForwardCurrentMessageToInvocation
+            {
+                Value = destination
+            });
+            return Task.FromResult(0);
         }
 
-        public string MessageId { get; }
-        public string ReplyToAddress { get; }
-        public IReadOnlyDictionary<string, string> MessageHeaders { get; }
+       
         public Task HandleCurrentMessageLater()
         {
             throw new NotImplementedException();
@@ -82,7 +103,7 @@ namespace NServiceBus.Testing
             {
                 foreach (var e in ExpectedInvocations)
                 {
-                    e.Validate(actualInvocations.ToArray());
+                    e.Validate(this);
                 }
             }
             finally
@@ -90,5 +111,80 @@ namespace NServiceBus.Testing
                 actualInvocations.Clear();
             }
         }
+
+        void ProcessInvocation(Type genericType, object message)
+        {
+            ProcessInvocation(genericType, new Dictionary<string, object>(), message);
+        }
+
+        void ProcessInvocation(Type genericType, Dictionary<string, object> others, object message)
+        {
+            var messageType = GetMessageType(message);
+            var invocationType = genericType.MakeGenericType(messageType);
+            ProcessInvocationWithBuiltType(invocationType, others, message);
+        }
+
+        void ProcessInvocation<K>(Type dualGenericType, Dictionary<string, object> others, object message)
+        {
+            var invocationType = dualGenericType.MakeGenericType(GetMessageType(message), typeof(K));
+            ProcessInvocationWithBuiltType(invocationType, others, message);
+        }
+
+        void ProcessInvocationWithBuiltType(Type builtType, Dictionary<string, object> others, object message)
+        {
+            if (message == null)
+            {
+                throw new NullReferenceException("message is null.");
+            }
+
+            var invocation = Activator.CreateInstance(builtType) as ActualInvocation;
+
+            builtType.GetProperty("Message").SetValue(invocation, message, null);
+
+            foreach (var kv in others)
+            {
+                builtType.GetProperty(kv.Key).SetValue(invocation, kv.Value, null);
+            }
+
+            actualInvocations.Add(invocation);
+        }
+
+        Type GetMessageType(object message)
+        {
+            if (message.GetType().FullName.EndsWith("__impl"))
+            {
+                var name = message.GetType().FullName.Replace("__impl", "").Replace("\\", "");
+                foreach (var i in message.GetType().GetInterfaces())
+                {
+                    if (i.FullName == name)
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            return message.GetType();
+        }
+
+        public void Clear()
+        {
+            ExpectedInvocations.Clear();
+            RepliedMessages.Clear();
+            SentMessages.Clear();
+            PublishedMessages.Clear();
+        }
+    }
+
+    internal class InvokedMessage
+    {
+        public InvokedMessage(object message, ExtendableOptions sendOptions)
+        {
+            Message = message;
+            SendOptions = sendOptions;
+        }
+
+        public object Message { get; private set; }
+
+        public ExtendableOptions SendOptions { get; private set; }
     }
 }

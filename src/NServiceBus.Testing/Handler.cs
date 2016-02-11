@@ -50,7 +50,7 @@
         /// </summary>
         public Handler<T> ExpectSend<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -59,7 +59,7 @@
         /// </summary>
         public Handler<T> ExpectNotSend<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotSendInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotSendInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -68,7 +68,7 @@
         /// </summary>
         public Handler<T> ExpectNotReply<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotReplyInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotReplyInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -77,7 +77,7 @@
         /// </summary>
         public Handler<T> ExpectReply<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedReplyInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedReplyInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -87,7 +87,7 @@
         /// </summary>
         public Handler<T> ExpectSendLocal<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendLocalInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendLocalInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -96,7 +96,7 @@
         /// </summary>
         public Handler<T> ExpectNotSendLocal<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotSendLocalInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotSendLocalInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -105,7 +105,7 @@
         /// </summary>
         public Handler<T> ExpectReturn<TEnum>(Func<TEnum, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedReturnInvocation<TEnum> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedReturnInvocation<TEnum> { Check = check });
             return this;
         }
 
@@ -114,7 +114,7 @@
         /// </summary>
         public Handler<T> ExpectSendToDestination<TMessage>(Func<TMessage, string, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendToDestinationInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendToDestinationInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -123,7 +123,7 @@
         /// </summary>
         public Handler<T> ExpectPublish<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedPublishInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedPublishInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -132,7 +132,7 @@
         /// </summary>
         public Handler<T> ExpectNotPublish<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotPublishInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotPublishInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -141,7 +141,7 @@
         /// </summary>
         public Handler<T> ExpectDoNotContinueDispatchingCurrentMessageToHandlers()
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDoNotContinueDispatchingCurrentMessageToHandlersInvocation<object>());
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDoNotContinueDispatchingCurrentMessageToHandlersInvocation<object>());
             return this;
         }
 
@@ -150,7 +150,7 @@
         /// </summary>
         public Handler<T> ExpectHandleCurrentMessageLater()
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedHandleCurrentMessageLaterInvocation<object>());
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedHandleCurrentMessageLaterInvocation<object>());
             return this;
         }
 
@@ -159,7 +159,7 @@
         /// </summary>
         public Handler<T> ExpectSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendToSitesInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendToSitesInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -168,7 +168,7 @@
         /// </summary>
         public Handler<T> ExpectNotSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotSendToSitesInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotSendToSitesInvocation<TMessage> { Check = check });
             return this;
         }
 
@@ -177,7 +177,7 @@
         /// </summary>
         public Handler<T> ExpectDefer<TMessage>(Func<TMessage, TimeSpan, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDeferMessageInvocation<TMessage, TimeSpan> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDeferMessageInvocation<TMessage, TimeSpan> { Check = check });
             return this;
         }
 
@@ -186,7 +186,7 @@
         /// </summary>
         public Handler<T> ExpectDefer<TMessage>(Func<TMessage, DateTime, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDeferMessageInvocation<TMessage, DateTime> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDeferMessageInvocation<TMessage, DateTime> { Check = check });
             return this;
         }
 
@@ -195,7 +195,7 @@
         /// </summary>
         public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, TimeSpan, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotDeferMessageInvocation<TMessage, TimeSpan> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotDeferMessageInvocation<TMessage, TimeSpan> { Check = check });
             return this;
         }
 
@@ -204,7 +204,7 @@
         /// </summary>
         public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, DateTime, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotDeferMessageInvocation<TMessage, DateTime> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotDeferMessageInvocation<TMessage, DateTime> { Check = check });
             return this;
         }
 
@@ -213,7 +213,7 @@
         /// </summary>
         public Handler<T> ExpectNotForwardCurrentMessageTo(Func<string, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotForwardCurrentMessageToInvocation{ Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotForwardCurrentMessageToInvocation{ Check = check });
             return this;
         }
 
@@ -222,7 +222,7 @@
         /// </summary>
         public Handler<T> ExpectForwardCurrentMessageTo(Func<string, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedForwardCurrentMessageToInvocation { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedForwardCurrentMessageToInvocation { Check = check });
             return this;
         }
 

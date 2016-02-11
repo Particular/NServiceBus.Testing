@@ -55,7 +55,7 @@
     </None>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0-unstable1461\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.6.0.0-unstable1527\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Obsolete, Version=3.1.0.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
@@ -70,6 +70,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpectedInvocations\ExpectedReplyToOriginator.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedTimeOutInvocation.cs" />
     <Compile Include="FakeDequer.cs" />
     <Compile Include="FakeEncryptor.cs" />
     <Compile Include="FakeQueueCreator.cs" />
@@ -78,11 +80,14 @@
     <Compile Include="Handler.cs" />
     <Compile Include="InMemoryDataBus.cs" />
     <Compile Include="Invocations.cs" />
-    <Compile Include="NewTest.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedMessageInvocation.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedInvocation.cs" />
     <Compile Include="Saga.cs" />
-    <Compile Include="StubBus.cs" />
     <Compile Include="Test.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Saga_Old.cs" />
+    <Compile Include="StubBus_Old.cs" />
+    <Compile Include="Test_Old.cs" />
     <Compile Include="TestableMessageHandlerContext.cs" />
     <Compile Include="TestConfigurationSource.cs" />
     <Compile Include="TimeoutManager.cs" />
