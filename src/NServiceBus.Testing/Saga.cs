@@ -14,7 +14,7 @@
         internal Saga(T saga)
         {
             this.saga = saga;
-            testableMessageHandlerContext = new TestableMessageHandlerContext();
+            testableMessageHandlerContext = new TestableMessageHandlerContext(messageCreator);
 
             if (saga.Entity == null)
             {

@@ -4,7 +4,6 @@ namespace NServiceBus.Testing
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
-    using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
     using NServiceBus.Persistence;
     using NServiceBus.Testing.ExpectedInvocations;
 
@@ -69,7 +68,6 @@ namespace NServiceBus.Testing
             return Task.FromResult(0);
         }
 
-
         public Task HandleCurrentMessageLater()
         {
             throw new NotImplementedException();
@@ -133,9 +131,12 @@ namespace NServiceBus.Testing
             //PublishedMessages.Clear();
         }
 
-        IMessageCreator messageCreator = new MessageMapper();
+        IMessageCreator messageCreator;
 
-       
+        public TestableMessageHandlerContext(IMessageCreator messageCreator)
+        {
+            this.messageCreator = messageCreator;
+        }
     }
 
     internal class InvokedMessage

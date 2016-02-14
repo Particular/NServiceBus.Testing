@@ -21,33 +21,31 @@
             var success = callResults.Any(result => result);
 
             if ((!success && !Negate) || (Negate && success))
-                throw new Exception(string.Format("{0} not fulfilled.\nCalls made:\n{1}", filter(GetType()), string.Join("\n", invocations.Select(i => filter(i.GetType())))));
+                throw new Exception($"{filter(GetType())} not fulfilled.\nCalls made:\n{string.Join("\n", invocations.Select(i => filter(i.GetType())))}");
         }
 
         protected abstract bool Validate(T invocation);
         protected bool Negate;
 
         private readonly Func<Type, string> filter =
-                    t =>
-                    {
-                        var s = t.ToString().Replace("NServiceBus.Testing.", "").Replace("`1[", "<").Replace("`2[",
-                                                                                                             "<");
-                        if (s.EndsWith("]"))
-                        {
-                            s = s.Substring(0, s.Length - 1);
-                            s += ">";
-                        }
+            t =>
+            {
+                var s = t.ToString().Replace("NServiceBus.Testing.", "").Replace("`1[", "<").Replace("`2[", "<");
+                if (s.EndsWith("]"))
+                {
+                    s = s.Substring(0, s.Length - 1);
+                    s += ">";
+                }
 
-                        return s;
-                    };
-
+                return s;
+            };
     }
 
-    class SingleMessageExpectedInvocation<INVOCATION, M> : ExpectedInvocation<INVOCATION> where INVOCATION : MessageInvocation<M>
+    class SingleMessageExpectedInvocation<TInvocation, TMessage> : ExpectedInvocation<TInvocation> where TInvocation : MessageInvocation<TMessage>
     {
-        public Func<M, bool> Check { get; set; }
+        public Func<TMessage, bool> Check { get; set; }
 
-        protected override bool Validate(INVOCATION invocation)
+        protected override bool Validate(TInvocation invocation)
         {
             if (Check == null)
                 return true;
@@ -55,7 +53,7 @@
             if (invocation.Message == null)
                 return false;
 
-            return Check((M)invocation.Message);
+            return Check((TMessage)invocation.Message);
         }
     }
 
@@ -64,11 +62,11 @@
         public object Message { get; set; }
     }
 
-    class SingleValueExpectedInvocation<INVOCATION, T> : ExpectedInvocation<INVOCATION> where INVOCATION : SingleValueInvocation<T>
+    class SingleValueExpectedInvocation<TInvocation, T> : ExpectedInvocation<TInvocation> where TInvocation : SingleValueInvocation<T>
     {
         public Func<T, bool> Check { get; set; }
 
-        protected override bool Validate(INVOCATION invocation)
+        protected override bool Validate(TInvocation invocation)
         {
             if (Check == null)
                 return true;
@@ -82,11 +80,11 @@
         public T Value { get; set; }
     }
 
-    class ExpectedMessageAndValueInvocation<INVOCATION, M, K> : ExpectedInvocation<INVOCATION> where INVOCATION : MessageAndValueInvocation<M, K>
+    class ExpectedMessageAndValueInvocation<TInvocation, M, K> : ExpectedInvocation<TInvocation> where TInvocation : MessageAndValueInvocation<M, K>
     {
         public Func<M, K, bool> Check { get; set; }
 
-        protected override bool Validate(INVOCATION invocation)
+        protected override bool Validate(TInvocation invocation)
         {
             if (Check == null)
                 return true;
@@ -103,17 +101,17 @@
         public K Value { get; set; }
     }
 
-    class ExpectedPublishInvocation<M> : SingleMessageExpectedInvocation<PublishInvocation<M>, M> { }
-    class PublishInvocation<M> : MessageInvocation<M> { }
+    class ExpectedPublishInvocation<TMessage> : SingleMessageExpectedInvocation<PublishInvocation<TMessage>, TMessage> { }
+    class PublishInvocation<TMessage> : MessageInvocation<TMessage> { }
 
-    class ExpectedSendInvocation<M> : SingleMessageExpectedInvocation<SendInvocation<M>, M> { }
-    class SendInvocation<M> : MessageInvocation<M> { }
+    class ExpectedSendInvocation<TMessage> : SingleMessageExpectedInvocation<SendInvocation<TMessage>, TMessage> { }
+    class SendInvocation<TMessage> : MessageInvocation<TMessage> { }
 
-    class ExpectedSendLocalInvocation<M> : SingleMessageExpectedInvocation<SendLocalInvocation<M>, M> { }
-    class SendLocalInvocation<M> : MessageInvocation<M> { }
+    class ExpectedSendLocalInvocation<TMessage> : SingleMessageExpectedInvocation<SendLocalInvocation<TMessage>, TMessage> { }
+    class SendLocalInvocation<TMessage> : MessageInvocation<TMessage> { }
 
-    class ExpectedReplyInvocation<M> : SingleMessageExpectedInvocation<ReplyInvocation<M>, M> { }
-    class ReplyInvocation<M> : MessageInvocation<M> { }
+    class ExpectedReplyInvocation<TMessage> : SingleMessageExpectedInvocation<ReplyInvocation<TMessage>, TMessage> { }
+    class ReplyInvocation<TMessage> : MessageInvocation<TMessage> { }
 
     class ForwardCurrentMessageToInvocation : SingleValueInvocation<string> { }
     class ExpectedForwardCurrentMessageToInvocation : SingleValueExpectedInvocation<ForwardCurrentMessageToInvocation, string> { }

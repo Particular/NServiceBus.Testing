@@ -21,7 +21,7 @@
         internal Handler(T handler)
         {
             this.handler = handler;
-            testableMessageHandlerContext = new TestableMessageHandlerContext();
+            testableMessageHandlerContext = new TestableMessageHandlerContext(messageCreator);
         }
 
         /// <summary>
