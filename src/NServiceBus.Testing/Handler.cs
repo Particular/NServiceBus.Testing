@@ -155,24 +155,6 @@
         }
 
         /// <summary>
-        /// Check that the handler sends a message of the given type to sites.
-        /// </summary>
-        public Handler<T> ExpectSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
-        {
-            expectedInvocations.Add(new ExpectedSendToSitesInvocation<TMessage> { Check = check });
-            return this;
-        }
-
-        /// <summary>
-        /// Check that the handler doesn't send a message of the given type to sites.
-        /// </summary>
-        public Handler<T> ExpectNotSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
-        {
-            expectedInvocations.Add(new ExpectedNotSendToSitesInvocation<TMessage> { Check = check });
-            return this;
-        }
-
-        /// <summary>
         /// Check that the handler defers a message of the given type.
         /// </summary>
         public Handler<T> ExpectDefer<TMessage>(Func<TMessage, TimeSpan, bool> check)

@@ -31,22 +31,6 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        public void ShouldFailAssertingSendToSitesWasCalled()
-        {
-            Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
-                .ExpectSendToSites<TestMessage>((m, a) => true)
-                .OnMessage<TestMessage>());
-        }
-
-        [Test]
-        public void ShouldAssertSendToSitesWasNotCalled()
-        {
-            Test.Handler<EmptyHandler>()
-                .ExpectNotSendToSites<TestMessage>((m, a) => true)
-                .OnMessage<TestMessage>();
-        }
-
-        [Test]
         public void ShouldAssertDeferWasCalledWithTimeSpan()
         {
             var timespan = TimeSpan.FromMinutes(10);
