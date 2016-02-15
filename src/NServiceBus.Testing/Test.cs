@@ -20,9 +20,9 @@
         ///     Begin the test script for the passed in saga instance.
         ///     Callers need to instantiate the saga's data class as well as give it an ID.
         /// </summary>
-        public static Saga<T> Saga<T>(T saga) where T : Saga, new()
+        public static Saga<TSaga> Saga<TSaga>(TSaga saga) where TSaga : Saga, new()
         {
-            throw new NotImplementedException();
+            return new Saga<TSaga>(saga);
         }
 
         /// <summary>

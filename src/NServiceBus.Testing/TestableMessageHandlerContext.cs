@@ -18,8 +18,8 @@ namespace NServiceBus.Testing
         
         public IList<InvokedMessage> RepliedMessages { get; set; } = new List<InvokedMessage>();
 
-        IList<ActualInvocation> actualInvocations = new List<ActualInvocation>();
-        
+        public IList<string> ForwardedMessages { get; set; } = new List<string>();
+
         public IDictionary<string, string> IncomingHeaders { get; } = new Dictionary<string, string>();
 
         public IList<ExpectedInvocation> ExpectedInvocations { get; } = new List<ExpectedInvocation>();
@@ -77,10 +77,7 @@ namespace NServiceBus.Testing
 
         public Task ForwardCurrentMessageTo(string destination)
         {
-            actualInvocations.Add(new ForwardCurrentMessageToInvocation
-            {
-                Value = destination
-            });
+            ForwardedMessages.Add(destination);
             return Task.FromResult(0);
         }
 
@@ -92,7 +89,7 @@ namespace NServiceBus.Testing
 
         public void DoNotContinueDispatchingCurrentMessageToHandlers()
         {
-            actualInvocations.Add(new DoNotContinueDispatchingCurrentMessageToHandlersInvocation<object>());
+            throw new NotImplementedException();
         }
 
         public SynchronizedStorageSession SynchronizedStorageSession { get; }
@@ -108,46 +105,46 @@ namespace NServiceBus.Testing
             }
             finally
             {
-                actualInvocations.Clear();
+                Clear();
             }
         }
 
-        void ProcessInvocation(Type genericType, object message)
-        {
-            ProcessInvocation(genericType, new Dictionary<string, object>(), message);
-        }
+            //void ProcessInvocation(Type genericType, object message)
+            //{
+            //    ProcessInvocation(genericType, new Dictionary<string, object>(), message);
+            //}
 
-        void ProcessInvocation(Type genericType, Dictionary<string, object> others, object message)
-        {
-            var messageType = GetMessageType(message);
-            var invocationType = genericType.MakeGenericType(messageType);
-            ProcessInvocationWithBuiltType(invocationType, others, message);
-        }
+            //void ProcessInvocation(Type genericType, Dictionary<string, object> others, object message)
+            //{
+            //    var messageType = GetMessageType(message);
+            //    var invocationType = genericType.MakeGenericType(messageType);
+            //    ProcessInvocationWithBuiltType(invocationType, others, message);
+            //}
 
-        void ProcessInvocation<K>(Type dualGenericType, Dictionary<string, object> others, object message)
-        {
-            var invocationType = dualGenericType.MakeGenericType(GetMessageType(message), typeof(K));
-            ProcessInvocationWithBuiltType(invocationType, others, message);
-        }
+            //void ProcessInvocation<K>(Type dualGenericType, Dictionary<string, object> others, object message)
+            //{
+            //    var invocationType = dualGenericType.MakeGenericType(GetMessageType(message), typeof(K));
+            //    ProcessInvocationWithBuiltType(invocationType, others, message);
+            //}
 
-        void ProcessInvocationWithBuiltType(Type builtType, Dictionary<string, object> others, object message)
-        {
-            if (message == null)
-            {
-                throw new NullReferenceException("message is null.");
-            }
+            //void ProcessInvocationWithBuiltType(Type builtType, Dictionary<string, object> others, object message)
+            //{
+            //    if (message == null)
+            //    {
+            //        throw new NullReferenceException("message is null.");
+            //    }
 
-            var invocation = Activator.CreateInstance(builtType) as ActualInvocation;
+            //    var invocation = Activator.CreateInstance(builtType) as ActualInvocation;
 
-            builtType.GetProperty("Message").SetValue(invocation, message, null);
+            //    builtType.GetProperty("Message").SetValue(invocation, message, null);
 
-            foreach (var kv in others)
-            {
-                builtType.GetProperty(kv.Key).SetValue(invocation, kv.Value, null);
-            }
+            //    foreach (var kv in others)
+            //    {
+            //        builtType.GetProperty(kv.Key).SetValue(invocation, kv.Value, null);
+            //    }
 
-            actualInvocations.Add(invocation);
-        }
+            //    actualInvocations.Add(invocation);
+            //}
 
         Type GetMessageType(object message)
         {

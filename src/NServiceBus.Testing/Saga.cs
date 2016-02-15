@@ -47,8 +47,8 @@
         /// </summary>
         public Saga<T> WithExternalDependencies(Action<T> actionToSetUpExternalDependencies)
         {
-            throw new NotImplementedException();
-
+            actionToSetUpExternalDependencies(saga);
+            return this;
         }
 
         /// <summary>
@@ -56,8 +56,8 @@
         /// </summary>
         public Saga<T> WhenReceivesMessageFrom(string client)
         {
-            throw new NotImplementedException();
-
+            saga.Entity.Originator = client;
+            return this;
         }
 
         /// <summary>
@@ -66,8 +66,8 @@
         /// </summary>
         public Saga<T> SetIncomingHeader(string key, string value)
         {
-            throw new NotImplementedException();
-
+            incomingHeaders[key] = value;
+            return this;
         }
 
         /// <summary>
@@ -76,8 +76,8 @@
         /// </summary>
         public Saga<T> SetMessageId(string messageId)
         {
-            throw new NotImplementedException();
-
+            this.messageId = () => messageId;
+            return this;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@
         /// </summary>
         public Saga<T> ExpectSend<TMessage>(Func<TMessage, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedMessageInvocation<TMessage>(check, () => testableMessageHandlerContext.SentMessages));
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedInvocations.ExpectedSendInvocation<TMessage>(check));
             return this;
         }
 
@@ -100,8 +100,7 @@
         /// <param name="check">An action containing assertions on the message.</param>
         public Saga<T> ExpectSend<TMessage>(Action<TMessage> check)
         {
-            throw new NotImplementedException();
-
+            return ExpectSend(CheckActionToFunc(check));
         }
 
         /// <summary>
@@ -109,7 +108,8 @@
         /// </summary>
         public Saga<T> ExpectNotSend<TMessage>(Func<TMessage, bool> check)
         {
-            throw new NotImplementedException();
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedInvocations.ExpectedNotSendInvocation<TMessage>(check));
+            return this;
 
         }
 
@@ -119,8 +119,7 @@
         /// <param name="check">An action containing assertions on the message.</param>
         public Saga<T> ExpectNotSend<TMessage>(Action<TMessage> check)
         {
-            throw new NotImplementedException();
-
+            return ExpectSend(CheckActionToFunc(check));
         }
 
         /// <summary>
@@ -128,7 +127,7 @@
         /// </summary>
         public Saga<T> ExpectReply<TMessage>(Func<TMessage, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedMessageInvocation<TMessage>(check, () => testableMessageHandlerContext.RepliedMessages));
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedInvocations.ExpectedReplyInvocation<TMessage>(check));
             return this;
         }
 
@@ -196,8 +195,8 @@
         /// </summary>
         public Saga<T> ExpectNotForwardCurrentMessageTo(Func<string, bool> check)
         {
-            throw new NotImplementedException();
-
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotForwardCurrentMessageTo(check));
+            return this;
         }
 
         /// <summary>
@@ -205,8 +204,8 @@
         /// </summary>
         public Saga<T> ExpectForwardCurrentMessageTo(Func<string, bool> check)
         {
-            throw new NotImplementedException();
-
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedForwardCurrentMessageTo(check));
+            return this;
         }
 
         /// <summary>
@@ -224,8 +223,7 @@
         /// <param name="check">An action that performs assertions on the message.</param>
         public Saga<T> ExpectReplyToOriginator<TMessage>(Action<TMessage> check)
         {
-            throw new NotImplementedException();
-
+            return ExpectReplyToOriginator(CheckActionToFunc(check));
         }
 
         /// <summary>
@@ -233,7 +231,7 @@
         /// </summary>
         public Saga<T> ExpectPublish<TMessage>(Func<TMessage, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedMessageInvocation<TMessage>(check, () => testableMessageHandlerContext.PublishedMessages));
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedInvocations.ExpectedPublishInvocation<TMessage>(check));
             return this;
         }
 
@@ -244,8 +242,6 @@
         public Saga<T> ExpectPublish<TMessage>(Action<TMessage> check)
         {
             return ExpectPublish(CheckActionToFunc(check));
-
-
         }
 
         /// <summary>
@@ -253,8 +249,8 @@
         /// </summary>
         public Saga<T> ExpectNotPublish<TMessage>(Func<TMessage, bool> check = null)
         {
-            throw new NotImplementedException();
-
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedInvocations.ExpectedNotPublishInvocation<TMessage>(check));
+            return this;
         }
 
         /// <summary>
@@ -263,8 +259,7 @@
         /// <param name="check">An action that performs assertions on the message.</param>
         public Saga<T> ExpectNotPublish<TMessage>(Action<TMessage> check)
         {
-            throw new NotImplementedException();
-
+            return ExpectNotPublish(CheckActionToFunc(check));
         }
 
         /// <summary>
@@ -292,7 +287,7 @@
         /// and then clearing them for continued testing.
         /// </summary>
         [ObsoleteEx(
-            RemoveInVersion = "7", 
+            RemoveInVersion = "7",
             TreatAsErrorFromVersion = "6",
             Replacement = "When(Action<T, IMessageHandlerContext> sagaIsInvoked)")]
         public Saga<T> When(Action<T> sagaIsInvoked)
@@ -307,12 +302,12 @@
         public Saga<T> When(Func<T, IMessageHandlerContext, Task> sagaIsInvoked)
         {
             // var id = messageId();
-            
+
             sagaIsInvoked(saga, testableMessageHandlerContext).GetAwaiter().GetResult();
 
             testableMessageHandlerContext.Validate();
             testableMessageHandlerContext.Clear();
-            
+
             // messageId = () => Guid.NewGuid().ToString();
             return this;
         }
@@ -339,8 +334,16 @@
         /// </summary>
         public Saga<T> ExpectTimeoutToBeSetIn<TMessage>(Func<TMessage, TimeSpan, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedTimeoutInvocation<TMessage>(check));
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDelayDeliveryWithInvocation<TMessage>(check));
             return this;
+        }
+
+        /// <summary>
+        /// Verifies that the saga is setting the specified timeout
+        /// </summary>
+        public Saga<T> ExpectTimeoutToBeSetIn<TMessage>(Action<TMessage, TimeSpan> check)
+        {
+            return ExpectTimeoutToBeSetIn(CheckActionToFunc(check));
         }
 
         /// <summary>
@@ -354,17 +357,19 @@
         /// <summary>
         /// Verifies that the saga is setting the specified timeout
         /// </summary>
-        public Saga<T> ExpectTimeoutToBeSetIn<TMessage>(Action<TMessage, TimeSpan> check)
+        public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
         {
-            return ExpectTimeoutToBeSetIn(CheckActionToFunc(check));
+
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDoNotDeliverBeforeInvocation<TMessage>(check));
+            return this;
         }
 
         /// <summary>
         /// Verifies that the saga is setting the specified timeout
         /// </summary>
-        public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
+        public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Action<TMessage, DateTime> check)
         {
-            throw new NotImplementedException();
+            return ExpectTimeoutToBeSetAt(CheckActionToFunc(check));
         }
 
         /// <summary>
@@ -375,18 +380,13 @@
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Verifies that the saga is setting the specified timeout
-        /// </summary>
-        public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Action<TMessage, DateTime> check)
-        {
-            throw new NotImplementedException();
-        }
-
         private static Func<T1, bool> CheckActionToFunc<T1>(Action<T1> check)
         {
-            throw new NotImplementedException();
-
+            return arg =>
+            {
+                check(arg);
+                return true;
+            };
         }
 
         static Func<T1, T2, bool> CheckActionToFunc<T1, T2>(Action<T1, T2> check)

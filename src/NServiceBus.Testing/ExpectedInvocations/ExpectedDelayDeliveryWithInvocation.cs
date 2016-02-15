@@ -6,9 +6,9 @@
     using NServiceBus.DeliveryConstraints;
     using NServiceBus.Extensibility;
 
-    class ExpectedTimeoutInvocation<TMessage> : ExpectedInvocation
+    class ExpectedDelayDeliveryWithInvocation<TMessage> : ExpectedInvocation
     {
-        internal ExpectedTimeoutInvocation(Func<TMessage, TimeSpan, bool> check)
+        internal ExpectedDelayDeliveryWithInvocation(Func<TMessage, TimeSpan, bool> check)
         {
             this.check = check;
         }

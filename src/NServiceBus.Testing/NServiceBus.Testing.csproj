@@ -70,8 +70,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpectedInvocations\ExpectedDoNotDeliverBeforeInvocation.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedForwardCurrentMessageTo.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedNotPublishInvocation.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedPublishInvocation.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedReplyInvocation.cs" />
     <Compile Include="ExpectedInvocations\ExpectedReplyToOriginator.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedTimeOutInvocation.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedNotSendInvocation.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedSendInvocation.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedDelayDeliveryWithInvocation.cs" />
     <Compile Include="FakeDequer.cs" />
     <Compile Include="FakeEncryptor.cs" />
     <Compile Include="FakeQueueCreator.cs" />
