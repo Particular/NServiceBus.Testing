@@ -50,7 +50,6 @@
         {
             decimal total = 600;
 
-            // Todo: I'm not keen on this :/
             Test.Saga<DiscountPolicy>()
                 .ExpectSend<ProcessOrder>(m => m.Total == total)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
@@ -195,9 +194,44 @@
                 .ExpectNotForwardCurrentMessageTo(dest => dest == "expectedDestination")
                 .When((s, c) => s.Handle(new StartsSaga(), c));
         }
+
+        [Test]
+        public void TimeoutInThePast()
+        {
+            var expected = DateTime.UtcNow.AddDays(-3);
+            var message = new TheMessage { TimeoutAt = expected };
+
+            Test.Saga<TimeoutSaga>()
+                .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => at == expected)
+                .When((s, c) => s.Handle(message, c));
+        }
+
+        [Test]
+        public void TimeoutInThePastWithSendOnTimeout()
+        {
+            var message = new TheMessage { TimeoutAt = DateTime.UtcNow.AddDays(-3) };
+
+            Test
+                .Saga<TimeoutSaga>()
+                .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => true)
+                .When((s, c) => s.Handle(message, c))
+                .ExpectSend<TheMessageSentAtTimeout>()
+                .WhenHandlingTimeout<TheTimeout>();
+        }
+
+        [Test]
+        public void TimeoutInTheFuture()
+        {
+            var expected = DateTime.UtcNow.AddDays(3);
+            var message = new TheMessage { TimeoutAt = expected };
+
+            Test
+                .Saga<TimeoutSaga>()
+                .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => at == expected)
+                .When((s, c) => s.Handle(message, c));
+        }
     }
-
-
+    
     public class SagaThatDoesAReply : NServiceBus.Saga<SagaThatDoesAReply.SagaThatDoesAReplyData>,
         IHandleMessages<MyRequest>
     {
@@ -388,5 +422,47 @@
         public Guid Id { get; set; }
         public string Originator { get; set; }
         public string OriginalMessageId { get; set; }
+    }
+
+    public class TimeoutSaga : NServiceBus.Saga<TimeoutData>,
+                           IAmStartedByMessages<TheMessage>,
+                           IHandleTimeouts<TheTimeout>
+    {
+        public Task Handle(TheMessage message, IMessageHandlerContext context)
+        {
+            return RequestTimeout<TheTimeout>(context, message.TimeoutAt);
+        }
+
+        public Task Timeout(TheTimeout state, IMessageHandlerContext context)
+        {
+            context.Send(new TheMessageSentAtTimeout());
+            MarkAsComplete();
+
+            return Task.FromResult(0);
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TimeoutData> mapper)
+        {
+        }
+    }
+
+    public class TimeoutData : IContainSagaData
+    {
+        public Guid Id { get; set; }
+        public string Originator { get; set; }
+        public string OriginalMessageId { get; set; }
+    }
+
+    public class TheMessage : IMessage
+    {
+        public DateTime TimeoutAt { get; set; }
+    }
+
+    public class TheTimeout : IMessage
+    {
+    }
+
+    public class TheMessageSentAtTimeout : IMessage
+    {
     }
 }

@@ -74,6 +74,7 @@
     <Compile Include="ExpectedInvocations\ExpectedForwardCurrentMessageTo.cs" />
     <Compile Include="ExpectedInvocations\ExpectedNotPublishInvocation.cs" />
     <Compile Include="ExpectedInvocations\ExpectedPublishInvocation.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedNotReplyInvocation.cs" />
     <Compile Include="ExpectedInvocations\ExpectedReplyInvocation.cs" />
     <Compile Include="ExpectedInvocations\ExpectedReplyToOriginator.cs" />
     <Compile Include="ExpectedInvocations\ExpectedNotSendInvocation.cs" />
