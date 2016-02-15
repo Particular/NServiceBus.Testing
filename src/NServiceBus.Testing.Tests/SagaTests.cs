@@ -17,7 +17,7 @@
                 .ExpectSend<Command>()
                 .When((s, c) => s.Handle(new StartsSaga(), c))
                 .ExpectPublish<Event>()
-                .WhenSagaTimesOut()
+                .WhenHandlingTimeout<StartsSaga>()
                 .AssertSagaCompletionIs(true);
         }
 
@@ -82,7 +82,7 @@
                 {
                     Total = total
                 }, c))
-                .WhenSagaTimesOut()
+                .WhenHandlingTimeout<SubmitOrder>()
                 .ExpectSend<ProcessOrder>(m => m.Total == total)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
                 .When((s, c) => s.Handle(new SubmitOrder
@@ -148,8 +148,8 @@
                 {
                     Total = 300
                 }, c))
-                .WhenSagaTimesOut()
-                .ExpectSend<ProcessOrder>(m => m.Total == 200)
+                .WhenHandlingTimeout<SubmitOrder>()
+                .ExpectSend<ProcessOrder>(m => m.Total == 200 * (decimal)0.9)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
                 .When((s, c) => s.Handle(new SubmitOrder
                 {

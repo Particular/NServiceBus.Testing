@@ -3,6 +3,8 @@ namespace NServiceBus.Testing
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using NServiceBus.DelayedDelivery;
+    using NServiceBus.DeliveryConstraints;
     using NServiceBus.Extensibility;
     using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
     using NServiceBus.Persistence;
@@ -10,12 +12,10 @@ namespace NServiceBus.Testing
 
     internal class TestableMessageHandlerContext : IMessageHandlerContext
     {
-        IMessageCreator messageCreator = new MessageMapper();
-
         public List<InvokedMessage> SentMessages { get; } = new List<InvokedMessage>();
 
         public List<InvokedMessage> PublishedMessages { get; } = new List<InvokedMessage>();
-        
+
         public IList<InvokedMessage> RepliedMessages { get; set; } = new List<InvokedMessage>();
 
         public IList<string> ForwardedMessages { get; set; } = new List<string>();
@@ -29,20 +29,44 @@ namespace NServiceBus.Testing
         public string ReplyToAddress { get; }
 
         public IReadOnlyDictionary<string, string> MessageHeaders { get; }
-        
+
         public ContextBag Extensions { get; } = new ContextBag();
+
+        public object TimeOutMessage { get; private set; }
 
         public Task Send(object message, SendOptions options)
         {
+            if (IsMessageATimeOut(options))
+            {
+                TimeOutMessage = message;
+            }
             SentMessages.Add(new InvokedMessage(message, options));
             return Task.FromResult(0);
+        }
+
+        bool IsMessageATimeOut(SendOptions options)
+        {
+            DoNotDeliverBefore doNotDeliverBefore;
+            DelayDeliveryWith delayDeliveryWith;
+            
+            if (options.GetExtensions().TryGetDeliveryConstraint(out doNotDeliverBefore))
+            {
+                return true;
+            }
+
+            if (options.GetExtensions().TryGetDeliveryConstraint(out delayDeliveryWith))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public Task Send<T>(Action<T> messageConstructor, SendOptions options)
         {
             return Send(messageCreator.CreateInstance(messageConstructor), options);
         }
-        
+
         public Task Publish(object message, PublishOptions options)
         {
             PublishedMessages.Add(new InvokedMessage(message, options));
@@ -52,16 +76,6 @@ namespace NServiceBus.Testing
         public Task Publish<T>(Action<T> messageConstructor, PublishOptions publishOptions)
         {
             return Publish(messageCreator.CreateInstance(messageConstructor), publishOptions);
-        }
-
-        public Task Subscribe(Type eventType, SubscribeOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Unsubscribe(Type eventType, UnsubscribeOptions options)
-        {
-            throw new NotImplementedException();
         }
 
         public Task Reply(object message, ReplyOptions options)
@@ -81,7 +95,7 @@ namespace NServiceBus.Testing
             return Task.FromResult(0);
         }
 
-       
+
         public Task HandleCurrentMessageLater()
         {
             throw new NotImplementedException();
@@ -93,6 +107,16 @@ namespace NServiceBus.Testing
         }
 
         public SynchronizedStorageSession SynchronizedStorageSession { get; }
+
+        public Task Subscribe(Type eventType, SubscribeOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Unsubscribe(Type eventType, UnsubscribeOptions options)
+        {
+            throw new NotImplementedException();
+        }
 
         public void Validate()
         {
@@ -109,42 +133,6 @@ namespace NServiceBus.Testing
             }
         }
 
-            //void ProcessInvocation(Type genericType, object message)
-            //{
-            //    ProcessInvocation(genericType, new Dictionary<string, object>(), message);
-            //}
-
-            //void ProcessInvocation(Type genericType, Dictionary<string, object> others, object message)
-            //{
-            //    var messageType = GetMessageType(message);
-            //    var invocationType = genericType.MakeGenericType(messageType);
-            //    ProcessInvocationWithBuiltType(invocationType, others, message);
-            //}
-
-            //void ProcessInvocation<K>(Type dualGenericType, Dictionary<string, object> others, object message)
-            //{
-            //    var invocationType = dualGenericType.MakeGenericType(GetMessageType(message), typeof(K));
-            //    ProcessInvocationWithBuiltType(invocationType, others, message);
-            //}
-
-            //void ProcessInvocationWithBuiltType(Type builtType, Dictionary<string, object> others, object message)
-            //{
-            //    if (message == null)
-            //    {
-            //        throw new NullReferenceException("message is null.");
-            //    }
-
-            //    var invocation = Activator.CreateInstance(builtType) as ActualInvocation;
-
-            //    builtType.GetProperty("Message").SetValue(invocation, message, null);
-
-            //    foreach (var kv in others)
-            //    {
-            //        builtType.GetProperty(kv.Key).SetValue(invocation, kv.Value, null);
-            //    }
-
-            //    actualInvocations.Add(invocation);
-            //}
 
         Type GetMessageType(object message)
         {
@@ -166,10 +154,14 @@ namespace NServiceBus.Testing
         public void Clear()
         {
             ExpectedInvocations.Clear();
-            RepliedMessages.Clear();
-            SentMessages.Clear();
-            PublishedMessages.Clear();
+            //RepliedMessages.Clear();
+            //SentMessages.Clear();
+            //PublishedMessages.Clear();
         }
+
+        IMessageCreator messageCreator = new MessageMapper();
+
+       
     }
 
     internal class InvokedMessage

@@ -29,7 +29,7 @@
                 .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => true)
                 .When((s, c) => s.Handle(message, c))
                 .ExpectSend<TheMessageSentAtTimeout>()
-                .WhenSagaTimesOut();
+                .WhenHandlingTimeout<TheTimeout>();
         }
 
         [Test]

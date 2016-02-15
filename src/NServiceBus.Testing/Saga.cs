@@ -279,7 +279,18 @@
         {
             var message = messageCreator.CreateInstance(initializeMessage);
 
-            return When((s, c) => ((dynamic)saga).Handle(message, c));
+            return When((s, c) => ((dynamic)s).Handle(message, c));
+        }
+
+        /// <summary>
+        /// Initializes the given timeout message type and checks all the expectations previously set up,
+        /// and then clears them for continued testing.
+        /// </summary>
+        public Saga<T> WhenHandlingTimeout<TMessage>(Action<TMessage> initializeMessage = null)
+        {
+            var message = messageCreator.CreateInstance(initializeMessage);
+
+            return When((s, c) => ((dynamic)s).Timeout(message, c));
         }
 
         /// <summary>
@@ -316,6 +327,10 @@
         /// Invokes the saga timeout passing in the last timeout state it sent
         /// and then clears out all previous expectations.
         /// </summary>
+        [ObsoleteEx(
+            RemoveInVersion = "7",
+            TreatAsErrorFromVersion = "6",
+            Replacement = "WhenHandlingTimeOut(Action<TMessage> initializeMessage = null)")]
         public Saga<T> WhenSagaTimesOut()
         {
             throw new NotImplementedException();
@@ -326,7 +341,7 @@
         /// </summary>
         public Saga<T> AssertSagaCompletionIs(bool complete)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException();    
         }
 
         /// <summary>
@@ -351,7 +366,8 @@
         /// </summary>
         public Saga<T> ExpectNoTimeoutToBeSetIn<TMessage>(Func<TMessage, TimeSpan, bool> check = null)
         {
-            throw new NotImplementedException();
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDelayDeliveryWithInvocation<TMessage>(check, true));
+            return this;
         }
 
         /// <summary>
@@ -359,7 +375,6 @@
         /// </summary>
         public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
         {
-
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDoNotDeliverBeforeInvocation<TMessage>(check));
             return this;
         }
@@ -377,7 +392,8 @@
         /// </summary>
         public Saga<T> ExpectNoTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
         {
-            throw new NotImplementedException();
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDoNotDeliverBeforeInvocation<TMessage>(check, true));
+            return this;
         }
 
         private static Func<T1, bool> CheckActionToFunc<T1>(Action<T1> check)

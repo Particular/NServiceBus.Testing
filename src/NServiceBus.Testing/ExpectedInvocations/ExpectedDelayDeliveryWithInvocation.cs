@@ -8,9 +8,10 @@
 
     class ExpectedDelayDeliveryWithInvocation<TMessage> : ExpectedInvocation
     {
-        internal ExpectedDelayDeliveryWithInvocation(Func<TMessage, TimeSpan, bool> check)
+        internal ExpectedDelayDeliveryWithInvocation(Func<TMessage, TimeSpan, bool> check, bool negate = false)
         {
             this.check = check;
+            this.negate = negate;
         }
 
         internal override void Validate(TestableMessageHandlerContext context)
@@ -19,29 +20,39 @@
                 .Where(i => i.Message.GetType() == typeof(TMessage))
                 .ToList();
 
+            var found = false;
+
             if (check == null && invokedMessages.Any())
             {
-                return;
+                found = true;
+            }
+            else
+            {
+                foreach (var invokedMessage in invokedMessages)
+                {
+                    DelayDeliveryWith constraint;
+
+                    if (!invokedMessage.SendOptions.GetExtensions().TryGetDeliveryConstraint(out constraint))
+                    {
+                        continue;
+                    }
+
+                    if (check((TMessage)invokedMessage.Message, constraint.Delay))
+                    {
+                        found = true;
+                    }
+                }
             }
 
-            foreach (var invokedMessage in invokedMessages)
+            if ((found || negate) && (!negate || !found))
             {
-                DelayDeliveryWith constraint;
-
-                if (!invokedMessage.SendOptions.GetExtensions().TryGetDeliveryConstraint(out constraint))
-                {
-                    continue;
-                }
-
-                if (check((TMessage) invokedMessage.Message, constraint.Delay))
-                {
-                    return;
-                }
+                return;
             }
 
             Fail(invokedMessages.Select(i => i.Message).Cast<TMessage>().ToList());
         }
 
         readonly Func<TMessage, TimeSpan, bool> check;
+        readonly bool negate;
     }
 }

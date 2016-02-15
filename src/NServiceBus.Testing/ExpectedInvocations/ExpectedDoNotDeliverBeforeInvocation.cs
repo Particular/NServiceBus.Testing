@@ -8,9 +8,10 @@
 
     class ExpectedDoNotDeliverBeforeInvocation<TMessage> : ExpectedInvocation
     {
-        internal ExpectedDoNotDeliverBeforeInvocation(Func<TMessage, DateTime, bool> check)
+        internal ExpectedDoNotDeliverBeforeInvocation(Func<TMessage, DateTime, bool> check, bool negate = false)
         {
             this.check = check;
+            this.negate = negate;
         }
 
         internal override void Validate(TestableMessageHandlerContext context)
@@ -19,29 +20,38 @@
                 .Where(i => i.Message.GetType() == typeof(TMessage))
                 .ToList();
 
+            var found = false;
             if (check == null && invokedMessages.Any())
             {
-                return;
+                found = true;
+            }
+            else
+            {
+                foreach (var invokedMessage in invokedMessages)
+                {
+                    DoNotDeliverBefore constraint;
+
+                    if (!invokedMessage.SendOptions.GetExtensions().TryGetDeliveryConstraint(out constraint))
+                    {
+                        continue;
+                    }
+
+                    if (check((TMessage)invokedMessage.Message, constraint.At))
+                    {
+                        found = true;
+                    }
+                }
             }
 
-            foreach (var invokedMessage in invokedMessages)
+            if ((found || negate) && (!negate || !found))
             {
-                DoNotDeliverBefore constraint;
-
-                if (!invokedMessage.SendOptions.GetExtensions().TryGetDeliveryConstraint(out constraint))
-                {
-                    continue;
-                }
-
-                if (check((TMessage) invokedMessage.Message, constraint.At))
-                {
-                    return;
-                }
+                return;
             }
 
             Fail(invokedMessages.Select(i => i.Message).Cast<TMessage>().ToList());
         }
 
         readonly Func<TMessage, DateTime, bool> check;
+        readonly bool negate;
     }
 }
