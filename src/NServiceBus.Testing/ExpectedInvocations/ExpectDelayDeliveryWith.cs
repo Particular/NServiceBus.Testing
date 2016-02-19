@@ -6,9 +6,9 @@
     using NServiceBus.DeliveryConstraints;
     using NServiceBus.Extensibility;
 
-    class ExpectedDelayDeliveryWithInvocation<TMessage> : ExpectedInvocation
+    class ExpectDelayDeliveryWith<TMessage> : ExpectInvocation
     {
-        internal ExpectedDelayDeliveryWithInvocation(Func<TMessage, TimeSpan, bool> check, bool negate = false)
+        internal ExpectDelayDeliveryWith(Func<TMessage, TimeSpan, bool> check, bool negate = false)
         {
             this.check = check;
             this.negate = negate;
@@ -31,6 +31,8 @@
                 foreach (var invokedMessage in invokedMessages)
                 {
                     DelayDeliveryWith constraint;
+
+                    ((SendOptions)invokedMessage.SendOptions).GetCorrelationId();
 
                     if (!invokedMessage.SendOptions.GetExtensions().TryGetDeliveryConstraint(out constraint))
                     {

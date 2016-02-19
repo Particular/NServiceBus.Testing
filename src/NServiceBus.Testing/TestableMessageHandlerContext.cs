@@ -3,8 +3,6 @@ namespace NServiceBus.Testing
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using NServiceBus.DelayedDelivery;
-    using NServiceBus.DeliveryConstraints;
     using NServiceBus.Extensibility;
     using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
     using NServiceBus.Persistence;
@@ -22,7 +20,7 @@ namespace NServiceBus.Testing
 
         public IDictionary<string, string> IncomingHeaders { get; } = new Dictionary<string, string>();
 
-        public IList<ExpectedInvocation> ExpectedInvocations { get; } = new List<ExpectedInvocation>();
+        public IList<ExpectInvocation> ExpectedInvocations { get; } = new List<ExpectInvocation>();
 
         public string MessageId { get; }
 
@@ -32,34 +30,10 @@ namespace NServiceBus.Testing
 
         public ContextBag Extensions { get; } = new ContextBag();
 
-        public object TimeOutMessage { get; private set; }
-
         public Task Send(object message, SendOptions options)
         {
-            if (IsMessageATimeOut(options))
-            {
-                TimeOutMessage = message;
-            }
             SentMessages.Add(new InvokedMessage(message, options));
             return Task.FromResult(0);
-        }
-
-        bool IsMessageATimeOut(SendOptions options)
-        {
-            DoNotDeliverBefore doNotDeliverBefore;
-            DelayDeliveryWith delayDeliveryWith;
-            
-            if (options.GetExtensions().TryGetDeliveryConstraint(out doNotDeliverBefore))
-            {
-                return true;
-            }
-
-            if (options.GetExtensions().TryGetDeliveryConstraint(out delayDeliveryWith))
-            {
-                return true;
-            }
-
-            return false;
         }
 
         public Task Send<T>(Action<T> messageConstructor, SendOptions options)

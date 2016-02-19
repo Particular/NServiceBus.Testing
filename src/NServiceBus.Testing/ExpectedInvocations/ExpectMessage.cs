@@ -4,7 +4,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
     using System.Collections.Generic;
     using System.Linq;
 
-    class ExpectedMessageInvocation<TMessage> : ExpectedInvocation
+    class ExpectedMessageInvocation<TMessage> : ExpectInvocation
     {
         internal ExpectedMessageInvocation(
             Func<TMessage, bool> check,

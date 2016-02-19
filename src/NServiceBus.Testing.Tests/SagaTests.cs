@@ -201,7 +201,7 @@
             var expected = DateTime.UtcNow.AddDays(-3);
             var message = new TheMessage { TimeoutAt = expected };
 
-            Test.Saga<TimeoutSaga>()
+            Test.Saga<MyTimeoutSaga>()
                 .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => at == expected)
                 .When((s, c) => s.Handle(message, c));
         }
@@ -212,7 +212,7 @@
             var message = new TheMessage { TimeoutAt = DateTime.UtcNow.AddDays(-3) };
 
             Test
-                .Saga<TimeoutSaga>()
+                .Saga<MyTimeoutSaga>()
                 .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => true)
                 .When((s, c) => s.Handle(message, c))
                 .ExpectSend<TheMessageSentAtTimeout>()
@@ -226,7 +226,7 @@
             var message = new TheMessage { TimeoutAt = expected };
 
             Test
-                .Saga<TimeoutSaga>()
+                .Saga<MyTimeoutSaga>()
                 .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => at == expected)
                 .When((s, c) => s.Handle(message, c));
         }
@@ -288,7 +288,7 @@
         {
             await ReplyToOriginator(context, new ResponseToOriginator());
             await context.Publish<Event>();
-            await context.Send<StartsSaga>(s => { });
+            await context.Send<Command>(s => { });
             await context.ForwardCurrentMessageTo("forwardingDestination");
             await RequestTimeout(context, TimeSpan.FromDays(7), message);
         }
@@ -424,7 +424,7 @@
         public string OriginalMessageId { get; set; }
     }
 
-    public class TimeoutSaga : NServiceBus.Saga<TimeoutData>,
+    public class MyTimeoutSaga : NServiceBus.Saga<MyTimeoutData>,
                            IAmStartedByMessages<TheMessage>,
                            IHandleTimeouts<TheTimeout>
     {
@@ -441,12 +441,12 @@
             return Task.FromResult(0);
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TimeoutData> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyTimeoutData> mapper)
         {
         }
     }
 
-    public class TimeoutData : IContainSagaData
+    public class MyTimeoutData : IContainSagaData
     {
         public Guid Id { get; set; }
         public string Originator { get; set; }

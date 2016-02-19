@@ -1,94 +1,97 @@
-﻿//namespace NServiceBus.Testing.Tests
-//{
-//    using System;
-//    using NUnit.Framework;
+﻿namespace NServiceBus.Testing.Tests
+{
+    using System;
+    using System.Threading.Tasks;
+    using NUnit.Framework;
 
-//    [TestFixture]
-//    public class Timeouts : BaseTests
-//    {
-//        [Test]
-//        public void Should_assert_30_style_timeouts_being_set()
-//        {
-//            Test.Saga<TimeoutSaga>()
-//                .ExpectTimeoutToBeSetIn<MyTimeout>()
-//                .When(saga => saga.Handle(new StartMessage()));
-//        }
+    [TestFixture]
+    public class Timeouts
+    {
+        [Test]
+        public void Should_assert_30_style_timeouts_being_set()
+        {
+            Test.Saga<TimeoutSaga>()
+                .ExpectTimeoutToBeSetIn<MyTimeout>()
+                .When((s, c) => s.Handle(new StartMessage(), c));
+        }
 
-//        [Test]
-//        public void Should_assert_30_style_timeouts_being_set_together_with_other_timeouts()
-//        {
-//            Test.Saga<TimeoutSaga>()
-//                .ExpectTimeoutToBeSetIn<MyTimeout>()
-//                .When(saga => saga.Handle(new StartMessage()));
-//        }
+        [Test]
+        public void Should_assert_30_style_timeouts_being_set_together_with_other_timeouts()
+        {
+            Test.Saga<TimeoutSaga>()
+                .ExpectTimeoutToBeSetIn<MyTimeout>()
+                .When((s, c) => s.Handle(new StartMessage(), c));
+        }
 
-//        [Test]
-//        public void Should_assert_30_style_timeouts_being_set_with_the_correct_timeSpan()
-//        {
-//            Test.Saga<TimeoutSaga>()
-//                .ExpectTimeoutToBeSetIn<MyTimeout>((state, expiresIn) => expiresIn == TimeSpan.FromDays(1))
-//                .When(saga => saga.Handle(new StartMessage()));
-//        }
+        [Test]
+        public void Should_assert_30_style_timeouts_being_set_with_the_correct_timeSpan()
+        {
+            Test.Saga<TimeoutSaga>()
+                .ExpectTimeoutToBeSetIn<MyTimeout>((state, expiresIn) => expiresIn == TimeSpan.FromDays(1))
+                .When((s, c) => s.Handle(new StartMessage(), c));
+        }
 
-//        [Test]
-//        public void Should_assert_30_style_timeouts_being_set_with_the_correct_state()
-//        {
-//            Test.Saga<TimeoutSaga>()
-//                .ExpectTimeoutToBeSetIn<MyTimeout>((state, expiresIn) => state.SomeProperty == "Test")
-//                .When(saga => saga.Handle(new StartMessage()));
-//        }
-//    }
+        [Test]
+        public void Should_assert_30_style_timeouts_being_set_with_the_correct_state()
+        {
+            Test.Saga<TimeoutSaga>()
+                .ExpectTimeoutToBeSetIn<MyTimeout>((state, expiresIn) => state.SomeProperty == "Test")
+                .When((s, c) => s.Handle(new StartMessage(), c));
+        }
+    }
 
-//    class TimeoutSaga : Saga<TimeoutSagaData>,
-//                                 IHandleTimeouts<MyTimeout>,
-//                                 IHandleTimeouts<MyOtherTimeout>,
-//                                 IAmStartedByMessages<StartMessage>
-//    {
+    class TimeoutSaga : NServiceBus.Saga<TimeoutSagaData>,
+                                 IHandleTimeouts<MyTimeout>,
+                                 IHandleTimeouts<MyOtherTimeout>,
+                                 IAmStartedByMessages<StartMessage>
+    {
 
-//        public void Handle(StartMessage message)
-//        {
-//            RequestTimeout(TimeSpan.FromDays(1), new MyTimeout
-//                                                        {
-//                                                            SomeProperty = "Test"
-//                                                        });
-//            RequestTimeout<MyOtherTimeout>(TimeSpan.FromDays(1));
-//        }
+        public async Task Handle(StartMessage message, IMessageHandlerContext context)
+        {
+            await RequestTimeout(context, TimeSpan.FromDays(1), new MyTimeout
+            {
+                SomeProperty = "Test"
+            });
 
-//        public void Timeout(MyTimeout state)
-//        {
-//            Bus.Send(new SomeMessage());
-//        }
+            await RequestTimeout<MyOtherTimeout>(context, TimeSpan.FromDays(1));
+        }
 
-//        public void Timeout(MyOtherTimeout state)
-//        {
-//        }
+        public Task Timeout(MyTimeout state, IMessageHandlerContext context)
+        {
+            return context.Send(new SomeMessage());
+        }
 
-//        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TimeoutSagaData> mapper)
-//        {
-//        }
-//    }
+        public Task Timeout(MyOtherTimeout state, IMessageHandlerContext context)
+        {
+            return Task.FromResult(0);
+        }
 
-//    class StartMessage
-//    {
-//    }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TimeoutSagaData> mapper)
+        {
+        }
+    }
 
-//    class SomeMessage : IMessage
-//    {
-//    }
+    class StartMessage
+    {
+    }
 
-//    class MyTimeout
-//    {
-//        public string SomeProperty { get; set; }
-//    }
+    class SomeMessage : IMessage
+    {
+    }
 
-//    class MyOtherTimeout
-//    {
-//    }
+    class MyTimeout
+    {
+        public string SomeProperty { get; set; }
+    }
 
-//    class TimeoutSagaData : IContainSagaData
-//    {
-//        public Guid Id { get; set; }
-//        public string Originator { get; set; }
-//        public string OriginalMessageId { get; set; }
-//    }
-//}
+    class MyOtherTimeout
+    {
+    }
+
+    class TimeoutSagaData : IContainSagaData
+    {
+        public Guid Id { get; set; }
+        public string Originator { get; set; }
+        public string OriginalMessageId { get; set; }
+    }
+}

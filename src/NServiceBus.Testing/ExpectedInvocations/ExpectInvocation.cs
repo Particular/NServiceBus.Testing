@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    abstract class ExpectedInvocation
+    abstract class ExpectInvocation
     {
         internal abstract void Validate(TestableMessageHandlerContext context);
 

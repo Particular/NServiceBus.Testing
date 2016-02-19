@@ -6,9 +6,9 @@
     using NServiceBus.DeliveryConstraints;
     using NServiceBus.Extensibility;
 
-    class ExpectedDoNotDeliverBeforeInvocation<TMessage> : ExpectedInvocation
+    class ExpectDoNotDeliverBefore<TMessage> : ExpectInvocation
     {
-        internal ExpectedDoNotDeliverBeforeInvocation(Func<TMessage, DateTime, bool> check, bool negate = false)
+        internal ExpectDoNotDeliverBefore(Func<TMessage, DateTime, bool> check, bool negate = false)
         {
             this.check = check;
             this.negate = negate;

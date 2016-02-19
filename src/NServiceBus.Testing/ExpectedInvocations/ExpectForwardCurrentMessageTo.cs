@@ -5,9 +5,9 @@
     using System.Linq;
     using NServiceBus.Testing.ExpectedInvocations;
 
-    class ExpectedForwardCurrentMessageTo : ExpectedInvocation
+    class ExpectForwardCurrentMessageTo : ExpectInvocation
     {
-        internal ExpectedForwardCurrentMessageTo(Func<string, bool> check, bool negate = false)
+        internal ExpectForwardCurrentMessageTo(Func<string, bool> check, bool negate = false)
         {
             this.check = check;
             this.negate = negate;
@@ -27,12 +27,5 @@
 
         readonly Func<string, bool> check;
         readonly bool negate;
-    }
-
-    class ExpectedNotForwardCurrentMessageTo : ExpectedForwardCurrentMessageTo
-    {
-        public ExpectedNotForwardCurrentMessageTo(Func<string, bool> check) : base(check, true)
-        {
-        }
     }
 }

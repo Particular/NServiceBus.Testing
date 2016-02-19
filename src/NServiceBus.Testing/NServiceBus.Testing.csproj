@@ -46,16 +46,13 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="FodyWeavers.xml">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="nservicebus.testing.nuspec" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0-unstable1527\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.6.0.0-unstable1564\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Obsolete, Version=3.1.0.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
@@ -70,26 +67,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExpectedInvocations\ExpectedDoNotDeliverBeforeInvocation.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedForwardCurrentMessageTo.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedNotPublishInvocation.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedPublishInvocation.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedNotReplyInvocation.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedReplyInvocation.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedReplyToOriginator.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedNotSendInvocation.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedSendInvocation.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedDelayDeliveryWithInvocation.cs" />
-    <Compile Include="FakeDequer.cs" />
-    <Compile Include="FakeEncryptor.cs" />
-    <Compile Include="FakeQueueCreator.cs" />
-    <Compile Include="FakeSender.cs" />
-    <Compile Include="FakeTestTransport.cs" />
+    <Compile Include="ExpectedInvocations\ExpectDoNotDeliverBefore.cs" />
+    <Compile Include="ExpectedInvocations\ExpectNotForwardCurrentMessageTo.cs" />
+    <Compile Include="ExpectedInvocations\ExpectForwardCurrentMessageTo.cs" />
+    <Compile Include="ExpectedInvocations\ExpectNotPublish.cs" />
+    <Compile Include="ExpectedInvocations\ExpectSendToDestination.cs" />
+    <Compile Include="ExpectedInvocations\ExpectPublish.cs" />
+    <Compile Include="ExpectedInvocations\ExpectNotReply.cs" />
+    <Compile Include="ExpectedInvocations\ExpectReply.cs" />
+    <Compile Include="ExpectedInvocations\ExpectReplyToOriginator.cs" />
+    <Compile Include="ExpectedInvocations\ExpectNotSend.cs" />
+    <Compile Include="ExpectedInvocations\ExpectSend.cs" />
+    <Compile Include="ExpectedInvocations\ExpectDelayDeliveryWith.cs" />
     <Compile Include="Handler.cs" />
-    <Compile Include="InMemoryDataBus.cs" />
     <Compile Include="Invocations.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedMessageInvocation.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedInvocation.cs" />
+    <Compile Include="ExpectedInvocations\ExpectMessage.cs" />
+    <Compile Include="ExpectedInvocations\ExpectInvocation.cs" />
     <Compile Include="Saga.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -97,8 +90,9 @@
     <Compile Include="StubBus_Old.cs" />
     <Compile Include="Test_Old.cs" />
     <Compile Include="TestableMessageHandlerContext.cs" />
-    <Compile Include="TestConfigurationSource.cs" />
-    <Compile Include="TimeoutManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
