@@ -60,7 +60,7 @@ namespace NServiceBus.Testing.Tests
         [Test]
         public void ShouldAssertDeferWasCalledWithDateTime()
         {
-            var datetime = DateTime.Now;
+            var datetime = DateTime.UtcNow;
             Test.Handler<DeferringDateTimeHandler>()
                 .WithExternalDependencies(h => h.Defer = datetime)
                 .ExpectDefer<TestMessage>((m, t) => t == datetime)
@@ -79,7 +79,7 @@ namespace NServiceBus.Testing.Tests
         [Test]
         public void ShouldFailAssertingDeferWasCalledWithDateTime()
         {
-            var datetime = DateTime.Now;
+            var datetime = DateTime.UtcNow;
             Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
                 .ExpectDefer<TestMessage>((m, t) => t == datetime)
                 .OnMessage<TestMessage>());
@@ -97,7 +97,7 @@ namespace NServiceBus.Testing.Tests
         [Test]
         public void ShouldAssertDeferWasNotCalledWithDateTime()
         {
-            var datetime = DateTime.Now;
+            var datetime = DateTime.UtcNow;
             Test.Handler<EmptyHandler>()
                 .ExpectNotDefer<TestMessage>((m, t) => t == datetime)
                 .OnMessage<TestMessage>();
@@ -116,7 +116,7 @@ namespace NServiceBus.Testing.Tests
         [Test]
         public void ShouldFailAssertingDeferWasNotCalledWithDateTime()
         {
-            var datetime = DateTime.Now;
+            var datetime = DateTime.UtcNow;
             Assert.Throws<Exception>(() => Test.Handler<DeferringDateTimeHandler>()
                 .WithExternalDependencies(h => h.Defer = datetime)
                 .ExpectNotDefer<TestMessage>((m, t) => t == datetime)

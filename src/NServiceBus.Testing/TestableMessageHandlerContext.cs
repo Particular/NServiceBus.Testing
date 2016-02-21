@@ -29,6 +29,12 @@ namespace NServiceBus.Testing
 
         public ContextBag Extensions { get; } = new ContextBag();
 
+        public SynchronizedStorageSession SynchronizedStorageSession { get; }
+
+        public bool HandlerInvocationAborted { get; private set; }
+
+        public bool HandleCurrentMessageLaterWasCalled { get; private set; }
+
         public Task Send(object message, SendOptions options)
         {
             SentMessages.Add(new InvokedMessage(message, options));
@@ -70,15 +76,14 @@ namespace NServiceBus.Testing
 
         public Task HandleCurrentMessageLater()
         {
-            throw new NotImplementedException();
+            HandleCurrentMessageLaterWasCalled = true;
+            return Task.FromResult(0);
         }
 
         public void DoNotContinueDispatchingCurrentMessageToHandlers()
         {
-            throw new NotImplementedException();
+            HandlerInvocationAborted = true;
         }
-
-        public SynchronizedStorageSession SynchronizedStorageSession { get; }
 
         public Task Subscribe(Type eventType, SubscribeOptions options)
         {

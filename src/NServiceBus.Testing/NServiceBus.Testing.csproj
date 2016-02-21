@@ -67,7 +67,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExpectedInvocations\ExpectDoNotContinueDispatching.cs" />
     <Compile Include="ExpectedInvocations\ExpectDoNotDeliverBefore.cs" />
+    <Compile Include="ExpectedInvocations\ExpectHandleCurrentMessageLater.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotForwardCurrentMessageTo.cs" />
     <Compile Include="ExpectedInvocations\ExpectForwardCurrentMessageTo.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotPublish.cs" />

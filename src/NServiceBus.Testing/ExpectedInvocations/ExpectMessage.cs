@@ -18,9 +18,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
         internal override void Validate(TestableMessageHandlerContext context)
         {
-            var invokedMessages = messages(context)
-                .Where(i => i.Message.GetType().FullName.Replace("__impl", "").Replace("\\", "") == typeof(TMessage).FullName)
-                .ToList();
+            var invokedMessages = GetInvokedMessages(context);
 
             var found = false;
 
@@ -46,5 +44,12 @@ namespace NServiceBus.Testing.ExpectedInvocations
         readonly Func<TestableMessageHandlerContext, IList<InvokedMessage>> messages;
 
         readonly bool negate;
+
+        protected IList<InvokedMessage> GetInvokedMessages(TestableMessageHandlerContext context)
+        {
+            return messages(context)
+                .Where(i => i.Message.GetType().FullName.Replace("__impl", "").Replace("\\", "") == typeof(TMessage).FullName)
+                .ToList();
+        }
     }
 }

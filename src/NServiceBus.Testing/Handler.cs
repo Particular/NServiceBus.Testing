@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Reflection;
     using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
+    using NServiceBus.Testing.ExpectedInvocations;
 
     /// <summary>
     /// Message handler unit testing framework.
@@ -50,7 +51,7 @@
         /// </summary>
         public Handler<T> ExpectSend<TMessage>(Func<TMessage, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSend<TMessage>(check));
             return this;
         }
 
@@ -123,7 +124,7 @@
         /// </summary>
         public Handler<T> ExpectPublish<TMessage>(Func<TMessage, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedPublishInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectPublish<TMessage>(check));
             return this;
         }
 
@@ -132,7 +133,7 @@
         /// </summary>
         public Handler<T> ExpectNotPublish<TMessage>(Func<TMessage, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotPublishInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotPublish<TMessage>(check));
             return this;
         }
 
@@ -141,7 +142,7 @@
         /// </summary>
         public Handler<T> ExpectDoNotContinueDispatchingCurrentMessageToHandlers()
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDoNotContinueDispatchingCurrentMessageToHandlersInvocation<object>());
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDoNotContinueDispatching());
             return this;
         }
 
@@ -150,7 +151,7 @@
         /// </summary>
         public Handler<T> ExpectHandleCurrentMessageLater()
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedHandleCurrentMessageLaterInvocation<object>());
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectHandleCurrentMessageLater());
             return this;
         }
 
@@ -177,7 +178,7 @@
         /// </summary>
         public Handler<T> ExpectDefer<TMessage>(Func<TMessage, TimeSpan, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDeferMessageInvocation<TMessage, TimeSpan> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDelayDeliveryWith<TMessage>(check));
             return this;
         }
 
@@ -186,7 +187,7 @@
         /// </summary>
         public Handler<T> ExpectDefer<TMessage>(Func<TMessage, DateTime, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedDeferMessageInvocation<TMessage, DateTime> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDoNotDeliverBefore<TMessage>(check));
             return this;
         }
 
@@ -195,7 +196,7 @@
         /// </summary>
         public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, TimeSpan, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotDeferMessageInvocation<TMessage, TimeSpan> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDelayDeliveryWith<TMessage>(check, true));
             return this;
         }
 
@@ -204,7 +205,7 @@
         /// </summary>
         public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, DateTime, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotDeferMessageInvocation<TMessage, DateTime> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDoNotDeliverBefore<TMessage>(check, true));
             return this;
         }
 
@@ -259,18 +260,19 @@
         /// </summary>
         public void OnMessage<TMessage>(TMessage message, string messageId)
         {
-            var h = GetMessageHandler(handler.GetType(), message.GetType());
+            var h = GetMessageHandler<TMessage>(handler.GetType(), message.GetType());
             h.Invoke(handler, new object[] { message, testableMessageHandlerContext });
 
             testableMessageHandlerContext.Validate();
         }
 
-        private static MethodInfo GetMessageHandler(Type targetType, Type messageType)
+        private static MethodInfo GetMessageHandler<TMessage>(Type targetType, Type messageType)
         {
             var method = targetType.GetMethod("Handle", new[] { messageType, typeof(IMessageHandlerContext) });
             if (method != null) return method;
 
-            var handlerType = typeof(IHandleMessages<>).MakeGenericType(messageType);
+            var realMessageType = typeof(TMessage).IsInterface ? typeof(TMessage) : messageType;
+            var handlerType = typeof(IHandleMessages<>).MakeGenericType(realMessageType);
             return targetType.GetInterfaceMap(handlerType)
                             .TargetMethods
                             .FirstOrDefault();

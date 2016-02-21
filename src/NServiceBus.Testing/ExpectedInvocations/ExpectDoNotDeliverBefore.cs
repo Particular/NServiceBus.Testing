@@ -6,9 +6,10 @@
     using NServiceBus.DeliveryConstraints;
     using NServiceBus.Extensibility;
 
-    class ExpectDoNotDeliverBefore<TMessage> : ExpectInvocation
+    class ExpectDoNotDeliverBefore<TMessage> : ExpectedMessageInvocation<TMessage>
     {
-        internal ExpectDoNotDeliverBefore(Func<TMessage, DateTime, bool> check, bool negate = false)
+        internal ExpectDoNotDeliverBefore(Func<TMessage, DateTime, bool> check, bool negate = false) 
+            : base(null, context => context.SentMessages, negate)
         {
             this.check = check;
             this.negate = negate;
@@ -16,9 +17,7 @@
 
         internal override void Validate(TestableMessageHandlerContext context)
         {
-            var invokedMessages = context.SentMessages
-                .Where(i => i.Message.GetType() == typeof(TMessage))
-                .ToList();
+            var invokedMessages = GetInvokedMessages(context);
 
             var found = false;
             if (check == null && invokedMessages.Any())
