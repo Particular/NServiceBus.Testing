@@ -55,10 +55,6 @@
     <Reference Include="System.Web.Services" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\NServiceBus.Testing\Invocations.cs">
-      <Link>Invocations.cs</Link>
-    </Compile>
-    <Compile Include="InvocationTests.cs" />
     <Compile Include="Issue_933.cs" />
     <Compile Include="SagaTests.cs" />
     <Compile Include="TestHandlerFixture.cs" />

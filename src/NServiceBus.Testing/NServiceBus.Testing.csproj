@@ -84,16 +84,12 @@
     <Compile Include="ExpectedInvocations\ExpectSend.cs" />
     <Compile Include="ExpectedInvocations\ExpectDelayDeliveryWith.cs" />
     <Compile Include="Handler.cs" />
-    <Compile Include="Invocations.cs" />
     <Compile Include="ExpectedInvocations\ExpectedMessageInvocation.cs" />
     <Compile Include="ExpectedInvocations\ExpectInvocation.cs" />
     <Compile Include="InvokedMessageExtensions.cs" />
     <Compile Include="Saga.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Saga_Old.cs" />
-    <Compile Include="StubBus_Old.cs" />
-    <Compile Include="Test_Old.cs" />
     <Compile Include="TestableMessageHandlerContext.cs" />
   </ItemGroup>
   <ItemGroup>
