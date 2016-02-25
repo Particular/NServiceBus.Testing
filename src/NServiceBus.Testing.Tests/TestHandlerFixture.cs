@@ -258,6 +258,38 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
+        public void ShouldFailExpectSendLocalIfNotSendingLocal()
+        {
+            Assert.Throws<Exception>(() => Test.Handler<SendingHandler<Send1>>()
+                .ExpectSendLocal<Send1>(m => true)
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldPassExpectSendLocalIfSendingLocal()
+        {
+            Test.Handler<SendingLocalHandler<Send1>>()
+                .ExpectSendLocal<Send1>(m => true)
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldFailExpectSendLocalIfSendingLocalWithoutMatch()
+        {
+            Assert.Throws<Exception>(() => Test.Handler<SendingLocalHandler<Publish1>>()
+                .ExpectSendLocal<Send1>(m => true)
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldFailExpectSendLocalIfSendingLocalWithFailingCheck()
+        {
+            Assert.Throws<Exception>(() => Test.Handler<SendingLocalHandler<Send1>>()
+                .ExpectSendLocal<Send1>(m => false)
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
         public void ShouldPassExpectNotSendLocalIfNotSendingLocal()
         {
             Test.Handler<EmptyHandler>()
@@ -278,6 +310,14 @@ namespace NServiceBus.Testing.Tests
         {
             Test.Handler<SendingLocalHandler<Publish1>>()
                 .ExpectNotSendLocal<Send1>(m => true)
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectNotSendLocalIfSendingLocalWithFailingCheck()
+        {
+            Test.Handler<SendingLocalHandler<Send1>>()
+                .ExpectNotSendLocal<Send1>(m => false)
                 .OnMessage<TestMessage>();
         }
 
@@ -539,11 +579,11 @@ namespace NServiceBus.Testing.Tests
         public class SendingLocalHandler<TSend> : IHandleMessages<TestMessage>
             where TSend : IMessage
         {
-            public Action<TSend> ModifyPublish { get; set; } = m => { };
+            public Action<TSend> ModifyMessage { get; set; } = m => { };
 
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                return context.SendLocal(ModifyPublish);
+                return context.SendLocal(ModifyMessage);
             }
         }
 

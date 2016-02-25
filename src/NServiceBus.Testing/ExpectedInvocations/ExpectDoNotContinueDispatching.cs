@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus.Testing.ExpectedInvocations
 {
-    using System;
     using System.Linq;
 
     internal class ExpectDoNotContinueDispatching : ExpectInvocation
