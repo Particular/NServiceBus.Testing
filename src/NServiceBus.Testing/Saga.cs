@@ -182,7 +182,8 @@
         /// </summary>
         public Saga<T> ExpectHandleCurrentMessageLater()
         {
-            throw new NotImplementedException();
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectHandleCurrentMessageLater());
+            return this;
         }
 
         /// <summary>
@@ -297,7 +298,8 @@
         /// </summary>
         public Saga<T> ExpectSendLocal<TMessage>(Func<TMessage, bool> check = null)
         {
-            throw new NotImplementedException();
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSendLocal<TMessage>(check));
+            return this;
         }
 
         /// <summary>
@@ -307,15 +309,16 @@
         /// <param name="check">An action that performs assertions on the message.</param>
         public Saga<T> ExpectSendLocal<TMessage>(Action<TMessage> check)
         {
-            throw new NotImplementedException();
+            return ExpectSendLocal(CheckActionToFunc(check));
         }
 
         /// <summary>
         ///     Check that the saga does not send a message type to its local queue that complies with the given predicate.
         /// </summary>
-        public Saga<T> ExpectNotSendLocal<TMessage>(Func<TMessage, bool> check)
+        public Saga<T> ExpectNotSendLocal<TMessage>(Func<TMessage, bool> check = null)
         {
-            throw new NotImplementedException();
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSendLocal<TMessage>(check));
+            return this;
         }
 
         /// <summary>
@@ -324,7 +327,7 @@
         /// <param name="check">An action that performs assertions on the message.</param>
         public Saga<T> ExpectNotSendLocal<TMessage>(Action<TMessage> check)
         {
-            throw new NotImplementedException();
+            return ExpectNotSendLocal(CheckActionToFunc(check));
         }
 
         /// <summary>
