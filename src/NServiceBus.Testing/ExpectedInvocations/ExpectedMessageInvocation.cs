@@ -18,7 +18,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
         internal override void Validate(TestableMessageHandlerContext context)
         {
-            var invokedMessages = GetInvokedMessages(context);
+            var invokedMessages = messages(context).Containing<TMessage>();
 
             var found = false;
 
@@ -44,12 +44,5 @@ namespace NServiceBus.Testing.ExpectedInvocations
         readonly Func<TestableMessageHandlerContext, IList<InvokedMessage>> messages;
 
         readonly bool negate;
-
-        protected IList<InvokedMessage> GetInvokedMessages(TestableMessageHandlerContext context)
-        {
-            return messages(context)
-                .Where(i => i.Message is TMessage)
-                .ToList();
-        }
     }
 }

@@ -1,17 +1,12 @@
 ﻿namespace NServiceBus.Testing.ExpectedInvocations
 {
-    class ExpectHandleCurrentMessageLater : ExpectedMessageInvocation<object>
+    class ExpectHandleCurrentMessageLater : ExpectInvocation
     {
-        public ExpectHandleCurrentMessageLater(bool negate = false) 
-            : base(null, context => context.SentMessages, negate)
-        {
-        }
-
         internal override void Validate(TestableMessageHandlerContext context)
         {
             if (!context.HandleCurrentMessageLaterWasCalled)
             {
-                Fail(GetInvokedMessages(context));
+                Fail(context.SentMessages);
             }
         }
     }

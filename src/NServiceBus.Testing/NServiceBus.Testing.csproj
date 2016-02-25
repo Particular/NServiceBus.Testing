@@ -87,6 +87,7 @@
     <Compile Include="Invocations.cs" />
     <Compile Include="ExpectedInvocations\ExpectedMessageInvocation.cs" />
     <Compile Include="ExpectedInvocations\ExpectInvocation.cs" />
+    <Compile Include="InvokedMessageExtensions.cs" />
     <Compile Include="Saga.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

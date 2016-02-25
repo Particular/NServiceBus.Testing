@@ -3,19 +3,18 @@ namespace NServiceBus.Testing.ExpectedInvocations
     using System;
     using System.Linq;
 
-    class ExpectSendLocal<TMessage> : ExpectedMessageInvocation<TMessage>
+    class ExpectSendLocal<TMessage> : ExpectInvocation
     {
         private readonly Func<TMessage, bool> check;
 
         public ExpectSendLocal(Func<TMessage, bool> check)
-            : base(check, c => c.SentMessages)
         {
             this.check = check;
         }
 
         internal override void Validate(TestableMessageHandlerContext context)
         {
-            var invokedMessages = GetInvokedMessages(context);
+            var invokedMessages = context.SentMessages.Containing<TMessage>();
 
             foreach (var invokedMessage in invokedMessages)
             {

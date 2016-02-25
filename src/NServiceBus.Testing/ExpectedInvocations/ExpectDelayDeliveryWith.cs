@@ -6,10 +6,9 @@
     using NServiceBus.DeliveryConstraints;
     using NServiceBus.Extensibility;
 
-    class ExpectDelayDeliveryWith<TMessage> : ExpectedMessageInvocation<TMessage>
+    class ExpectDelayDeliveryWith<TMessage> : ExpectInvocation
     {
-        internal ExpectDelayDeliveryWith(Func<TMessage, TimeSpan, bool> check, bool negate = false) 
-            : base(null, context => context.SentMessages, negate)
+        internal ExpectDelayDeliveryWith(Func<TMessage, TimeSpan, bool> check, bool negate = false)
         {
             this.check = check;
             this.negate = negate;
@@ -17,7 +16,7 @@
 
         internal override void Validate(TestableMessageHandlerContext context)
         {
-            var invokedMessages = GetInvokedMessages(context);
+            var invokedMessages = context.SentMessages.Containing<TMessage>();
 
             var found = false;
 
