@@ -48,7 +48,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
         protected IList<InvokedMessage> GetInvokedMessages(TestableMessageHandlerContext context)
         {
             return messages(context)
-                .Where(i => i.Message.GetType().FullName.Replace("__impl", "").Replace("\\", "") == typeof(TMessage).FullName)
+                .Where(i => i.Message is TMessage)
                 .ToList();
         }
     }

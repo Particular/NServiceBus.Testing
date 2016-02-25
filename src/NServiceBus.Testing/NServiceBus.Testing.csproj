@@ -85,7 +85,7 @@
     <Compile Include="ExpectedInvocations\ExpectDelayDeliveryWith.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="Invocations.cs" />
-    <Compile Include="ExpectedInvocations\ExpectMessage.cs" />
+    <Compile Include="ExpectedInvocations\ExpectedMessageInvocation.cs" />
     <Compile Include="ExpectedInvocations\ExpectInvocation.cs" />
     <Compile Include="Saga.cs" />
     <Compile Include="Test.cs" />
