@@ -32,14 +32,6 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        public void ShouldFailAssertingSendToSitesWasCalled()
-        {
-            Assert.Throws<Exception>(() => Test.Handler<EmptyHandler>()
-                .ExpectSendToSites<TestMessage>((m, a) => true)
-                .OnMessage<TestMessage>());
-        }
-
-        [Test]
         public void ShouldAssertSendToSitesWasNotCalled()
         {
             Test.Handler<EmptyHandler>()
@@ -536,7 +528,7 @@ namespace NServiceBus.Testing.Tests
         public class SendingHandler<TSend> : IHandleMessages<TestMessage>
             where TSend : IMessage
         {
-            public Action<TSend> ModifyPublish { get; set; }
+            public Action<TSend> ModifyPublish { get; set; } = m => { };
 
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
@@ -547,7 +539,7 @@ namespace NServiceBus.Testing.Tests
         public class SendingLocalHandler<TSend> : IHandleMessages<TestMessage>
             where TSend : IMessage
         {
-            public Action<TSend> ModifyPublish { get; set; }
+            public Action<TSend> ModifyPublish { get; set; } = m => { };
 
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
@@ -558,7 +550,7 @@ namespace NServiceBus.Testing.Tests
         public class PublishingHandler<TPublish> : IHandleMessages<TestMessage>
             where TPublish : IMessage
         {
-            public Action<TPublish> ModifyPublish { get; set; }
+            public Action<TPublish> ModifyPublish { get; set; } = m => { };
 
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
@@ -570,8 +562,8 @@ namespace NServiceBus.Testing.Tests
             where TPublish1 : IMessage
             where TPublish2 : IMessage
         {
-            public Action<TPublish1> ModifyPublish1 { get; set; }
-            public Action<TPublish2> ModifyPublish2 { get; set; }
+            public Action<TPublish1> ModifyPublish1 { get; set; } = m => { };
+            public Action<TPublish2> ModifyPublish2 { get; set; } = m => { };
 
             public async Task Handle(TestMessage message, IMessageHandlerContext context)
             {

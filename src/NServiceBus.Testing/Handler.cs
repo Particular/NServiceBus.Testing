@@ -60,7 +60,7 @@
         /// </summary>
         public Handler<T> ExpectNotSend<TMessage>(Func<TMessage, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotSendInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSend<TMessage>(check));
             return this;
         }
 
@@ -88,7 +88,7 @@
         /// </summary>
         public Handler<T> ExpectSendLocal<TMessage>(Func<TMessage, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendLocalInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSendLocal<TMessage>(check));
             return this;
         }
 
@@ -97,7 +97,7 @@
         /// </summary>
         public Handler<T> ExpectNotSendLocal<TMessage>(Func<TMessage, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedNotSendLocalInvocation<TMessage> { Check = check });
+            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSendNotLocal<TMessage>(check));
             return this;
         }
 
@@ -158,10 +158,12 @@
         /// <summary>
         /// Check that the handler sends a message of the given type to sites.
         /// </summary>
+        [ObsoleteEx(
+            RemoveInVersion = "7",
+            TreatAsErrorFromVersion = "6")]
         public Handler<T> ExpectSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedSendToSitesInvocation<TMessage> { Check = check });
-            return this;
+            throw new NotImplementedException();
         }
 
         /// <summary>

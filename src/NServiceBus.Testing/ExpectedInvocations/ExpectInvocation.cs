@@ -8,7 +8,7 @@
     {
         internal abstract void Validate(TestableMessageHandlerContext context);
 
-        internal void Fail<TMessage>(IList<TMessage> invokedMessages)
+        internal void Fail<TMessage>(IEnumerable<TMessage> invokedMessages)
         {
             throw new Exception($"{Filter(GetType())} not fulfilled.\nCalls made:\n{string.Join("\n", invokedMessages.Select(i => Filter(i.GetType())))}");
         }

@@ -73,6 +73,8 @@
     <Compile Include="ExpectedInvocations\ExpectNotForwardCurrentMessageTo.cs" />
     <Compile Include="ExpectedInvocations\ExpectForwardCurrentMessageTo.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotPublish.cs" />
+    <Compile Include="ExpectedInvocations\ExpectNotSendLocal.cs" />
+    <Compile Include="ExpectedInvocations\ExpectSendLocal.cs" />
     <Compile Include="ExpectedInvocations\ExpectSendToDestination.cs" />
     <Compile Include="ExpectedInvocations\ExpectPublish.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotReply.cs" />
