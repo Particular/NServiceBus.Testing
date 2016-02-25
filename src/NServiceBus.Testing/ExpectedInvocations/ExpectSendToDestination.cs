@@ -18,8 +18,8 @@ namespace NServiceBus.Testing.ExpectedInvocations
         {
             var invokedMessages = context.SentMessages
                 .Where(i => i.Message.GetType() == typeof(TMessage))
-                .Where(i => string.IsNullOrWhiteSpace(((SendOptions)i.SendOptions).GetCorrelationId()) &&
-                    !string.IsNullOrWhiteSpace(((SendOptions)i.SendOptions).GetDestination()))
+                .Where(i => string.IsNullOrWhiteSpace(i.Options.GetCorrelationId()) &&
+                    !string.IsNullOrWhiteSpace(i.Options.GetDestination()))
                 .ToList();
 
             var found = false;
@@ -28,7 +28,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
             {
                 found = true;
             }
-            else if (invokedMessages.Any(i => check((TMessage)i.Message, ((SendOptions)i.SendOptions).GetDestination())))
+            else if (invokedMessages.Any(i => check((TMessage)i.Message, i.Options.GetDestination())))
             {
                 found = true;
             }

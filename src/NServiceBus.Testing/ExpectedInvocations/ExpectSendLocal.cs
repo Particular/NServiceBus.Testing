@@ -18,13 +18,13 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
             foreach (var invokedMessage in invokedMessages)
             {
-                if (((SendOptions)invokedMessage.SendOptions).IsRoutingToThisEndpoint() && check((TMessage)invokedMessage.Message))
+                if (invokedMessage.Options.IsRoutingToThisEndpoint() && check(invokedMessage.Message))
                 {
                     return;
                 }
             }
 
-            Fail(invokedMessages.Select(i => i.Message).Cast<TMessage>());
+            Fail(invokedMessages.Select(i => i.Message));
         }
     }
 }

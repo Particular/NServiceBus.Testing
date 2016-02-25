@@ -4,31 +4,27 @@ namespace NServiceBus.Testing.ExpectedInvocations
     using System.Collections.Generic;
     using System.Linq;
 
-    class ExpectedMessageInvocation<TMessage> : ExpectInvocation
+    abstract class ExpectedMessageInvocation<TMessage> : ExpectInvocation
     {
-        internal ExpectedMessageInvocation(
-            Func<TMessage, bool> check,
-            Func<TestableMessageHandlerContext, IList<InvokedMessage>> messages)
+        internal ExpectedMessageInvocation(Func<TMessage, bool> check)
         {
             this.check = check ?? (message => true);
-            this.messages = messages;
-            
         }
 
         internal override void Validate(TestableMessageHandlerContext context)
         {
-            var invokedMessages = messages(context).Containing<TMessage>();
+            var invokedMessages = GetMessages(context);
 
-            if (invokedMessages.Any(invokedMessage => check((TMessage) invokedMessage.Message)))
+            if (invokedMessages.Any(invokedMessage => check(invokedMessage)))
             {
                 return;
             }
 
-            Fail(invokedMessages.Select(i => i.Message).Cast<TMessage>().ToList());
+            Fail(invokedMessages);
         }
 
-        readonly Func<TMessage, bool> check;
+        protected abstract List<TMessage> GetMessages(TestableMessageHandlerContext context);
 
-        readonly Func<TestableMessageHandlerContext, IList<InvokedMessage>> messages;
+        readonly Func<TMessage, bool> check;
     }
 }

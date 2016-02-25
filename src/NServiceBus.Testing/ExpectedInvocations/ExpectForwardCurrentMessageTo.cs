@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Testing
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using NServiceBus.Testing.ExpectedInvocations;
 
@@ -22,7 +21,7 @@
                 return;
             }
 
-            Fail(new List<InvokedMessage>());
+            Fail(Enumerable.Empty<object>());
         }
 
         readonly Func<string, bool> check;

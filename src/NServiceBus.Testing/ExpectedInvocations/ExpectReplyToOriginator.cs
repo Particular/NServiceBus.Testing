@@ -15,8 +15,8 @@
         {
             var invokedMessages = context.RepliedMessages
                 .Where(i => i.Message.GetType() == typeof(TMessage))
-                .Where(i => !string.IsNullOrWhiteSpace(((ReplyOptions)i.SendOptions).GetCorrelationId()) &&
-                    !string.IsNullOrWhiteSpace(((ReplyOptions)i.SendOptions).GetDestination()))
+                .Where(i => !string.IsNullOrWhiteSpace(((ReplyOptions)i.Options).GetCorrelationId()) &&
+                    !string.IsNullOrWhiteSpace(((ReplyOptions)i.Options).GetDestination()))
                 .ToList();
 
             var found = false;

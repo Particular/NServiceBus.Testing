@@ -29,12 +29,12 @@
                 {
                     DoNotDeliverBefore constraint;
 
-                    if (!invokedMessage.SendOptions.GetExtensions().TryGetDeliveryConstraint(out constraint))
+                    if (!invokedMessage.Options.GetExtensions().TryGetDeliveryConstraint(out constraint))
                     {
                         continue;
                     }
 
-                    if (check((TMessage)invokedMessage.Message, constraint.At))
+                    if (check(invokedMessage.Message, constraint.At))
                     {
                         found = true;
                     }
@@ -46,7 +46,7 @@
                 return;
             }
 
-            Fail(invokedMessages.Select(i => i.Message).Cast<TMessage>().ToList());
+            Fail(invokedMessages.Select(i => i.Message).ToList());
         }
 
         readonly Func<TMessage, DateTime, bool> check;

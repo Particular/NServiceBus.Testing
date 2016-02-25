@@ -30,14 +30,12 @@
                 {
                     DelayDeliveryWith constraint;
 
-                    ((SendOptions)invokedMessage.SendOptions).GetCorrelationId();
-
-                    if (!invokedMessage.SendOptions.GetExtensions().TryGetDeliveryConstraint(out constraint))
+                    if (!invokedMessage.Options.GetExtensions().TryGetDeliveryConstraint(out constraint))
                     {
                         continue;
                     }
 
-                    if (check((TMessage)invokedMessage.Message, constraint.Delay))
+                    if (check(invokedMessage.Message, constraint.Delay))
                     {
                         found = true;
                     }
@@ -49,7 +47,7 @@
                 return;
             }
 
-            Fail(invokedMessages.Select(i => i.Message).Cast<TMessage>().ToList());
+            Fail(invokedMessages.Select(i => i.Message).ToList());
         }
 
         readonly Func<TMessage, TimeSpan, bool> check;

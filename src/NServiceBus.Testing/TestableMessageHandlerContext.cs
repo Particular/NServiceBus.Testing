@@ -9,11 +9,11 @@ namespace NServiceBus.Testing
 
     internal class TestableMessageHandlerContext : IMessageHandlerContext
     {
-        public List<InvokedMessage> SentMessages { get; } = new List<InvokedMessage>();
+        public List<SentMessage<object>> SentMessages { get; } = new List<SentMessage<object>>();
 
-        public List<InvokedMessage> PublishedMessages { get; } = new List<InvokedMessage>();
+        public List<PublishedMessage<object>> PublishedMessages { get; } = new List<PublishedMessage<object>>();
 
-        public IList<InvokedMessage> RepliedMessages { get; set; } = new List<InvokedMessage>();
+        public IList<RepliedMessage<object>> RepliedMessages { get; set; } = new List<RepliedMessage<object>>();
 
         public IList<string> ForwardedMessages { get; set; } = new List<string>();
 
@@ -37,7 +37,7 @@ namespace NServiceBus.Testing
 
         public Task Send(object message, SendOptions options)
         {
-            SentMessages.Add(new InvokedMessage(message, options));
+            SentMessages.Add(new SentMessage<object>(message, options));
             return Task.FromResult(0);
         }
 
@@ -48,7 +48,7 @@ namespace NServiceBus.Testing
 
         public Task Publish(object message, PublishOptions options)
         {
-            PublishedMessages.Add(new InvokedMessage(message, options));
+            PublishedMessages.Add(new PublishedMessage<object>(message, options));
             return Task.FromResult(0);
         }
 
@@ -59,7 +59,7 @@ namespace NServiceBus.Testing
 
         public Task Reply(object message, ReplyOptions options)
         {
-            RepliedMessages.Add(new InvokedMessage(message, options));
+            RepliedMessages.Add(new RepliedMessage<object>(message, options));
             return Task.FromResult(0);
         }
 
@@ -110,24 +110,6 @@ namespace NServiceBus.Testing
             }
         }
 
-
-        Type GetMessageType(object message)
-        {
-            if (message.GetType().FullName.EndsWith("__impl"))
-            {
-                var name = message.GetType().FullName.Replace("__impl", "").Replace("\\", "");
-                foreach (var i in message.GetType().GetInterfaces())
-                {
-                    if (i.FullName == name)
-                    {
-                        return i;
-                    }
-                }
-            }
-
-            return message.GetType();
-        }
-
         public void Clear()
         {
             ExpectedInvocations.Clear();
@@ -144,16 +126,55 @@ namespace NServiceBus.Testing
         }
     }
 
-    internal class InvokedMessage
+    internal class Outgoing<TMessage, TOptions>
     {
-        public InvokedMessage(object message, ExtendableOptions sendOptions)
+        public Outgoing(TMessage message, TOptions options)
         {
             Message = message;
-            SendOptions = sendOptions;
+            Options = options;
         }
 
-        public object Message { get; private set; }
+        public TMessage Message { get; private set; }
 
-        public ExtendableOptions SendOptions { get; private set; }
+        public TOptions Options { get; private set; }
+    }
+
+    internal class SentMessage<TMessage>
+    {
+        public SentMessage(TMessage message, SendOptions options)
+        {
+            Message = message;
+            Options = options;
+        }
+
+        public TMessage Message { get; private set; }
+
+        public SendOptions Options { get; private set; }
+    }
+
+    internal class PublishedMessage<TMessage>
+    {
+        public PublishedMessage(TMessage message, PublishOptions options)
+        {
+            Message = message;
+            Options = options;
+        }
+
+        public TMessage Message { get; private set; }
+
+        public PublishOptions Options { get; private set; }
+    }
+
+    internal class RepliedMessage<TMessage>
+    {
+        public RepliedMessage(TMessage message, ExtendableOptions options)
+        {
+            Message = message;
+            Options = options;
+        }
+
+        public TMessage Message { get; private set; }
+
+        public ExtendableOptions Options { get; private set; }
     }
 }
