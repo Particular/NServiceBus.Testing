@@ -1,7 +1,5 @@
 ﻿namespace NServiceBus.Testing.ExpectedInvocations
 {
-    using System;
-
     class ExpectHandleCurrentMessageLater : ExpectedMessageInvocation<object>
     {
         public ExpectHandleCurrentMessageLater(bool negate = false) 

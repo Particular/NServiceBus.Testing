@@ -97,7 +97,7 @@
         /// </summary>
         public Handler<T> ExpectNotSendLocal<TMessage>(Func<TMessage, bool> check)
         {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSendNotLocal<TMessage>(check));
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSendLocal<TMessage>(check));
             return this;
         }
 
