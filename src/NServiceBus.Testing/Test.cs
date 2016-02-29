@@ -24,6 +24,14 @@
         }
 
         /// <summary>
+        ///     Get the reference to the message creator used for testing.
+        /// </summary>
+        public static IMessageCreator MessageCreator
+        {
+            get { return messageCreator; }
+        }
+
+        /// <summary>
         ///     Initializes the testing infrastructure.
         /// </summary>
         public static void Initialize(Action<BusConfiguration> customisations = null)
