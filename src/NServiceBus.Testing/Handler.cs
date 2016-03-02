@@ -105,15 +105,6 @@
         }
 
         /// <summary>
-        /// Check that the handler uses the bus to return the appropriate error code.
-        /// </summary>
-        public Handler<T> ExpectReturn<TEnum>(Func<TEnum, bool> check)
-        {
-            //testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectedReturnInvocation<TEnum> { Check = check });
-            return this;
-        }
-
-        /// <summary>
         /// Check that the handler publishes a message of the given type complying with the given predicate.
         /// </summary>
         public Handler<T> ExpectPublish<TMessage>(Func<TMessage, bool> check)
@@ -248,6 +239,17 @@
             handleMethod(handler, message, testableMessageHandlerContext).GetAwaiter().GetResult();
 
             testableMessageHandlerContext.Validate();
+        }
+
+        /// <summary>
+        /// Check that the handler uses the bus to return the appropriate error code.
+        /// </summary>
+        [ObsoleteEx(
+            RemoveInVersion = "7",
+            TreatAsErrorFromVersion = "6")]
+        public Handler<T> ExpectReturn<TEnum>(Func<TEnum, bool> check)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
