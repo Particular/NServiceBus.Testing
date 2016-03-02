@@ -83,19 +83,6 @@
             return messageCreator.CreateInstance(action);
         }
 
-        /// <summary>
-        /// Specify a test for a message handler specifying a callback to create
-        /// the handler and getting an instance of the bus passed in.
-        /// Useful for handlers based on constructor injection.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6")]
-        public static Handler<T> Handler<T>(Func<IMessageSession, T> handlerCreationCallback)
-        {
-            throw new NotImplementedException();
-        }
-
         static IMessageCreator messageCreator = new MessageMapper();
     }
 }
