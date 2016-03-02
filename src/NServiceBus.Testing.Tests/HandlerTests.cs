@@ -490,6 +490,14 @@ namespace NServiceBus.Testing.Tests
             Assert.AreEqual("Header2", command.Header2);
         }
 
+        [Test]
+        public void OnMessageShouldAwaitAsyncTasks()
+        {
+            Test.Handler<AsyncHandler>()
+                .ExpectSend<Send1>(m => true)
+                .OnMessage<MyCommand>();
+        }
+
         private class MyCommand : ICommand
         {
             public string Header1 { get; set; }
@@ -516,6 +524,15 @@ namespace NServiceBus.Testing.Tests
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
                 return Task.FromResult(0);
+            }
+        }
+
+        private class AsyncHandler : IHandleMessages<MyCommand>
+        {
+            public async Task Handle(MyCommand message, IMessageHandlerContext context)
+            {
+                await Task.Yield();
+                await context.Send<Send1>(m => { }, new SendOptions());
             }
         }
 
