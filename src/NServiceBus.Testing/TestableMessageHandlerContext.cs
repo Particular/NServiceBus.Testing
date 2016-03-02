@@ -90,16 +90,6 @@ namespace NServiceBus.Testing
             HandlerInvocationAborted = true;
         }
 
-        public Task Subscribe(Type eventType, SubscribeOptions options)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task Unsubscribe(Type eventType, UnsubscribeOptions options)
-        {
-            throw new NotSupportedException();
-        }
-
         public void Validate()
         {
             try
