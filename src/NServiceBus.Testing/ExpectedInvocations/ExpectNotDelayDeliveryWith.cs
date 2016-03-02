@@ -20,7 +20,6 @@
             if (sentMessages.Any(s => check(s.Message, s.Options.GetDeliveryDelay().Value)))
             {
                 Fail(sentMessages.Select(i => i.Message).ToList());
-
             }
         }
 

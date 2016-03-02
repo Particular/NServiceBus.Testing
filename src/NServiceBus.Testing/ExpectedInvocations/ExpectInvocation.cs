@@ -10,7 +10,7 @@
 
         protected void Fail<TMessage>(IEnumerable<TMessage> invokedMessages)
         {
-            throw new Exception($"{Filter(GetType())} not fulfilled.\nCalls made:\n{string.Join("\n", invokedMessages.Select(i => Filter(i.GetType())))}");
+            throw new Exception($"{GetExpecationName(GetType())} not fulfilled.\nCalls made:\n{string.Join("\n", invokedMessages.Select(i => GetExpecationName(i.GetType())))}");
         }
 
         protected void Fail(string message)
@@ -18,7 +18,7 @@
             throw new Exception(message);
         }
 
-        string Filter(Type type)
+        string GetExpecationName(Type type)
         {
             var formattedString = type.ToString()
                 .Replace("NServiceBus.Testing.", "")

@@ -569,12 +569,12 @@ namespace NServiceBus.Testing.Tests
         {
             public TimeSpan Defer { get; set; }
 
-            public async Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
                 var sendOptions = new SendOptions();
                 sendOptions.DelayDeliveryWith(Defer);
 
-                await context.Send(message, sendOptions);
+                return context.Send(message, sendOptions);
             }
         }
 
@@ -582,12 +582,12 @@ namespace NServiceBus.Testing.Tests
         {
             public DateTime Defer { get; set; }
 
-            public async Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
                 var sendOptions = new SendOptions();
                 sendOptions.DoNotDeliverBefore(Defer);
 
-                await context.Send(message, sendOptions);
+                return context.Send(message, sendOptions);
             }
         }
 

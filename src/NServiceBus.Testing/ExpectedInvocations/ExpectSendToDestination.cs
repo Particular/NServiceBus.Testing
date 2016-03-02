@@ -14,15 +14,14 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
         public override void Validate(TestableMessageHandlerContext context)
         {
-            var sentMessages = context.SentMessages
-                .Where(i => i.Message.GetType() == typeof(TMessage))
+            var sentMessages = context.SentMessages.Containing<TMessage>()
                 .Where(i => string.IsNullOrWhiteSpace(i.Options.GetCorrelationId()) &&
                     !string.IsNullOrWhiteSpace(i.Options.GetDestination()))
                 .ToList();
 
-            if (!sentMessages.Any(i => check((TMessage) i.Message, i.Options.GetDestination())))
+            if (!sentMessages.Any(i => check(i.Message, i.Options.GetDestination())))
             {
-                Fail(sentMessages.Select(i => i.Message).Cast<TMessage>().ToList());
+                Fail(sentMessages.Select(i => i.Message).ToList());
             }
         }
     }
