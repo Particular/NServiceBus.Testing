@@ -3,25 +3,29 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
+    using System.Linq.Expressions;
+    using System.Threading.Tasks;
+    using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
+    using NServiceBus.Testing.ExpectedInvocations;
 
     /// <summary>
     /// Message handler unit testing framework.
     /// </summary>
     public class Handler<T>
     {
-        private readonly StubBus bus;
         private readonly T handler;
-        private IDictionary<string, string> incomingHeaders = new Dictionary<string, string>();
-        private IList<IExpectedInvocation> expectedInvocations = new List<IExpectedInvocation>();
+
+        MessageMapper messageCreator = new MessageMapper();
+
+        TestableMessageHandlerContext testableMessageHandlerContext;
 
         /// <summary>
         /// Creates a new instance of the handler tester.
         /// </summary>
-        internal Handler(T handler, StubBus bus)
+        internal Handler(T handler)
         {
             this.handler = handler;
-            this.bus = bus;
+            testableMessageHandlerContext = new TestableMessageHandlerContext(messageCreator);
         }
 
         /// <summary>
@@ -40,7 +44,7 @@
         /// </summary>
         public Handler<T> SetIncomingHeader(string key, string value)
         {
-            incomingHeaders[key] = value;
+            testableMessageHandlerContext.IncomingHeaders[key] = value;
 
             return this;
         }
@@ -50,7 +54,7 @@
         /// </summary>
         public Handler<T> ExpectSend<TMessage>(Func<TMessage, bool> check)
         {
-            expectedInvocations.Add(new ExpectedSendInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSend<TMessage>(check));
             return this;
         }
 
@@ -59,7 +63,7 @@
         /// </summary>
         public Handler<T> ExpectNotSend<TMessage>(Func<TMessage, bool> check)
         {
-            expectedInvocations.Add(new ExpectedNotSendInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSend<TMessage>(check));
             return this;
         }
 
@@ -68,7 +72,7 @@
         /// </summary>
         public Handler<T> ExpectNotReply<TMessage>(Func<TMessage, bool> check)
         {
-            expectedInvocations.Add(new ExpectedNotReplyInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotReply<TMessage>(check));
             return this;
         }
 
@@ -77,7 +81,7 @@
         /// </summary>
         public Handler<T> ExpectReply<TMessage>(Func<TMessage, bool> check)
         {
-            expectedInvocations.Add(new ExpectedReplyInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectReply<TMessage>(check));
             return this;
         }
 
@@ -87,7 +91,7 @@
         /// </summary>
         public Handler<T> ExpectSendLocal<TMessage>(Func<TMessage, bool> check)
         {
-            expectedInvocations.Add(new ExpectedSendLocalInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSendLocal<TMessage>(check));
             return this;
         }
 
@@ -96,25 +100,7 @@
         /// </summary>
         public Handler<T> ExpectNotSendLocal<TMessage>(Func<TMessage, bool> check)
         {
-            expectedInvocations.Add(new ExpectedNotSendLocalInvocation<TMessage> { Check = check });
-            return this;
-        }
-
-        /// <summary>
-        /// Check that the handler uses the bus to return the appropriate error code.
-        /// </summary>
-        public Handler<T> ExpectReturn<TEnum>(Func<TEnum, bool> check)
-        {
-            expectedInvocations.Add(new ExpectedReturnInvocation<TEnum> { Check = check });
-            return this;
-        }
-
-        /// <summary>
-        /// Check that the handler sends the given message type to the appropriate destination.
-        /// </summary>
-        public Handler<T> ExpectSendToDestination<TMessage>(Func<TMessage, Address, bool> check)
-        {
-            expectedInvocations.Add(new ExpectedSendToDestinationInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSendLocal<TMessage>(check));
             return this;
         }
 
@@ -123,7 +109,7 @@
         /// </summary>
         public Handler<T> ExpectPublish<TMessage>(Func<TMessage, bool> check)
         {
-            expectedInvocations.Add(new ExpectedPublishInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectPublish<TMessage>(check));
             return this;
         }
 
@@ -132,7 +118,7 @@
         /// </summary>
         public Handler<T> ExpectNotPublish<TMessage>(Func<TMessage, bool> check)
         {
-            expectedInvocations.Add(new ExpectedNotPublishInvocation<TMessage> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotPublish<TMessage>(check));
             return this;
         }
 
@@ -141,7 +127,7 @@
         /// </summary>
         public Handler<T> ExpectDoNotContinueDispatchingCurrentMessageToHandlers()
         {
-            expectedInvocations.Add(new ExpectedDoNotContinueDispatchingCurrentMessageToHandlersInvocation<object>());
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDoNotContinueDispatching());
             return this;
         }
 
@@ -150,7 +136,7 @@
         /// </summary>
         public Handler<T> ExpectHandleCurrentMessageLater()
         {
-            expectedInvocations.Add(new ExpectedHandleCurrentMessageLaterInvocation<object>());
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectHandleCurrentMessageLater());
             return this;
         }
 
@@ -159,7 +145,7 @@
         /// </summary>
         public Handler<T> ExpectDefer<TMessage>(Func<TMessage, TimeSpan, bool> check)
         {
-            expectedInvocations.Add(new ExpectedDeferMessageInvocation<TMessage, TimeSpan> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDelayDeliveryWith<TMessage>(check));
             return this;
         }
 
@@ -168,7 +154,7 @@
         /// </summary>
         public Handler<T> ExpectDefer<TMessage>(Func<TMessage, DateTime, bool> check)
         {
-            expectedInvocations.Add(new ExpectedDeferMessageInvocation<TMessage, DateTime> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDoNotDeliverBefore<TMessage>(check));
             return this;
         }
 
@@ -177,7 +163,7 @@
         /// </summary>
         public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, TimeSpan, bool> check)
         {
-            expectedInvocations.Add(new ExpectedNotDeferMessageInvocation<TMessage, TimeSpan> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotDelayDeliveryWith<TMessage>(check));
             return this;
         }
 
@@ -186,7 +172,7 @@
         /// </summary>
         public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, DateTime, bool> check)
         {
-            expectedInvocations.Add(new ExpectedNotDeferMessageInvocation<TMessage, DateTime> { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotDoNotDeliverBefore<TMessage>(check));
             return this;
         }
 
@@ -195,7 +181,7 @@
         /// </summary>
         public Handler<T> ExpectNotForwardCurrentMessageTo(Func<string, bool> check)
         {
-            expectedInvocations.Add(new ExpectedNotForwardCurrentMessageToInvocation{ Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotForwardCurrentMessageTo(check));
             return this;
         }
 
@@ -204,7 +190,7 @@
         /// </summary>
         public Handler<T> ExpectForwardCurrentMessageTo(Func<string, bool> check)
         {
-            expectedInvocations.Add(new ExpectedForwardCurrentMessageToInvocation { Check = check });
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectForwardCurrentMessageTo(check));
             return this;
         }
 
@@ -222,8 +208,8 @@
         /// </summary>
         public void OnMessage<TMessage>(string messageId, Action<TMessage> initializeMessage = null)
         {
-            var msg = bus.CreateInstance(initializeMessage);
-            OnMessage(msg, messageId);
+            var message = messageCreator.CreateInstance<TMessage>();
+            OnMessage(message, messageId);
         }
 
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
@@ -241,41 +227,91 @@
         /// </summary>
         public void OnMessage<TMessage>(TMessage message, string messageId)
         {
-            var context = new MessageContext { Id = messageId, ReturnAddress = "client", Headers = incomingHeaders };
-            bus.CurrentMessageContext = context;
+            testableMessageHandlerContext.MessageId = messageId;
 
-            foreach (var keyValuePair in incomingHeaders)
+            var messageType = messageCreator.GetMappedTypeFor(message.GetType());
+            var handleMethod = GetMethod(handler.GetType(), messageType, typeof(IHandleMessages<>));
+            if (handleMethod == null)
             {
-                bus.SetHeaderAction(message, keyValuePair.Key, keyValuePair.Value);
+                return;
             }
 
-            ExtensionMethods.CurrentMessageBeingHandled = message;
+            handleMethod(handler, message, testableMessageHandlerContext).GetAwaiter().GetResult();
 
-            try
-            {
-                var method = GetMessageHandler(handler.GetType(), typeof(TMessage));
-                method.Invoke(handler, new object[] {message});
-            }
-            catch (TargetInvocationException e)
-            {
-                throw e.InnerException;
-            }
-
-            bus.ValidateAndReset(expectedInvocations);
-            expectedInvocations.Clear();
-
-            ExtensionMethods.CurrentMessageBeingHandled = null;
+            testableMessageHandlerContext.Validate();
         }
 
-        private static MethodInfo GetMessageHandler(Type targetType, Type messageType)
+        /// <summary>
+        /// Check that the handler uses the bus to return the appropriate error code.
+        /// </summary>
+        [ObsoleteEx(
+            RemoveInVersion = "7",
+            TreatAsErrorFromVersion = "6")]
+        public Handler<T> ExpectReturn<TEnum>(Func<TEnum, bool> check)
         {
-            var method = targetType.GetMethod("Handle", new[] { messageType });
-            if (method != null) return method;
+            throw new NotImplementedException();
+        }
 
-            var handlerType = typeof(IHandleMessages<>).MakeGenericType(messageType);
-            return targetType.GetInterfaceMap(handlerType)
-                            .TargetMethods
-                            .FirstOrDefault();
+        /// <summary>
+        /// Check that the handler sends the given message type to the appropriate destination.
+        /// </summary>
+        [ObsoleteEx(
+            RemoveInVersion = "7",
+            TreatAsErrorFromVersion = "6")]
+        public Handler<T> ExpectSendToDestination<TMessage>(Func<TMessage, string, bool> check)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Check that the handler sends a message of the given type to sites.
+        /// </summary>
+        [ObsoleteEx(
+            RemoveInVersion = "7",
+            TreatAsErrorFromVersion = "6")]
+        public Handler<T> ExpectSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Check that the handler doesn't send a message of the given type to sites.		
+        /// </summary>
+        [ObsoleteEx(
+            RemoveInVersion = "7",
+            TreatAsErrorFromVersion = "6")]
+        public Handler<T> ExpectNotSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
+        {
+            throw new NotImplementedException();
+        }
+
+        static Func<object, object, IMessageHandlerContext, Task> GetMethod(Type targetType, Type messageType, Type interfaceGenericType)
+        {
+            var interfaceType = interfaceGenericType.MakeGenericType(messageType);
+
+            if (!interfaceType.IsAssignableFrom(targetType))
+            {
+                return null;
+            }
+
+            var methodInfo = targetType.GetInterfaceMap(interfaceType).TargetMethods.FirstOrDefault();
+            if (methodInfo == null)
+            {
+                return null;
+            }
+
+            var target = Expression.Parameter(typeof(object));
+            var messageParam = Expression.Parameter(typeof(object));
+            var contextParam = Expression.Parameter(typeof(IMessageHandlerContext));
+
+            var castTarget = Expression.Convert(target, targetType);
+
+            var methodParameters = methodInfo.GetParameters();
+            var messageCastParam = Expression.Convert(messageParam, methodParameters.ElementAt(0).ParameterType);
+
+            Expression body = Expression.Call(castTarget, methodInfo, messageCastParam, contextParam);
+
+            return Expression.Lambda<Func<object, object, IMessageHandlerContext, Task>>(body, target, messageParam, contextParam).Compile();
         }
     }
 }
