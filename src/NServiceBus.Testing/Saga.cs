@@ -355,7 +355,7 @@
         [ObsoleteEx(
             RemoveInVersion = "7",
             TreatAsErrorFromVersion = "6",
-            Replacement = "WhenHandlingTimeOut(Action<TMessage> initializeMessage = null)")]
+            ReplacementTypeOrMember = "WhenHandlingTimeOut(Action<TMessage> initializeMessage = null)")]
         public Saga<T> WhenSagaTimesOut()
         {
             throw new NotImplementedException();
@@ -368,7 +368,7 @@
         [ObsoleteEx(
             RemoveInVersion = "7",
             TreatAsErrorFromVersion = "6",
-            Replacement = "When(Action<T, IMessageHandlerContext> sagaIsInvoked)")]
+            ReplacementTypeOrMember = "When(Action<T, IMessageHandlerContext> sagaIsInvoked)")]
         public Saga<T> When(Action<T> sagaIsInvoked)
         {
             throw new NotImplementedException();
