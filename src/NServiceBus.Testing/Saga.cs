@@ -9,7 +9,7 @@
     /// <summary>
     /// Saga unit testing framework.
     /// </summary>
-    public class Saga<T> where T : Saga, new()
+    public class Saga<T> where T : Saga
     {
         internal Saga(T saga)
         {
