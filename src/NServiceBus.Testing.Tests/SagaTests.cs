@@ -53,10 +53,16 @@
             Test.Saga<DiscountPolicy>()
                 .ExpectSend<ProcessOrder>(m => m.Total == total)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When((s, c) => s.Handle(new SubmitOrder { Total = total }, c))
-                .ExpectSend<ProcessOrder>(m => m.Total == total * (decimal)0.9)
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = total
+                }, c))
+                .ExpectSend<ProcessOrder>(m => m.Total == total*(decimal) 0.9)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When((s, c) => s.Handle(new SubmitOrder { Total = total }, c));
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = total
+                }, c));
         }
 
         [Test]
@@ -66,7 +72,10 @@
 
             Test.Saga<DiscountPolicy>()
                 .ExpectSend<ProcessOrder>(m => Assert.That(() => m.Total, Is.EqualTo(total)))
-                .When((s, c) => s.Handle(new SubmitOrder { Total = total }, c));
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = total
+                }, c));
         }
 
         [Test]
@@ -89,7 +98,6 @@
                     Total = total
                 }, c));
         }
-
 
         [Test]
         public void RemoteOrder()
@@ -141,14 +149,14 @@
                 {
                     Total = 400
                 }, c))
-                .ExpectSend<ProcessOrder>(m => m.Total == 300 * (decimal)0.9)
+                .ExpectSend<ProcessOrder>(m => m.Total == 300*(decimal) 0.9)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
                 .When((s, c) => s.Handle(new SubmitOrder
                 {
                     Total = 300
                 }, c))
                 .WhenHandlingTimeout<SubmitOrder>()
-                .ExpectSend<ProcessOrder>(m => m.Total == 200 * (decimal)0.9)
+                .ExpectSend<ProcessOrder>(m => m.Total == 200*(decimal) 0.9)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
                 .When((s, c) => s.Handle(new SubmitOrder
                 {
@@ -199,7 +207,10 @@
         public void TimeoutInThePast()
         {
             var expected = DateTime.UtcNow.AddDays(-3);
-            var message = new TheMessage { TimeoutAt = expected };
+            var message = new TheMessage
+            {
+                TimeoutAt = expected
+            };
 
             Test.Saga<MyTimeoutSaga>()
                 .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => at == expected)
@@ -209,7 +220,10 @@
         [Test]
         public void TimeoutInThePastWithSendOnTimeout()
         {
-            var message = new TheMessage { TimeoutAt = DateTime.UtcNow.AddDays(-3) };
+            var message = new TheMessage
+            {
+                TimeoutAt = DateTime.UtcNow.AddDays(-3)
+            };
 
             Test.Saga<MyTimeoutSaga>()
                 .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => true)
@@ -222,7 +236,10 @@
         public void TimeoutInTheFuture()
         {
             var expected = DateTime.UtcNow.AddDays(3);
-            var message = new TheMessage { TimeoutAt = expected };
+            var message = new TheMessage
+            {
+                TimeoutAt = expected
+            };
 
             Test.Saga<MyTimeoutSaga>()
                 .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => at == expected)
@@ -258,13 +275,14 @@
         IHandleMessages<SendLocalSaga.RequestSendLocal>,
         IHandleMessages<SendLocalSaga.RequestNotSendLocal>
     {
-        public Task Handle(RequestSendLocal message, IMessageHandlerContext context)
-        {
-            return context.SendLocal(new Message());
-        }
         public Task Handle(RequestNotSendLocal message, IMessageHandlerContext context)
         {
             return Task.FromResult(0);
+        }
+
+        public Task Handle(RequestSendLocal message, IMessageHandlerContext context)
+        {
+            return context.SendLocal(new Message());
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SendLocalSagaData> mapper)
@@ -327,7 +345,6 @@
     {
         public bool ShouldReply { get; set; }
     }
-
 
     public class MyReply
     {
@@ -462,7 +479,7 @@
             {
                 m.CustomerId = Data.CustomerId;
                 m.OrderId = message.OrderId;
-                m.Total = message.Total * (decimal)0.9;
+                m.Total = message.Total*(decimal) 0.9;
             });
         }
 
@@ -496,8 +513,8 @@
     }
 
     public class MyTimeoutSaga : NServiceBus.Saga<MyTimeoutData>,
-                           IAmStartedByMessages<TheMessage>,
-                           IHandleTimeouts<TheTimeout>
+        IAmStartedByMessages<TheMessage>,
+        IHandleTimeouts<TheTimeout>
     {
         public Task Handle(TheMessage message, IMessageHandlerContext context)
         {
