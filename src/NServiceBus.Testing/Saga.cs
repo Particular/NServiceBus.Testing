@@ -63,10 +63,18 @@
         /// <summary>
         /// Check that the saga sends a message of the given type complying with the given predicate.
         /// </summary>
-        public Saga<T> ExpectSend<TMessage>(Func<TMessage, bool> check = null)
+        public Saga<T> ExpectSend<TMessage>(Func<TMessage, SendOptions, bool> check = null)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSend<TMessage>(check));
             return this;
+        }
+
+        /// <summary>
+        /// Check that the saga sends a message of the given type complying with the given predicate.
+        /// </summary>
+        public Saga<T> ExpectSend<TMessage>(Func<TMessage, bool> check)
+        {
+            return ExpectSend((TMessage m, SendOptions _) => check(m));
         }
 
         /// <summary>
@@ -81,10 +89,18 @@
         /// <summary>
         /// Check that the saga does not send a message of the given type complying with the given predicate.
         /// </summary>
-        public Saga<T> ExpectNotSend<TMessage>(Func<TMessage, bool> check)
+        public Saga<T> ExpectNotSend<TMessage>(Func<TMessage, SendOptions, bool> check)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSend<TMessage>(check));
             return this;
+        }
+
+        /// <summary>
+        /// Check that the saga does not send a message of the given type complying with the given predicate.
+        /// </summary>
+        public Saga<T> ExpectNotSend<TMessage>(Func<TMessage, bool> check)
+        {
+            return ExpectNotSend((TMessage m, SendOptions _) => check(m));
         }
 
         /// <summary>
@@ -99,10 +115,18 @@
         /// <summary>
         /// Check that the saga replies with the given message type complying with the given predicate.
         /// </summary>
-        public Saga<T> ExpectReply<TMessage>(Func<TMessage, bool> check = null)
+        public Saga<T> ExpectReply<TMessage>(Func<TMessage, ReplyOptions, bool> check = null)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectReply<TMessage>(check));
             return this;
+        }
+
+        /// <summary>
+        /// Check that the saga replies with the given message type complying with the given predicate.
+        /// </summary>
+        public Saga<T> ExpectReply<TMessage>(Func<TMessage, bool> check)
+        {
+            return ExpectReply((TMessage m, ReplyOptions _) => check(m));
         }
         
         /// <summary>
@@ -144,10 +168,18 @@
         /// <summary>
         /// Check that the saga publishes a message of the given type complying with the given predicate.
         /// </summary>
-        public Saga<T> ExpectPublish<TMessage>(Func<TMessage, bool> check = null)
+        public Saga<T> ExpectPublish<TMessage>(Func<TMessage, PublishOptions, bool> check = null)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectPublish<TMessage>(check));
             return this;
+        }
+
+        /// <summary>
+        /// Check that the saga publishes a message of the given type complying with the given predicate.
+        /// </summary>
+        public Saga<T> ExpectPublish<TMessage>(Func<TMessage, bool> check)
+        {
+            return ExpectPublish((TMessage m, PublishOptions _) => check(m));
         }
 
         /// <summary>
@@ -162,10 +194,18 @@
         /// <summary>
         /// Check that the saga does not publish any messages of the given type complying with the given predicate.
         /// </summary>
-        public Saga<T> ExpectNotPublish<TMessage>(Func<TMessage, bool> check = null)
+        public Saga<T> ExpectNotPublish<TMessage>(Func<TMessage, PublishOptions, bool> check = null)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotPublish<TMessage>(check));
             return this;
+        }
+
+        /// <summary>
+        /// Check that the saga does not publish any messages of the given type complying with the given predicate.
+        /// </summary>
+        public Saga<T> ExpectNotPublish<TMessage>(Func<TMessage, bool> check)
+        {
+            return ExpectNotPublish((TMessage m, PublishOptions _) => check(m));
         }
 
         /// <summary>

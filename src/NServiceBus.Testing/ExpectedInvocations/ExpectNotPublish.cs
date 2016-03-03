@@ -3,16 +3,16 @@ namespace NServiceBus.Testing.ExpectedInvocations
     using System;
     using System.Collections.Generic;
 
-    class ExpectNotPublish<TMessage> : ExpectedNotMessageInvocation<TMessage>
+    class ExpectNotPublish<TMessage> : ExpectedNotMessageInvocation<TMessage, PublishOptions>
     {
-        public ExpectNotPublish(Func<TMessage, bool> check)
+        public ExpectNotPublish(Func<TMessage, PublishOptions, bool> check)
             : base(check)
         {
         }
 
-        protected override List<TMessage> GetMessages(TestableMessageHandlerContext context)
+        protected override IEnumerable<OutgoingMessage<TMessage, PublishOptions>> GetMessages(TestableMessageHandlerContext context)
         {
-            return context.PublishedMessages.GetMessages<TMessage>();
+            return context.PublishedMessages.Containing<TMessage>();
         }
     }
 }
