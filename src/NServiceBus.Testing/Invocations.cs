@@ -199,6 +199,11 @@
 
     class ExpectedReplyToOriginatorInvocation<M> : ExpectedInvocation<ReplyToOriginatorInvocation<M>>
     {
+        public ExpectedReplyToOriginatorInvocation(bool negate = false)
+        {
+            Negate = negate;
+        }
+
         public Func<M, Address, string, bool> Check { get; set; }
 
         protected override bool Validate(ReplyToOriginatorInvocation<M> invocation)
