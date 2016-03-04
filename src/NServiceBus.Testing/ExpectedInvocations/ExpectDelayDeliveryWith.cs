@@ -23,9 +23,6 @@
             }
         }
 
-        // Expected <TMessage> to be delayed, but no outgoing message matched with the expected configuration.
-        // Delayed <TMessage> with 00:15:00
-        // De
         readonly Func<TMessage, TimeSpan, bool> check;
     }
 }
