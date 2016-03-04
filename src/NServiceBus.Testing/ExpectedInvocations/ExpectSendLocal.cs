@@ -18,7 +18,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
             if (!sentMessages.Any(s => s.Options.IsRoutingToThisEndpoint() && check(s.Message)))
             {
-                Fail(sentMessages.Select(i => i.Message));
+                Fail($"Expected a message of type {typeof(TMessage).Name} to be routed to the current endpoint but no message matching your constraints was found.");
             }
         }
     }

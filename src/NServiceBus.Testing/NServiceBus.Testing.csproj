@@ -70,7 +70,6 @@
     <Compile Include="ExpectedInvocations\ExpectNotDelayDeliveryWith.cs" />
     <Compile Include="ExpectedInvocations\ExpectDoNotContinueDispatching.cs" />
     <Compile Include="ExpectedInvocations\ExpectDoNotDeliverBefore.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedNotMessageInvocation.cs" />
     <Compile Include="ExpectedInvocations\ExpectHandleCurrentMessageLater.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotForwardCurrentMessageTo.cs" />
     <Compile Include="ExpectedInvocations\ExpectForwardCurrentMessageTo.cs" />
@@ -86,7 +85,6 @@
     <Compile Include="ExpectedInvocations\ExpectReplyToOriginator.cs" />
     <Compile Include="ExpectedInvocations\ExpectDelayDeliveryWith.cs" />
     <Compile Include="Handler.cs" />
-    <Compile Include="ExpectedInvocations\ExpectedMessageInvocation.cs" />
     <Compile Include="ExpectedInvocations\ExpectInvocation.cs" />
     <Compile Include="InvokedMessageExtensions.cs" />
     <Compile Include="Saga.cs" />

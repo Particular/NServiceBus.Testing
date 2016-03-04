@@ -19,7 +19,7 @@
 
             if (sentMessages.Any(s => check(s.Message, s.Options.GetDeliveryDate().Value.DateTime)))
             {
-                Fail(sentMessages.Select(i => i.Message).ToList());
+                Fail($"Expected a message of type {typeof(TMessage).Name} to be deferred but no message matching your constraints was deferred.");
             }
         }
 

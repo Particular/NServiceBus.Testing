@@ -1,18 +1,25 @@
 namespace NServiceBus.Testing.ExpectedInvocations
 {
     using System;
-    using System.Collections.Generic;
+    using System.Linq;
 
-    class ExpectNotReply<TMessage> : ExpectedNotMessageInvocation<TMessage, ReplyOptions>
+    class ExpectNotReply<TMessage> : ExpectInvocation
     {
         public ExpectNotReply(Func<TMessage, ReplyOptions, bool> check)
-            : base(check)
         {
+            this.check = check ?? ((message, options) => true);
         }
 
-        protected override IEnumerable<OutgoingMessage<TMessage, ReplyOptions>> GetMessages(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context)
         {
-            return context.RepliedMessages.Containing<TMessage>();
+            var invokedMessages = context.RepliedMessages.Containing<TMessage>().ToList();
+
+            if (invokedMessages.Any(invokedMessage => check(invokedMessage.Message, invokedMessage.Options)))
+            {
+                Fail($"Expected no reply of type {typeof(TMessage).Name} to be sent but an outgoing message matching your constraints was found.");
+            }
         }
+
+        readonly Func<TMessage, ReplyOptions, bool> check;
     }
 }

@@ -19,10 +19,13 @@
 
             if (!sentMessages.Any(s => check(s.Message, s.Options.GetDeliveryDelay().Value)))
             {
-                Fail(sentMessages.Select(i => i.Message).ToList());
+                Fail($"Expected a message of type {typeof(TMessage).Name} to be deferred but no message matching your constraints was deferred.");
             }
         }
 
+        // Expected <TMessage> to be delayed, but no outgoing message matched with the expected configuration.
+        // Delayed <TMessage> with 00:15:00
+        // De
         readonly Func<TMessage, TimeSpan, bool> check;
     }
 }

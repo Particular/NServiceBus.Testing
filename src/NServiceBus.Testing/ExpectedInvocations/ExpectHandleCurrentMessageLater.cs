@@ -6,7 +6,7 @@
         {
             if (!context.HandleCurrentMessageLaterWasCalled)
             {
-                Fail("HandleCurrentMessageLater was not called.");
+                Fail($"Expected {nameof(context.HandleCurrentMessageLaterWasCalled)} to be called but it was not.");
             }
         }
     }

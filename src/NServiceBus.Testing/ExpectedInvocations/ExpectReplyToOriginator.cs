@@ -20,7 +20,7 @@
 
             if (!repliedMessages.Any(i => check(i.Message)))
             {
-                Fail(repliedMessages.Select(i => i.Message));
+                Fail($"Expected a reply of type {typeof(TMessage).Name} but no message matching your constraints was sent.");
             }
         }
 
