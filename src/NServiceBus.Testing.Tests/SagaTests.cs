@@ -269,6 +269,17 @@
                 .ExpectNotSendLocal<SendLocalSaga.Message>()
                 .WhenHandling<SendLocalSaga.RequestNotSendLocal>();
         }
+
+        [Test]
+        public void ShouldPassAssertSagaData()
+        {
+            var orderId = Guid.NewGuid();
+            var customerId = Guid.NewGuid();
+            Test.Saga<DiscountPolicy>()
+                .AssertSagaData<DiscountPolicyData>(state => state.RunningTotal == 0M)
+                .When(s => s.Handle(new SubmitOrder {CustomerId = customerId, OrderId = orderId, Total = 123.99M}))
+                .AssertSagaData<DiscountPolicyData>(state => state.CustomerId == customerId && state.RunningTotal == 123.99M);
+        }
     }
 
     public class SendLocalSaga : NServiceBus.Saga<SendLocalSaga.SendLocalSagaData>,

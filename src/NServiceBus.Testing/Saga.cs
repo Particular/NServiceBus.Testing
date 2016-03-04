@@ -241,6 +241,22 @@
         }
 
         /// <summary>
+        /// Assert that the saga data contains satisfies the predicate
+        /// </summary>
+        public Saga<T> AssertSagaData<TSagaData>(Func<TSagaData, bool> check) where TSagaData : IContainSagaData, new()
+        {
+            if (!(saga.Entity is TSagaData))
+            {
+                throw new Exception($"Assert failed. Saga data type provided `{typeof(TSagaData)}` is not matching the actual saga type `{saga.Entity.GetType()}`");
+            }
+            if (check((TSagaData)saga.Entity))
+            {
+                return this;
+            }
+            throw new Exception("Assert failed. Saga data did not contain the expected values.");
+        }
+
+        /// <summary>
         /// Verifies that the saga is setting the specified timeout
         /// </summary>
         public Saga<T> ExpectTimeoutToBeSetIn<TMessage>(Func<TMessage, TimeSpan, bool> check = null)
