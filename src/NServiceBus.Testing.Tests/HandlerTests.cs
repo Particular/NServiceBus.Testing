@@ -133,11 +133,53 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
+        public void ShouldPassExpectReplyProvidedOptionsToCheck()
+        {
+            var options = new ReplyOptions();
+            ReplyOptions capturedOptions = null;
+
+            Test.Handler<ReplyingHandler>()
+                .WithExternalDependencies(handler => handler.OptionsProvider = () => options)
+                .ExpectReply<MyReply>((reply, replyOptions) =>
+                {
+                    capturedOptions = replyOptions;
+                    return true;
+                })
+                .OnMessage(new MyRequest
+                {
+                    ShouldReply = true
+                });
+
+            Assert.AreSame(options, capturedOptions);
+        }
+
+        [Test]
         public void ShouldNotReplyWhenReceivingAWrongMessage()
         {
             Test.Handler<ReplyingHandler>()
                 .ExpectNotReply<MyReply>(reply => reply == null)
                 .OnMessage(new MyRequest { ShouldReply = false });
+        }
+
+        [Test]
+        public void ShouldPassExpectNotReplyProvidedOptionsToCheck()
+        {
+            var options = new ReplyOptions();
+            ReplyOptions capturedOptions = null;
+
+            Test.Handler<ReplyingHandler>()
+                .WithExternalDependencies(handler => handler.OptionsProvider = () => options)
+                .ExpectNotReply<MyReply>((reply, replyOptions) =>
+                {
+                    capturedOptions = replyOptions;
+                    return false;
+                })
+                .OnMessage(new MyRequest
+                {
+                    ShouldReply = true
+                });
+
+            Assert.AreSame(options, capturedOptions);
         }
 
         [Test]
@@ -177,7 +219,7 @@ namespace NServiceBus.Testing.Tests
         public void ShouldPassExpectPublishWhenPublishingAndCheckingPredicate()
         {
             Test.Handler<PublishingHandler<Publish1>>()
-                .WithExternalDependencies(h => h.ModifyPublish = m => m.Data = "Data")
+                .WithExternalDependencies(h => h.ModifyMessage = m => m.Data = "Data")
                 .ExpectPublish<Publish1>(m => m.Data == "Data")
                 .OnMessage<TestMessage>();
         }
@@ -186,7 +228,7 @@ namespace NServiceBus.Testing.Tests
         public void ShouldFailExpectNotPublishWhenPublishingAndCheckingPredicate()
         {
             Assert.Throws<Exception>(() => Test.Handler<PublishingHandler<Publish1>>()
-                .WithExternalDependencies(h => h.ModifyPublish = m => m.Data = "Data")
+                .WithExternalDependencies(h => h.ModifyMessage = m => m.Data = "Data")
                 .ExpectNotPublish<Publish1>(m => m.Data == "Data")
                 .OnMessage<TestMessage>());
         }
@@ -195,7 +237,7 @@ namespace NServiceBus.Testing.Tests
         public void ShouldFailExpectPublishWhenPublishingAndCheckingPredicateThatFails()
         {
             Assert.Throws<Exception>(() => Test.Handler<PublishingHandler<Publish1>>()
-                .WithExternalDependencies(h => h.ModifyPublish = m => m.Data = "NotData")
+                .WithExternalDependencies(h => h.ModifyMessage = m => m.Data = "NotData")
                 .ExpectPublish<Publish1>(m => m.Data == "Data")
                 .OnMessage<TestMessage>());
         }
@@ -204,7 +246,7 @@ namespace NServiceBus.Testing.Tests
         public void ShouldPassExpectNotPublishWhenPublishingAndCheckingPredicateThatFails()
         {
             Test.Handler<PublishingHandler<Publish1>>()
-                .WithExternalDependencies(h => h.ModifyPublish = m => m.Data = "NotData")
+                .WithExternalDependencies(h => h.ModifyMessage = m => m.Data = "NotData")
                 .ExpectNotPublish<Publish1>(m => m.Data == "Data")
                 .OnMessage<TestMessage>();
         }
@@ -218,11 +260,47 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
+        public void ShouldPassExpectPublishProvidedPublishOptionsToCheck()
+        {
+            var options = new PublishOptions();
+            PublishOptions capturedOptions = null;
+
+            Test.Handler<PublishingHandler<Publish1>>()
+                .WithExternalDependencies(h => h.OptionsProvider = () => options)
+                .ExpectPublish<Publish1>((message, publishOptions) =>
+                {
+                    capturedOptions = publishOptions;
+                    return true;
+                })
+                .OnMessage<TestMessage>();
+
+            Assert.AreSame(options, capturedOptions);
+        }
+
+        [Test]
         public void ShouldPassExpectNotPublishIfNotPublishing()
         {
             Test.Handler<EmptyHandler>()
                 .ExpectNotPublish<Publish1>(m => true)
                 .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectNotPublishProvidedPublishOptionsToCheck()
+        {
+            var options = new PublishOptions();
+            PublishOptions capturedOptions = null;
+
+            Test.Handler<PublishingHandler<Publish1>>()
+                .WithExternalDependencies(h => h.OptionsProvider = () => options)
+                .ExpectNotPublish<Publish1>((message, publishOptions) =>
+                {
+                    capturedOptions = publishOptions;
+                    return false;
+                })
+                .OnMessage<TestMessage>();
+
+            Assert.AreSame(options, capturedOptions);
         }
 
         [Test]
@@ -250,6 +328,24 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
+        public void ShouldPassExpectSendProvidedSendOptionsToCheck()
+        {
+            var options = new SendOptions();
+            SendOptions capturedOptions = null;
+
+            Test.Handler<SendingHandler<Send1>>()
+                .WithExternalDependencies(handler => handler.OptionsProvider = () => options)
+                .ExpectSend<Send1>((message, sendOptions) =>
+                {
+                    capturedOptions = sendOptions;
+                    return true;
+                })
+                .OnMessage<TestMessage>();
+
+            Assert.AreSame(options, capturedOptions);
+        }
+
+        [Test]
         public void ShouldPassExpectNotSendIfNotSending()
         {
             Test.Handler<EmptyHandler>()
@@ -263,6 +359,24 @@ namespace NServiceBus.Testing.Tests
             Assert.Throws<Exception>(() => Test.Handler<SendingHandler<Send1>>()
                 .ExpectNotSend<Send1>(m => true)
                 .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldPassExpectNotSentProvidedSendOptionsToCheck()
+        {
+            var options = new SendOptions();
+            SendOptions capturedOptions = null;
+
+            Test.Handler<SendingHandler<Send1>>()
+                .WithExternalDependencies(handler => handler.OptionsProvider = () => options)
+                .ExpectNotSend<Send1>((message, sendOptions) =>
+                {
+                    capturedOptions = sendOptions;
+                    return false;
+                })
+                .OnMessage<TestMessage>();
+
+            Assert.AreSame(options, capturedOptions);
         }
 
         [Test]
@@ -624,11 +738,13 @@ namespace NServiceBus.Testing.Tests
         public class SendingHandler<TSend> : IHandleMessages<TestMessage>
             where TSend : IMessage
         {
-            public Action<TSend> ModifyPublish { get; set; } = m => { };
+            public Action<TSend> ModifyMessage { get; set; } = m => { };
+
+            public Func<SendOptions> OptionsProvider { get; set; } = () => new SendOptions();
 
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                return context.Send(ModifyPublish);
+                return context.Send(ModifyMessage, OptionsProvider());
             }
         }
 
@@ -646,11 +762,13 @@ namespace NServiceBus.Testing.Tests
         public class PublishingHandler<TPublish> : IHandleMessages<TestMessage>
             where TPublish : IMessage
         {
-            public Action<TPublish> ModifyPublish { get; set; } = m => { };
+            public Action<TPublish> ModifyMessage { get; set; } = m => { };
+
+            public Func<PublishOptions> OptionsProvider { get; set; } = () => new PublishOptions();
 
             public Task Handle(TestMessage message, IMessageHandlerContext context)
             {
-                return context.Publish(ModifyPublish);
+                return context.Publish(ModifyMessage, OptionsProvider());
             }
         }
 
@@ -740,9 +858,11 @@ namespace NServiceBus.Testing.Tests
 
         public class ReplyingHandler : IHandleMessages<MyRequest>
         {
+            public Func<ReplyOptions> OptionsProvider { get; set; } = () => new ReplyOptions();
+
             public Task Handle(MyRequest message, IMessageHandlerContext context)
             {
-                return message.ShouldReply ? context.Reply(new MyReply()) : Task.FromResult(0);
+                return message.ShouldReply ? context.Reply(new MyReply(), OptionsProvider()) : Task.FromResult(0);
             }
         }
     }

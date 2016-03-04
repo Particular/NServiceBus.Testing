@@ -52,9 +52,26 @@
         /// <summary>
         /// Check that the handler sends a message of the given type complying with the given predicate.
         /// </summary>
-        public Handler<T> ExpectSend<TMessage>(Func<TMessage, bool> check)
+        public Handler<T> ExpectSend<TMessage>(Func<TMessage, SendOptions, bool> check)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSend<TMessage>(check));
+            return this;
+        }
+
+        /// <summary>
+        /// Check that the handler sends a message of the given type complying with the given predicate.
+        /// </summary>
+        public Handler<T> ExpectSend<TMessage>(Func<TMessage, bool> check)
+        {
+            return ExpectSend((TMessage m, SendOptions _) => check(m));
+        }
+
+        /// <summary>
+        /// Check that the handler does not send a message of the given type complying with the given predicate.
+        /// </summary>
+        public Handler<T> ExpectNotSend<TMessage>(Func<TMessage, SendOptions, bool> check)
+        {
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSend<TMessage>(check));
             return this;
         }
 
@@ -63,7 +80,15 @@
         /// </summary>
         public Handler<T> ExpectNotSend<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSend<TMessage>(check));
+            return ExpectNotSend((TMessage m, SendOptions _) => check(m));
+        }
+
+        /// <summary>
+        /// Check that the handler does not reply with a given message
+        /// </summary>
+        public Handler<T> ExpectNotReply<TMessage>(Func<TMessage, ReplyOptions, bool> check)
+        {
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotReply<TMessage>(check));
             return this;
         }
 
@@ -72,7 +97,15 @@
         /// </summary>
         public Handler<T> ExpectNotReply<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotReply<TMessage>(check));
+            return ExpectNotReply((TMessage m, ReplyOptions _) => check(m));
+        }
+
+        /// <summary>
+        /// Check that the handler replies with the given message type complying with the given predicate.
+        /// </summary>
+        public Handler<T> ExpectReply<TMessage>(Func<TMessage, ReplyOptions, bool> check)
+        {
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectReply<TMessage>(check));
             return this;
         }
 
@@ -81,8 +114,7 @@
         /// </summary>
         public Handler<T> ExpectReply<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectReply<TMessage>(check));
-            return this;
+            return ExpectReply((TMessage m, ReplyOptions _) => check(m));
         }
 
         /// <summary>
@@ -107,9 +139,26 @@
         /// <summary>
         /// Check that the handler publishes a message of the given type complying with the given predicate.
         /// </summary>
-        public Handler<T> ExpectPublish<TMessage>(Func<TMessage, bool> check)
+        public Handler<T> ExpectPublish<TMessage>(Func<TMessage, PublishOptions, bool> check)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectPublish<TMessage>(check));
+            return this;
+        }
+
+        /// <summary>
+        /// Check that the handler publishes a message of the given type complying with the given predicate.
+        /// </summary>
+        public Handler<T> ExpectPublish<TMessage>(Func<TMessage, bool> check)
+        {
+            return ExpectPublish((TMessage m, PublishOptions _) => check(m));
+        }
+
+        /// <summary>
+        /// Check that the handler does not publish any messages of the given type complying with the given predicate.
+        /// </summary>
+        public Handler<T> ExpectNotPublish<TMessage>(Func<TMessage, PublishOptions, bool> check)
+        {
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotPublish<TMessage>(check));
             return this;
         }
 
@@ -118,8 +167,7 @@
         /// </summary>
         public Handler<T> ExpectNotPublish<TMessage>(Func<TMessage, bool> check)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotPublish<TMessage>(check));
-            return this;
+            return ExpectNotPublish((TMessage m, PublishOptions _) => check(m));
         }
 
         /// <summary>

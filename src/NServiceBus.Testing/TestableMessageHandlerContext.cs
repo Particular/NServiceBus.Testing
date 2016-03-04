@@ -121,42 +121,36 @@ namespace NServiceBus.Testing
         IMessageCreator messageCreator;
     }
 
-    internal class SentMessage<TMessage>
+    internal class OutgoingMessage<TMessage, TOptions>
     {
-        internal SentMessage(TMessage message, SendOptions options)
+        public OutgoingMessage(TMessage message, TOptions options)
         {
             Message = message;
             Options = options;
         }
 
-        internal TMessage Message { get; private set; }
-
-        internal SendOptions Options { get; private set; }
+        public TMessage Message { get; }
+        public TOptions Options { get; }
     }
 
-    internal class PublishedMessage<TMessage>
+    internal class SentMessage<TMessage> : OutgoingMessage<TMessage, SendOptions>
     {
-        internal PublishedMessage(TMessage message, PublishOptions options)
+        internal SentMessage(TMessage message, SendOptions options) : base(message, options)
         {
-            Message = message;
-            Options = options;
         }
-
-        internal TMessage Message { get; private set; }
-
-        internal PublishOptions Options { get; private set; }
     }
 
-    internal class RepliedMessage<TMessage>
+    internal class PublishedMessage<TMessage> : OutgoingMessage<TMessage, PublishOptions>
     {
-        internal RepliedMessage(TMessage message, ReplyOptions options)
+        internal PublishedMessage(TMessage message, PublishOptions options) : base(message, options)
         {
-            Message = message;
-            Options = options;
         }
+    }
 
-        internal TMessage Message { get; private set; }
-
-        internal ReplyOptions Options { get; private set; }
+    internal class RepliedMessage<TMessage> : OutgoingMessage<TMessage, ReplyOptions>
+    {
+        internal RepliedMessage(TMessage message, ReplyOptions options) : base(message, options)
+        {
+        }
     }
 }
