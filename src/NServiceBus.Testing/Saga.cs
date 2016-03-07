@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
     using NServiceBus.Testing.ExpectedInvocations;
@@ -89,7 +91,7 @@
         /// <summary>
         /// Check that the saga does not send a message of the given type complying with the given predicate.
         /// </summary>
-        public Saga<T> ExpectNotSend<TMessage>(Func<TMessage, SendOptions, bool> check)
+        public Saga<T> ExpectNotSend<TMessage>(Func<TMessage, SendOptions, bool> check = null)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSend<TMessage>(check));
             return this;
@@ -128,7 +130,7 @@
         {
             return ExpectReply((TMessage m, ReplyOptions _) => check(m));
         }
-        
+
         /// <summary>
         /// Check that the saga doesn't forward a message to the given destination.
         /// </summary>
@@ -244,7 +246,6 @@
         public Saga<T> WhenHandlingTimeout<TMessage>(Action<TMessage> initializeMessage = null)
         {
             var message = messageCreator.CreateInstance(initializeMessage);
-
             return When((s, c) => ((dynamic) s).Timeout(message, c));
         }
 
@@ -255,6 +256,28 @@
         public Saga<T> When(Func<T, IMessageHandlerContext, Task> sagaIsInvoked)
         {
             sagaIsInvoked(saga, testableMessageHandlerContext).GetAwaiter().GetResult();
+
+            testableMessageHandlerContext.Validate();
+            testableMessageHandlerContext.Clear();
+
+            return this;
+        }
+
+        /// <summary>
+        /// Invokes the saga timeout passing in the last timeout state it sent
+        /// and then clears out all previous expectations.
+        /// </summary>
+        /// <param name="after">The ammount of time that has passed before the timeout is called.</param>
+        public Saga<T> WhenSagaTimesOut(TimeSpan? after = null)
+        {
+            testableMessageHandlerContext.TimeoutMessages
+                .Where(t => t.Within <= after.GetValueOrDefault(TimeSpan.MaxValue))
+                .OrderBy(t => t.Within)
+                .ToList()
+                .ForEach(t => timeoutMethodInfo.Value.MakeGenericMethod(t.Message.GetType()).Invoke(this, new[]
+                {
+                    t.Message
+                }));
 
             testableMessageHandlerContext.Validate();
             testableMessageHandlerContext.Clear();
@@ -389,19 +412,6 @@
         }
 
         /// <summary>
-        /// Invokes the saga timeout passing in the last timeout state it sent
-        /// and then clears out all previous expectations.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            ReplacementTypeOrMember = "WhenHandlingTimeOut(Action<TMessage> initializeMessage = null)")]
-        public Saga<T> WhenSagaTimesOut()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Uses the given delegate to invoke the saga, checking all the expectations previously set up,
         /// and then clearing them for continued testing.
         /// </summary>
@@ -424,6 +434,11 @@
         public Saga<T> SetMessageId(string messageId)
         {
             throw new NotImplementedException();
+        }
+
+        void HandleTimeout<TMessage>(TMessage message)
+        {
+            ((dynamic) saga).Timeout(message, testableMessageHandlerContext);
         }
 
         static Func<T1, bool> CheckActionToFunc<T1>(Action<T1> check)
@@ -451,5 +466,7 @@
         IMessageCreator messageCreator = new MessageMapper();
 
         TestableMessageHandlerContext testableMessageHandlerContext;
+
+        Lazy<MethodInfo> timeoutMethodInfo = new Lazy<MethodInfo>(() => typeof(Saga<T>).GetMethod("HandleTimeout", BindingFlags.Instance | BindingFlags.NonPublic));
     }
 }

@@ -30,7 +30,7 @@
         /// </summary>
         public static Saga<T> Saga<T>(Guid sagaId) where T : Saga, new()
         {
-            var saga = (T)Activator.CreateInstance(typeof(T));
+            var saga = (T) Activator.CreateInstance(typeof(T));
 
             var prop = typeof(T).GetProperty("Data");
 

@@ -14,6 +14,9 @@ namespace NServiceBus.Testing
         {
             this.messageCreator = messageCreator;
         }
+
+        public IList<TimeoutMessage<object>> TimeoutMessages { get; } = new List<TimeoutMessage<object>>();
+
         public IList<SentMessage<object>> SentMessages { get; } = new List<SentMessage<object>>();
 
         public IList<PublishedMessage<object>> PublishedMessages { get; } = new List<PublishedMessage<object>>();
@@ -26,6 +29,10 @@ namespace NServiceBus.Testing
 
         public IList<ExpectInvocation> ExpectedInvocations { get; } = new List<ExpectInvocation>();
 
+        public bool HandlerInvocationAborted { get; private set; }
+
+        public bool HandleCurrentMessageLaterWasCalled { get; private set; }
+
         public string MessageId { get; set; }
 
         public string ReplyToAddress { get; }
@@ -36,13 +43,22 @@ namespace NServiceBus.Testing
 
         public SynchronizedStorageSession SynchronizedStorageSession { get; }
 
-        public bool HandlerInvocationAborted { get; private set; }
-
-        public bool HandleCurrentMessageLaterWasCalled { get; private set; }
-
         public Task Send(object message, SendOptions options)
         {
+            var headers = options.GetHeaders();
+
+            if (headers.ContainsKey("NServiceBus.IsSagaTimeoutMessage"))
+            {
+                if (headers["NServiceBus.IsSagaTimeoutMessage"] == bool.TrueString)
+                {
+                    var within = GetWithin(options);
+
+                    TimeoutMessages.Add(new TimeoutMessage<object>(message, options, within));
+                }
+            }
+
             SentMessages.Add(new SentMessage<object>(message, options));
+
             return Task.FromResult(0);
         }
 
@@ -118,12 +134,33 @@ namespace NServiceBus.Testing
             HandlerInvocationAborted = false;
         }
 
+        static TimeSpan GetWithin(SendOptions options)
+        {
+            var within = options.GetDeliveryDelay();
+
+            if (!within.HasValue)
+            {
+                var dateTimeOffset = options.GetDeliveryDate();
+                if (dateTimeOffset != null)
+                {
+                    within = dateTimeOffset.Value - DateTimeOffset.Now;
+                }
+            }
+
+            if (!within.HasValue)
+            {
+                throw new Exception("No time has been set for the timeout message");
+            }
+
+            return within.Value;
+        }
+
         IMessageCreator messageCreator;
     }
 
-    internal class OutgoingMessage<TMessage, TOptions>
+    class OutgoingMessage<TMessage, TOptions>
     {
-        public OutgoingMessage(TMessage message, TOptions options)
+        protected OutgoingMessage(TMessage message, TOptions options)
         {
             Message = message;
             Options = options;
@@ -133,24 +170,34 @@ namespace NServiceBus.Testing
         public TOptions Options { get; }
     }
 
-    internal class SentMessage<TMessage> : OutgoingMessage<TMessage, SendOptions>
+    class SentMessage<TMessage> : OutgoingMessage<TMessage, SendOptions>
     {
-        internal SentMessage(TMessage message, SendOptions options) : base(message, options)
+        public SentMessage(TMessage message, SendOptions options) : base(message, options)
         {
         }
     }
 
-    internal class PublishedMessage<TMessage> : OutgoingMessage<TMessage, PublishOptions>
+    class PublishedMessage<TMessage> : OutgoingMessage<TMessage, PublishOptions>
     {
-        internal PublishedMessage(TMessage message, PublishOptions options) : base(message, options)
+        public PublishedMessage(TMessage message, PublishOptions options) : base(message, options)
         {
         }
     }
 
-    internal class RepliedMessage<TMessage> : OutgoingMessage<TMessage, ReplyOptions>
+    class RepliedMessage<TMessage> : OutgoingMessage<TMessage, ReplyOptions>
     {
-        internal RepliedMessage(TMessage message, ReplyOptions options) : base(message, options)
+        public RepliedMessage(TMessage message, ReplyOptions options) : base(message, options)
         {
         }
+    }
+
+    class TimeoutMessage<TMessage> : OutgoingMessage<TMessage, SendOptions>
+    {
+        public TimeoutMessage(TMessage message, SendOptions options, TimeSpan within) : base(message, options)
+        {
+            Within = within;
+        }
+
+        public TimeSpan Within { get; private set; }
     }
 }
