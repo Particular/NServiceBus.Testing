@@ -174,7 +174,7 @@
         [Test]
         public void ShouldFailExpectForwardCurrentMessageToIfMessageForwardedToUnexpectedDestination()
         {
-            Assert.Throws<Exception>(() => Test.Saga<MySaga>()
+            Assert.Throws<ExpectationException>(() => Test.Saga<MySaga>()
                 .ExpectForwardCurrentMessageTo(dest => dest == "expectedDestination")
                 .When((s, c) => s.Handle(new StartsSaga(), c)));
         }
@@ -190,7 +190,7 @@
         [Test]
         public void ShouldFailExpectNotForwardCurrentMessageToIfMessageForwardedToExpectedDestination()
         {
-            Assert.Throws<Exception>(() => Test.Saga<MySaga>()
+            Assert.Throws<ExpectationException>(() => Test.Saga<MySaga>()
                 .ExpectNotForwardCurrentMessageTo(dest => dest == "forwardingDestination")
                 .When((s, c) => s.Handle(new StartsSaga(), c)));
         }

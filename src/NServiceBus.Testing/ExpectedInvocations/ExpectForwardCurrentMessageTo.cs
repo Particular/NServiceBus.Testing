@@ -15,7 +15,7 @@
         {
             if (!context.ForwardedMessages.Any(m => check(m)))
             {
-                Fail(Enumerable.Empty<object>());
+                Fail("Expected the incoming message to be forwarded but no forwarded message matching your constraints was found.");
             }
         }
 

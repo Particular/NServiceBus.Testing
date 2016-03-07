@@ -15,7 +15,7 @@
         {
             if (context.ForwardedMessages.Any(m => check(m)))
             {
-                Fail(context.ForwardedMessages);
+                Fail("Expected the incoming message not to be forwarded but a forwarded message matching your constraints was found.");
             }
         }
 

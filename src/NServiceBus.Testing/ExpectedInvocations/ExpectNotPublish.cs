@@ -1,18 +1,25 @@
 namespace NServiceBus.Testing.ExpectedInvocations
 {
     using System;
-    using System.Collections.Generic;
+    using System.Linq;
 
-    class ExpectNotPublish<TMessage> : ExpectedNotMessageInvocation<TMessage, PublishOptions>
+    class ExpectNotPublish<TMessage> : ExpectInvocation
     {
         public ExpectNotPublish(Func<TMessage, PublishOptions, bool> check)
-            : base(check)
         {
+            this.check = check ?? ((message, options) => true);
         }
 
-        protected override IEnumerable<OutgoingMessage<TMessage, PublishOptions>> GetMessages(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context)
         {
-            return context.PublishedMessages.Containing<TMessage>();
+            var invokedMessages = context.PublishedMessages.Containing<TMessage>().ToList();
+
+            if (invokedMessages.Any(invokedMessage => check(invokedMessage.Message, invokedMessage.Options)))
+            {
+                Fail($"Expected no message of type {typeof(TMessage).Name} to be published but an outgoing message matching your constraints was found.");
+            }
         }
+
+        readonly Func<TMessage, PublishOptions, bool> check;
     }
 }

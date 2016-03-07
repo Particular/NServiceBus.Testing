@@ -1,12 +1,12 @@
 ﻿namespace NServiceBus.Testing.ExpectedInvocations
 {
-    internal class ExpectDoNotContinueDispatching : ExpectInvocation
+    class ExpectDoNotContinueDispatching : ExpectInvocation
     {
         public override void Validate(TestableMessageHandlerContext context)
         {
             if (!context.HandlerInvocationAborted)
             {
-                Fail("DoNotContinueDispatching was not called.");
+                Fail($"Expected `{nameof(context.DoNotContinueDispatchingCurrentMessageToHandlers)}` to be called on but it was not.");
             }
         }
     }

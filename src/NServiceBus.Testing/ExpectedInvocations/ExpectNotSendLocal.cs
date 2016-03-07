@@ -5,8 +5,6 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
     class ExpectNotSendLocal<TMessage> : ExpectInvocation
     {
-        private readonly Func<TMessage, bool> check;
-
         public ExpectNotSendLocal(Func<TMessage, bool> check)
         {
             this.check = check;
@@ -18,8 +16,10 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
             if (sentMessages.Any(s => s.Options.IsRoutingToThisEndpoint() && check(s.Message)))
             {
-                Fail(sentMessages.Select(i => i.Message));
+                Fail($"Expected no message of type {typeof(TMessage).Name} to be routed to the current endpoint but a message matching your constraints was found.");
             }
         }
+
+        readonly Func<TMessage, bool> check;
     }
 }

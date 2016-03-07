@@ -5,7 +5,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
     class ExpectSendToDestination<TMessage> : ExpectInvocation
     {
-        private readonly Func<TMessage, string, bool> check;
+        readonly Func<TMessage, string, bool> check;
 
         public ExpectSendToDestination(Func<TMessage, string, bool> check)
         {
@@ -21,7 +21,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
             if (!sentMessages.Any(i => check(i.Message, i.Options.GetDestination())))
             {
-                Fail(sentMessages.Select(i => i.Message).ToList());
+                Fail($"Expected a message of type {typeof(TMessage).Name} to be sent to a specific destination but a message matching your constraints was found.");
             }
         }
     }
