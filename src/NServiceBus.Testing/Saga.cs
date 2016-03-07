@@ -264,6 +264,24 @@
         }
 
         /// <summary>
+        /// Uses the given delegate to select the message handler and invoking it with the given message. Checks all the expectations previously, and then clearing them for continued testing.
+        /// </summary>
+        public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, TMessage message)
+        {
+            return When((s, context) => handlerSelector(s)(message, context));
+        }
+
+        /// <summary>
+        /// Uses the given delegate to select the message handler and invoking it with the specified message. Checks all the expectations previously, and then clearing them for continued testing.
+        /// </summary>
+        public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, Action<TMessage> messageInitializer = null)
+        {
+            var message = (TMessage) messageCreator.CreateInstance(typeof(TMessage));
+            messageInitializer?.Invoke(message);
+            return When((s, context) => handlerSelector(s)(message, context));
+        }
+
+        /// <summary>
         /// Invokes the saga timeout passing in the last timeout state it sent
         /// and then clears out all previous expectations.
         /// </summary>
