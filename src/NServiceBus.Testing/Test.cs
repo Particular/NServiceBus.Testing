@@ -83,6 +83,18 @@
             return messageCreator.CreateInstance(action);
         }
 
+        /// <summary>
+        /// Initializes the testing infrastructure.
+        /// </summary>
+        [ObsoleteEx(
+            Message = "Test initialization is no longer required and can be removed.",
+            RemoveInVersion = "7", 
+            TreatAsErrorFromVersion = "6")]
+        public static void Initialize(Action<EndpointConfiguration> customisations = null)
+        {
+            throw new NotImplementedException();
+        }
+
         static IMessageCreator messageCreator = new MessageMapper();
     }
 }
