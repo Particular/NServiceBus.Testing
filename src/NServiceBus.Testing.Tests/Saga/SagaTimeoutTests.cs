@@ -38,7 +38,7 @@
         }
     }
 
-    public class TimeoutSaga : NServiceBus.Saga<TimeoutSaga.SingleTimeoutData>,
+    public class TimeoutSaga : NServiceBus.Saga<TimeoutSaga.TimeoutData>,
         IHandleMessages<TimeoutSaga.StartMessage>,
         IHandleTimeouts<TimeoutSaga.TimeoutMessage1>,
         IHandleTimeouts<TimeoutSaga.TimeoutMessage2>
@@ -59,11 +59,11 @@
             return context.Send(new SendMessage2());
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SingleTimeoutData> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TimeoutData> mapper)
         {
         }
 
-        public class SingleTimeoutData : IContainSagaData
+        public class TimeoutData : IContainSagaData
         {
             public Guid Id { get; set; }
 
