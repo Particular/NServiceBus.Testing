@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="SagaTests.cs" />
     <Compile Include="HandlerTests.cs" />
+    <Compile Include="Saga\SagaTimeoutTests.cs" />
     <Compile Include="Timeouts.cs" />
   </ItemGroup>
   <ItemGroup>

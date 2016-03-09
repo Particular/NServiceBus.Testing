@@ -13,12 +13,6 @@
     /// </summary>
     public class Handler<T>
     {
-        private readonly T handler;
-
-        MessageMapper messageCreator = new MessageMapper();
-
-        TestableMessageHandlerContext testableMessageHandlerContext;
-
         /// <summary>
         /// Creates a new instance of the handler tester.
         /// </summary>
@@ -251,7 +245,7 @@
         }
 
         /// <summary>
-        /// Activates the test that has been set up passing in the given message, 
+        /// Activates the test that has been set up passing in the given message,
         /// setting the incoming headers and the message Id.
         /// </summary>
         public void OnMessage<TMessage>(string messageId, Action<TMessage> initializeMessage = null)
@@ -262,7 +256,10 @@
 
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
         /// <param name="initializedMessage">A message to be used with message handler.</param>
-        /// <remarks>This is different from "<![CDATA[public void OnMessage<TMessage>(Action<TMessage> initializedMessage)]]>" in a way that it uses the message, and not calls to an action.</remarks>
+        /// <remarks>
+        /// This is different from <see cref="OnMessage{TMessage}(System.Action{TMessage})"/> in a way that
+        /// it uses the message, and not calls to an action.
+        /// </remarks>
         /// <example><![CDATA[var message = new TestMessage {//...}; Test.Handler<EmptyHandler>().OnMessage<TestMessage>(message);]]></example>
         public void OnMessage<TMessage>(TMessage initializedMessage)
         {
@@ -323,7 +320,7 @@
         }
 
         /// <summary>
-        /// Check that the handler doesn't send a message of the given type to sites.		
+        /// Check that the handler doesn't send a message of the given type to sites.
         /// </summary>
         [ObsoleteEx(
             RemoveInVersion = "7",
@@ -361,5 +358,11 @@
 
             return Expression.Lambda<Func<object, object, IMessageHandlerContext, Task>>(body, target, messageParam, contextParam).Compile();
         }
+
+        private readonly T handler;
+
+        MessageMapper messageCreator = new MessageMapper();
+
+        TestableMessageHandlerContext testableMessageHandlerContext;
     }
 }

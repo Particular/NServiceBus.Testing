@@ -3,13 +3,20 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    internal static class InvokedMessageExtensions
+    static class InvokedMessageExtensions
     {
         public static IEnumerable<RepliedMessage<TMessage>> Containing<TMessage>(this IEnumerable<RepliedMessage<object>> repliedMessages)
         {
             return repliedMessages
                 .Where(x => x.Message is TMessage)
-                .Select(x => new RepliedMessage<TMessage>((TMessage)x.Message, x.Options));
+                .Select(x => new RepliedMessage<TMessage>((TMessage) x.Message, x.Options));
+        }
+
+        public static IEnumerable<TimeoutMessage<TMessage>> Containing<TMessage>(this IEnumerable<TimeoutMessage<object>> timeoutMessages)
+        {
+            return timeoutMessages
+                .Where(x => x.Message is TMessage)
+                .Select(x => new TimeoutMessage<TMessage>((TMessage) x.Message, x.Options, x.Within));
         }
 
         public static IEnumerable<PublishedMessage<TMessage>> Containing<TMessage>(this IEnumerable<PublishedMessage<object>> publishedMessages)

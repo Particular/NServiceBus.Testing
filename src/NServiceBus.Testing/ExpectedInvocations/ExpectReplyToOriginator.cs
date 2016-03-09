@@ -15,7 +15,7 @@
             var repliedMessages = context.RepliedMessages
                 .Containing<TMessage>()
                 .Where(i => !string.IsNullOrWhiteSpace(i.Options.GetCorrelationId()) &&
-                    !string.IsNullOrWhiteSpace(i.Options.GetDestination()))
+                            !string.IsNullOrWhiteSpace(i.Options.GetDestination()))
                 .ToList();
 
             if (!repliedMessages.Any(i => check(i.Message)))

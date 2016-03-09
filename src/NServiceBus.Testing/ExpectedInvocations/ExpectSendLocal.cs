@@ -20,6 +20,6 @@ namespace NServiceBus.Testing.ExpectedInvocations
             }
         }
 
-        private readonly Func<TMessage, bool> check;
+        readonly Func<TMessage, bool> check;
     }
 }
