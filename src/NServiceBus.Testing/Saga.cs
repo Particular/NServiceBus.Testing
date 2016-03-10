@@ -412,6 +412,15 @@
         }
 
         /// <summary>
+        /// Check that the saga data matches the given type and comlies with the given predicate.
+        /// </summary>
+        public Saga<T> ExpectSagaData<TSagaData>(Func<TSagaData, bool> check) where TSagaData : IContainSagaData
+        {
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSagaData<TSagaData>(saga, check));
+            return this;
+        }
+
+        /// <summary>
         /// Uses the given delegate to invoke the saga, checking all the expectations previously set up,
         /// and then clearing them for continued testing.
         /// </summary>

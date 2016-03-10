@@ -28,23 +28,29 @@
         /// <summary>
         /// Begin the test script for a saga of type T while specifying the saga id.
         /// </summary>
-        public static Saga<T> Saga<T>(Guid sagaId) where T : Saga, new()
+        public static Saga<TSaga> Saga<TSaga>(Guid sagaId) where TSaga : Saga, new()
         {
-            var saga = (T) Activator.CreateInstance(typeof(T));
-
-            var prop = typeof(T).GetProperty("Data");
+            var prop = typeof(TSaga).GetProperty("Data");
+            IContainSagaData sagaData = null;
 
             if (prop != null)
             {
-                var sagaData = Activator.CreateInstance(prop.PropertyType) as IContainSagaData;
-
-                saga.Entity = sagaData;
-
-                if (saga.Entity != null)
-                {
-                    saga.Entity.Id = sagaId;
-                }
+                sagaData = Activator.CreateInstance(prop.PropertyType) as IContainSagaData;
+                sagaData.Id = sagaId;
             }
+
+            return Saga<TSaga>(sagaData);
+        }
+
+        /// <summary>
+        /// Begin the test script for a saga of type T with the passed in in <see cref="IContainSagaData" />.
+        /// </summary>
+        public static Saga<TSaga> Saga<TSaga>(IContainSagaData sagaData) where TSaga : Saga, new()
+        {
+            var saga = new TSaga
+            {
+                Entity = sagaData
+            };
 
             return Saga(saga);
         }
