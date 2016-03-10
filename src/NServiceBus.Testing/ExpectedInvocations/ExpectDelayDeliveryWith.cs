@@ -5,7 +5,7 @@
 
     class ExpectDelayDeliveryWith<TMessage> : ExpectInvocation
     {
-        public ExpectDelayDeliveryWith(Func<TMessage, TimeSpan, bool> check)
+        public ExpectDelayDeliveryWith(Func<TMessage, TimeSpan, bool> check = null)
         {
             this.check = check ?? ((m, t) => true);
         }

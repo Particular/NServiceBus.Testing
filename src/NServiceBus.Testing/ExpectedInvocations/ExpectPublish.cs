@@ -5,7 +5,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
     class ExpectPublish<TMessage> : ExpectInvocation
     {
-        public ExpectPublish(Func<TMessage, PublishOptions, bool> check)
+        public ExpectPublish(Func<TMessage, PublishOptions, bool> check = null)
         {
             this.check = check ?? ((message, options) => true);
         }
