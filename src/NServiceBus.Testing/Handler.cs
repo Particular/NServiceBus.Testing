@@ -251,6 +251,7 @@
         public void OnMessage<TMessage>(string messageId, Action<TMessage> initializeMessage = null)
         {
             var message = messageCreator.CreateInstance<TMessage>();
+            initializeMessage?.Invoke(message);
             OnMessage(message, messageId);
         }
 

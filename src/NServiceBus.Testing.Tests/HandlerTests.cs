@@ -8,6 +8,18 @@ namespace NServiceBus.Testing.Tests
     public class HandlerTests
     {
         [Test]
+        public void ShouldInvokeMessageInitializerOnMessage()
+        {
+            Test.Handler<ReplyingHandler>()
+                .ExpectReply<MyReply>(m => m.String == "hello")
+                .OnMessage<MyRequest>(m =>
+                {
+                    m.String = "hello";
+                    m.ShouldReply = true;
+                });
+        }
+
+        [Test]
         public void ShouldAssertDoNotContinueDispatchingCurrentMessageToHandlersWasCalled()
         {
             Test.Handler<DoNotContinueDispatchingCurrentMessageToHandlersHandler>()
@@ -720,13 +732,13 @@ namespace NServiceBus.Testing.Tests
                 .OnMessage<MyCommand>();
         }
 
-        private class MyCommand : ICommand
+        class MyCommand : ICommand
         {
             public string Header1 { get; set; }
             public string Header2 { get; set; }
         }
 
-        private class MyCommandHandler : IHandleMessages<MyCommand>
+        class MyCommandHandler : IHandleMessages<MyCommand>
         {
             public Task Handle(MyCommand message, IMessageHandlerContext context)
             {
@@ -737,7 +749,7 @@ namespace NServiceBus.Testing.Tests
             }
         }
 
-        private class TestMessageImpl : TestMessage
+        class TestMessageImpl : TestMessage
         {
         }
 
@@ -749,7 +761,7 @@ namespace NServiceBus.Testing.Tests
             }
         }
 
-        private class AsyncHandler : IHandleMessages<MyCommand>
+        class AsyncHandler : IHandleMessages<MyCommand>
         {
             public async Task Handle(MyCommand message, IMessageHandlerContext context)
             {
@@ -970,7 +982,7 @@ namespace NServiceBus.Testing.Tests
 
             public Task Handle(MyRequest message, IMessageHandlerContext context)
             {
-                return message.ShouldReply ? context.Reply(new MyReply(), OptionsProvider()) : Task.FromResult(0);
+                return message.ShouldReply ? context.Reply(new MyReply { String = message.String }, OptionsProvider()) : Task.FromResult(0);
             }
         }
     }
