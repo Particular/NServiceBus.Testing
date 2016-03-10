@@ -125,10 +125,10 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        public void ShouldReplyWhenReceivingAMessage()
+        public void ShouldPassExpectReplyWhenReypling()
         {
             Test.Handler<ReplyingHandler>()
-                .ExpectReply<MyReply>(reply => reply != null)
+                .ExpectReply<MyReply>()
                 .OnMessage(new MyRequest { ShouldReply = true });
         }
 
@@ -154,10 +154,10 @@ namespace NServiceBus.Testing.Tests
         }
 
         [Test]
-        public void ShouldNotReplyWhenReceivingAWrongMessage()
+        public void ShouldPassExpectNotReplyWhenNotReplying()
         {
             Test.Handler<ReplyingHandler>()
-                .ExpectNotReply<MyReply>(reply => reply == null)
+                .ExpectNotReply<MyReply>()
                 .OnMessage(new MyRequest { ShouldReply = false });
         }
 
@@ -186,12 +186,28 @@ namespace NServiceBus.Testing.Tests
         public void ShouldPassExpectPublishWhenPublishing()
         {
             Test.Handler<PublishingHandler<Publish1>>()
+                .ExpectPublish<Publish1>()
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectPublishWhenPublishingWithCustomCheck()
+        {
+            Test.Handler<PublishingHandler<Publish1>>()
                 .ExpectPublish<Publish1>(m => true)
                 .OnMessage<TestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectNotPublishWhenPublishing()
+        {
+            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<Publish1>>()
+                .ExpectNotPublish<Publish1>()
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldFailExpectNotPublishWithCheckWhenPublishing()
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<Publish1>>()
                 .ExpectNotPublish<Publish1>(m => true)
@@ -281,6 +297,14 @@ namespace NServiceBus.Testing.Tests
         public void ShouldPassExpectNotPublishIfNotPublishing()
         {
             Test.Handler<EmptyHandler>()
+                .ExpectNotPublish<Publish1>()
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectNotPublishWithCheckIfNotPublishing()
+        {
+            Test.Handler<EmptyHandler>()
                 .ExpectNotPublish<Publish1>(m => true)
                 .OnMessage<TestMessage>();
         }
@@ -307,12 +331,28 @@ namespace NServiceBus.Testing.Tests
         public void ShouldPassExpectSendIfSending()
         {
             Test.Handler<SendingHandler<Send1>>()
+                .ExpectSend<Send1>()
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectSendWithCheckIfSending()
+        {
+            Test.Handler<SendingHandler<Send1>>()
                 .ExpectSend<Send1>(m => true)
                 .OnMessage<TestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectSendIfNotSending()
+        {
+            Assert.Throws<ExpectationException>(() => Test.Handler<EmptyHandler>()
+                .ExpectSend<Send1>()
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldFailExpectSendWithCheckIfNotSending()
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<EmptyHandler>()
                 .ExpectSend<Send1>(m => true)
@@ -349,12 +389,28 @@ namespace NServiceBus.Testing.Tests
         public void ShouldPassExpectNotSendIfNotSending()
         {
             Test.Handler<EmptyHandler>()
+                .ExpectNotSend<Send1>()
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectNotSendWithCheckIfNotSending()
+        {
+            Test.Handler<EmptyHandler>()
                 .ExpectNotSend<Send1>(m => true)
                 .OnMessage<TestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectNotSendIfSending()
+        {
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Send1>>()
+                .ExpectNotSend<Send1>()
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldFailExpectNotSendWithCheckIfSending()
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Send1>>()
                 .ExpectNotSend<Send1>(m => true)
@@ -383,12 +439,28 @@ namespace NServiceBus.Testing.Tests
         public void ShouldFailExpectSendLocalIfNotSendingLocal()
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Send1>>()
+                .ExpectSendLocal<Send1>()
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldFailExpectSendLocalWithCheckIfNotSendingLocal()
+        {
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Send1>>()
                 .ExpectSendLocal<Send1>(m => true)
                 .OnMessage<TestMessage>());
         }
 
         [Test]
         public void ShouldPassExpectSendLocalIfSendingLocal()
+        {
+            Test.Handler<SendingLocalHandler<Send1>>()
+                .ExpectSendLocal<Send1>()
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectSendLocalWithCheckIfSendingLocal()
         {
             Test.Handler<SendingLocalHandler<Send1>>()
                 .ExpectSendLocal<Send1>(m => true)
@@ -526,6 +598,14 @@ namespace NServiceBus.Testing.Tests
         public void ShouldFailExpectForwardCurrentMessageToIfMessageNotForwarded()
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<NotForwardingMessageHandler>()
+                .ExpectForwardCurrentMessageTo()
+                .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldFailExpectForwardCurrentMessageWithCheckToIfMessageNotForwarded()
+        {
+            Assert.Throws<ExpectationException>(() => Test.Handler<NotForwardingMessageHandler>()
                 .ExpectForwardCurrentMessageTo(dest => true)
                 .OnMessage<TestMessage>());
         }
@@ -538,6 +618,16 @@ namespace NServiceBus.Testing.Tests
             Assert.Throws<ExpectationException>(() => Test.Handler(handler)
                 .ExpectForwardCurrentMessageTo(dest => dest == "expectedDestination")
                 .OnMessage<TestMessage>());
+        }
+
+        [Test]
+        public void ShouldPassExpectForwardCurrentMessageToIfMessageForwarded()
+        {
+            var handler = new ForwardingMessageHandler("somewhere");
+
+            Test.Handler(handler)
+                .ExpectForwardCurrentMessageTo()
+                .OnMessage<TestMessage>();
         }
 
         [Test]
@@ -555,8 +645,26 @@ namespace NServiceBus.Testing.Tests
         public void ShouldPassExpectNotForwardCurrentMessageToIfMessageNotForwarded()
         {
             Test.Handler<NotForwardingMessageHandler>()
+                .ExpectNotForwardCurrentMessageTo()
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldPassExpectNotForwardCurrentMessageToWithCheckIfMessageNotForwarded()
+        {
+            Test.Handler<NotForwardingMessageHandler>()
                 .ExpectNotForwardCurrentMessageTo(dest => true)
                 .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldFailExpectNotForwardCurrentMessageToIfMessageForwardedToAnyDestination()
+        {
+            var handler = new ForwardingMessageHandler("somewhere");
+
+            Assert.Throws<ExpectationException>(() => Test.Handler(handler)
+                .ExpectNotForwardCurrentMessageTo()
+                .OnMessage<TestMessage>());
         }
 
         [Test]

@@ -5,9 +5,9 @@
 
     class ExpectDoNotDeliverBefore<TMessage> : ExpectInvocation
     {
-        public ExpectDoNotDeliverBefore(Func<TMessage, DateTime, bool> check)
+        public ExpectDoNotDeliverBefore(Func<TMessage, DateTime, bool> check = null)
         {
-            this.check = check;
+            this.check = check ?? ((m, d) => true);
         }
 
         public override void Validate(TestableMessageHandlerContext context)

@@ -6,9 +6,9 @@
 
     class ExpectNotForwardCurrentMessageTo : ExpectInvocation
     {
-        public ExpectNotForwardCurrentMessageTo(Func<string, bool> check)
+        public ExpectNotForwardCurrentMessageTo(Func<string, bool> check = null)
         {
-            this.check = check;
+            this.check = check ?? (s => true);
         }
 
         public override void Validate(TestableMessageHandlerContext context)

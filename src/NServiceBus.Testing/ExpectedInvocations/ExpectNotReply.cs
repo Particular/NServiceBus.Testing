@@ -5,7 +5,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
     class ExpectNotReply<TMessage> : ExpectInvocation
     {
-        public ExpectNotReply(Func<TMessage, ReplyOptions, bool> check)
+        public ExpectNotReply(Func<TMessage, ReplyOptions, bool> check = null)
         {
             this.check = check ?? ((message, options) => true);
         }

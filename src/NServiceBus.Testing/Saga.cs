@@ -132,9 +132,26 @@
         }
 
         /// <summary>
+        /// Check that the saga does not reply with the given message type complying with the given predicate.
+        /// </summary>
+        public Saga<T> ExpectNotReply<TMessage>(Func<TMessage, ReplyOptions, bool> check = null)
+        {
+            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotReply<TMessage>(check));
+            return this;
+        }
+
+        /// <summary>
+        /// Check that the saga does not reply with the given message type complying with the given predicate.
+        /// </summary>
+        public Saga<T> ExpectNotReply<TMessage>(Func<TMessage, bool> check)
+        {
+            return ExpectNotReply((TMessage m, ReplyOptions _) => check(m));
+        }
+
+        /// <summary>
         /// Check that the saga doesn't forward a message to the given destination.
         /// </summary>
-        public Saga<T> ExpectNotForwardCurrentMessageTo(Func<string, bool> check)
+        public Saga<T> ExpectNotForwardCurrentMessageTo(Func<string, bool> check = null)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotForwardCurrentMessageTo(check));
             return this;
@@ -143,7 +160,7 @@
         /// <summary>
         /// Check that the saga forwards a message to the given destination.
         /// </summary>
-        public Saga<T> ExpectForwardCurrentMessageTo(Func<string, bool> check)
+        public Saga<T> ExpectForwardCurrentMessageTo(Func<string, bool> check = null)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectForwardCurrentMessageTo(check));
             return this;
@@ -396,7 +413,7 @@
         /// <summary>
         /// Check that the saga sends the given message type to the appropriate destination.
         /// </summary>
-        public Saga<T> ExpectSendToDestination<TMessage>(Func<TMessage, string, bool> check)
+        public Saga<T> ExpectSendToDestination<TMessage>(Func<TMessage, string, bool> check = null)
         {
             testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSendToDestination<TMessage>(check));
             return this;

@@ -5,9 +5,9 @@ namespace NServiceBus.Testing.ExpectedInvocations
 
     class ExpectNotSendLocal<TMessage> : ExpectInvocation
     {
-        public ExpectNotSendLocal(Func<TMessage, bool> check)
+        public ExpectNotSendLocal(Func<TMessage, bool> check = null)
         {
-            this.check = check;
+            this.check = check ?? (x => true);
         }
 
         public override void Validate(TestableMessageHandlerContext context)

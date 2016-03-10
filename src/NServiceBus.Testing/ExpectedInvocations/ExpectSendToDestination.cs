@@ -7,7 +7,7 @@ namespace NServiceBus.Testing.ExpectedInvocations
     {
         readonly Func<TMessage, string, bool> check;
 
-        public ExpectSendToDestination(Func<TMessage, string, bool> check)
+        public ExpectSendToDestination(Func<TMessage, string, bool> check = null)
         {
             this.check = check ?? ((m, s) => true);
         }
