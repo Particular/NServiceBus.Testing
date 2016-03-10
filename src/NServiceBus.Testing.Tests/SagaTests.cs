@@ -344,10 +344,12 @@
     public class MyRequest
     {
         public bool ShouldReply { get; set; }
+        public string String { get; set; }
     }
 
     public class MyReply
     {
+        public string String { get; set; }
     }
 
     public class MySagaWithInterface : NServiceBus.Saga<MySagaWithInterface.MySagaDataWithInterface>,
@@ -453,7 +455,7 @@
             return Task.FromResult(0);
         }
 
-        private Task ProcessExternalOrder(SubmitOrder message, IMessageHandlerContext context)
+        Task ProcessExternalOrder(SubmitOrder message, IMessageHandlerContext context)
         {
             return context.Send<ProcessOrder>("remote.orderQueue", m =>
             {
@@ -463,7 +465,7 @@
             });
         }
 
-        private Task ProcessOrder(SubmitOrder message, IMessageHandlerContext context)
+        Task ProcessOrder(SubmitOrder message, IMessageHandlerContext context)
         {
             return context.Send<ProcessOrder>(m =>
             {
@@ -473,7 +475,7 @@
             });
         }
 
-        private Task ProcessOrderWithDiscount(SubmitOrder message, IMessageHandlerContext context)
+        Task ProcessOrderWithDiscount(SubmitOrder message, IMessageHandlerContext context)
         {
             return context.Send<ProcessOrder>(m =>
             {
