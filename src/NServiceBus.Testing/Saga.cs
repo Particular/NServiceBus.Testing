@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Testing
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
@@ -58,7 +57,7 @@
         /// </summary>
         public Saga<T> SetIncomingHeader(string key, string value)
         {
-            incomingHeaders[key] = value;
+            testableMessageHandlerContext.IncomingHeaders[key] = value;
             return this;
         }
 
@@ -486,8 +485,6 @@
         }
 
         readonly T saga;
-
-        IDictionary<string, string> incomingHeaders = new Dictionary<string, string>();
 
         IMessageCreator messageCreator = new MessageMapper();
 

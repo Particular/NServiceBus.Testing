@@ -269,6 +269,31 @@
                 .ExpectNotSendLocal<SendLocalSaga.Message>()
                 .WhenHandling<SendLocalSaga.RequestNotSendLocal>();
         }
+
+        [Test]
+        public void SetIncomingHeader()
+        {
+            const string customHeaderKey = "custom-header";
+            const string expectedHeaderValue = "header value";
+            var containsCustomHeader = false;
+            string receivedHeaderValue = null;
+
+            var saga = new CustomSaga<MyRequest, MySagaData>()
+            {
+                HandlerAction = (request, context, data) =>
+                {
+                    containsCustomHeader = context.MessageHeaders.TryGetValue(customHeaderKey, out receivedHeaderValue);
+                    return Task.FromResult(0);
+                }
+            };
+
+            Test.Saga(saga)
+                .SetIncomingHeader(customHeaderKey, expectedHeaderValue)
+                .When((s, c) => s.Handle(new MyRequest(), c));
+
+            Assert.IsTrue(containsCustomHeader);
+            Assert.AreEqual(expectedHeaderValue, receivedHeaderValue);
+        }
     }
 
     public class SendLocalSaga : NServiceBus.Saga<SendLocalSaga.SendLocalSagaData>,
@@ -487,6 +512,20 @@
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DiscountPolicyData> mapper)
         {
+        }
+    }
+
+    public class CustomSaga<TMessage, TSagaData> : NServiceBus.Saga<TSagaData>, IHandleMessages<TMessage> where TSagaData : IContainSagaData, new()
+    {
+        public Func<TMessage, IMessageHandlerContext, TSagaData, Task> HandlerAction { get; set; }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TSagaData> mapper)
+        {
+        }
+
+        public Task Handle(TMessage message, IMessageHandlerContext context)
+        {
+            return HandlerAction(message, context, Data);
         }
     }
 
