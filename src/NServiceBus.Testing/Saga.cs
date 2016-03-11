@@ -268,6 +268,7 @@
         /// <summary>
         /// Uses the given delegate to invoke the saga, checking all the expectations previously set up,
         /// and then clearing them for continued testing.
+        /// example: <c>When((saga, context) => s.Handle(new MyMessage(), context))</c>
         /// </summary>
         public Saga<T> When(Func<T, IMessageHandlerContext, Task> sagaIsInvoked)
         {
@@ -277,6 +278,26 @@
             testableMessageHandlerContext.Clear();
 
             return this;
+        }
+
+        /// <summary>
+        /// Uses the given delegate to select the message handler and invoking it with the given message. Checks all the expectations previously, and then clearing them for continued testing.
+        /// example: <c>When(s => s.Handle, new MyMessage())</c>
+        /// </summary>
+        public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, TMessage message)
+        {
+            return When((s, context) => handlerSelector(s)(message, context));
+        }
+
+        /// <summary>
+        /// Uses the given delegate to select the message handler and invoking it with the specified message. Checks all the expectations previously, and then clearing them for continued testing.
+        /// example: <c>When&lt;MyMessage>(s => s.Handle, m => { m.Value = 42 })</c>
+        /// </summary>
+        public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, Action<TMessage> messageInitializer = null)
+        {
+            var message = (TMessage) messageCreator.CreateInstance(typeof(TMessage));
+            messageInitializer?.Invoke(message);
+            return When((s, context) => handlerSelector(s)(message, context));
         }
 
         /// <summary>

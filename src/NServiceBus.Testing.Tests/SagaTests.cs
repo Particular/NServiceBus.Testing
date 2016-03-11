@@ -59,10 +59,7 @@
                 }, c))
                 .ExpectSend<ProcessOrder>(m => m.Total == total * (decimal)0.9)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When((s, c) => s.Handle(new SubmitOrder
-                {
-                    Total = total
-                }, c));
+                .When<SubmitOrder>(s => s.Handle, m => m.Total = total);
         }
 
         [Test]
@@ -72,10 +69,7 @@
 
             Test.Saga<DiscountPolicy>()
                 .ExpectSend<ProcessOrder>(m => Assert.That(() => m.Total, Is.EqualTo(total)))
-                .When((s, c) => s.Handle(new SubmitOrder
-                {
-                    Total = total
-                }, c));
+                .When<SubmitOrder>(s => s.Handle, m => m.Total = total);
         }
 
         [Test]
@@ -93,10 +87,10 @@
                 .WhenHandlingTimeout<SubmitOrder>(m => m.Total = total)
                 .ExpectSend<ProcessOrder>(m => m.Total == total)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
-                .When((s, c) => s.Handle(new SubmitOrder
+                .When(s => s.Handle, new SubmitOrder
                 {
                     Total = total
-                }, c));
+                });
         }
 
         [Test]
