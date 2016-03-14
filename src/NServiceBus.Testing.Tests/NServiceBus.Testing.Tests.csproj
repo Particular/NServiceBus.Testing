@@ -57,11 +57,23 @@
     <Reference Include="System.Web.Services" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SagaTests.cs" />
-    <Compile Include="HandlerTests.cs" />
-    <Compile Include="Saga\SagaDataTests.cs" />
-    <Compile Include="Saga\SagaTimeoutTests.cs" />
-    <Compile Include="Timeouts.cs" />
+    <Compile Include="Handler\ExpectDoNotContinueDispatchingCurrentMessageToHandlersTests.cs" />
+    <Compile Include="Handler\ExpectDeferTests.cs" />
+    <Compile Include="Handler\ExpectForwardCurrentMessageToTests.cs" />
+    <Compile Include="Handler\ExpectPublishTests.cs" />
+    <Compile Include="Handler\ExpectReplyTests.cs" />
+    <Compile Include="Handler\ExpectHandleCurrentMessageLaterTests.cs" />
+    <Compile Include="Handler\ExpectSendTests.cs" />
+    <Compile Include="Saga\ExpectForwardCurrentMessageToTests.cs" />
+    <Compile Include="Saga\SagaTests.cs" />
+    <Compile Include="Handler\HandlerTests.cs" />
+    <Compile Include="Saga\DiscountPolicySagaTests.cs" />
+    <Compile Include="Saga\ExpectHandleCurrentMessageLaterTests.cs" />
+    <Compile Include="Saga\ExpectReplyTests.cs" />
+    <Compile Include="Saga\ExpectSendLocalTests.cs" />
+    <Compile Include="Saga\ExpectTimeoutTests.cs" />
+    <Compile Include="Saga\ExpectSagaDataTests.cs" />
+    <Compile Include="Saga\WhenSagaTimesOutTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Testing\NServiceBus.Testing.csproj">

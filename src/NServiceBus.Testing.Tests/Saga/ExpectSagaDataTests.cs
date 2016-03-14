@@ -5,12 +5,15 @@
     using NUnit.Framework;
 
     [TestFixture]
-    class SagaDataTests
+    class ExpectSagaDataTests
     {
         [Test]
         public void ShouldCreateSagaWithSagaData()
         {
-            Test.Saga<SagaCreation>(new SagaCreation.CreationData { Property = "property" })
+            Test.Saga<SagaCreation>(new SagaCreation.CreationData
+            {
+                Property = "property"
+            })
                 .ExpectSagaData<SagaCreation.CreationData>(data => data.Property == "property")
                 .WhenHandling<SagaCreation.NoChangeMessage>();
         }
@@ -18,7 +21,10 @@
         [Test]
         public void ExpectSagaDataShouldPassWhenCheckSucceeds()
         {
-            Test.Saga<SagaCreation>(new SagaCreation.CreationData { Property = "property" })
+            Test.Saga<SagaCreation>(new SagaCreation.CreationData
+            {
+                Property = "property"
+            })
                 .ExpectSagaData<SagaCreation.CreationData>(data => data.Property == "newData")
                 .WhenHandling<SagaCreation.ChangeMessage>();
         }
@@ -26,7 +32,10 @@
         [Test]
         public void ExpectSagaDataShouldThrowExpectationExceptionWhenCheckDoesNotSucceed()
         {
-            Assert.Throws<ExpectationException>(() => Test.Saga<SagaCreation>(new SagaCreation.CreationData { Property = "property" })
+            Assert.Throws<ExpectationException>(() => Test.Saga<SagaCreation>(new SagaCreation.CreationData
+            {
+                Property = "property"
+            })
                 .ExpectSagaData<SagaCreation.CreationData>(data => data.Property == "42")
                 .WhenHandling<SagaCreation.ChangeMessage>());
         }
