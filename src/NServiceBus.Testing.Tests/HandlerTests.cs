@@ -1,6 +1,8 @@
 namespace NServiceBus.Testing.Tests
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Threading;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
@@ -732,6 +734,89 @@ namespace NServiceBus.Testing.Tests
                 .OnMessage<MyCommand>();
         }
 
+        [Test]
+        public void SendShouldBeThreadsafe()
+        {
+            var counter = 0;
+
+            Assert.Throws<ExpectationException>(() => Test.Handler<ConcurrentHandler>()
+                .WithExternalDependencies(h =>
+                {
+                    h.NumberOfThreads = 100;
+                    h.HandlerAction = context => context.Send<Send1>(m => { });
+                })
+                .ExpectSend<Send1>(m =>
+                {
+                    Interlocked.Increment(ref counter);
+                    return false;
+                })
+                .OnMessage<MyCommand>());
+            Assert.AreEqual(100, counter);
+        }
+
+        [Test]
+        public void PublishShouldBeThreadsafe()
+        {
+            var counter = 0;
+
+            Assert.Throws<ExpectationException>(() => Test.Handler<ConcurrentHandler>()
+                .WithExternalDependencies(h =>
+                {
+                    h.NumberOfThreads = 100;
+                    h.HandlerAction = context => context.Publish<Publish1>(m => { });
+                })
+                .ExpectPublish<Publish1>(m =>
+                {
+                    Interlocked.Increment(ref counter);
+                    return false;
+                })
+                .OnMessage<MyCommand>());
+
+            Assert.AreEqual(100, counter);
+        }
+
+        [Test]
+        public void ReplyShouldBeThreadsafe()
+        {
+            var counter = 0;
+
+            Assert.Throws<ExpectationException>(() => Test.Handler<ConcurrentHandler>()
+                .WithExternalDependencies(h =>
+                {
+                    h.NumberOfThreads = 100;
+                    h.HandlerAction = context => context.Reply<Send1>(m => { });
+                })
+                .ExpectReply<Send1>(m =>
+                {
+                    Interlocked.Increment(ref counter);
+                    return false;
+                })
+                .OnMessage<MyCommand>());
+
+            Assert.AreEqual(100, counter);
+        }
+
+        [Test]
+        public void ForwardCurrentMessageToShouldBeThreadsafe()
+        {
+            var counter = 0;
+
+            Assert.Throws<ExpectationException>(() => Test.Handler<ConcurrentHandler>()
+                .WithExternalDependencies(h =>
+                {
+                    h.NumberOfThreads = 100;
+                    h.HandlerAction = context => context.ForwardCurrentMessageTo("destination");
+                })
+                .ExpectForwardCurrentMessageTo(d =>
+                {
+                    Interlocked.Increment(ref counter);
+                    return false;
+                })
+                .OnMessage<MyCommand>());
+
+            Assert.AreEqual(100, counter);
+        }
+
         class MyCommand : ICommand
         {
             public string Header1 { get; set; }
@@ -767,6 +852,22 @@ namespace NServiceBus.Testing.Tests
             {
                 await Task.Yield();
                 await context.Send<Send1>(m => { }, new SendOptions());
+            }
+        }
+
+        class ConcurrentHandler : IHandleMessages<MyCommand>
+        {
+            public int NumberOfThreads { get; set; } = 100;
+
+            public Func<IMessageHandlerContext, Task> HandlerAction = x => Task.FromResult(0);
+
+            public Task Handle(MyCommand message, IMessageHandlerContext context)
+            {
+                var operations = new ConcurrentBag<Task>();
+
+                Parallel.For(0, NumberOfThreads, x => operations.Add(HandlerAction(context)));
+
+                return Task.WhenAll(operations);
             }
         }
 

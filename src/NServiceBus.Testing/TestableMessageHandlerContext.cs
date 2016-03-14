@@ -1,6 +1,7 @@
 namespace NServiceBus.Testing
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Threading.Tasks;
@@ -8,22 +9,22 @@ namespace NServiceBus.Testing
     using NServiceBus.Persistence;
     using NServiceBus.Testing.ExpectedInvocations;
 
-    internal class TestableMessageHandlerContext : IMessageHandlerContext
+    class TestableMessageHandlerContext : IMessageHandlerContext
     {
         public TestableMessageHandlerContext(IMessageCreator messageCreator)
         {
             this.messageCreator = messageCreator;
         }
 
-        public IList<TimeoutMessage<object>> TimeoutMessages { get; } = new List<TimeoutMessage<object>>();
+        public SentMessage<object>[] SentMessages => sentMessages.ToArray();
 
-        public IList<SentMessage<object>> SentMessages { get; } = new List<SentMessage<object>>();
+        public PublishedMessage<object>[] PublishedMessages => publishedMessages.ToArray();
 
-        public IList<PublishedMessage<object>> PublishedMessages { get; } = new List<PublishedMessage<object>>();
+        public TimeoutMessage<object>[] TimeoutMessages => timeoutMessages.ToArray();
 
-        public IList<RepliedMessage<object>> RepliedMessages { get; set; } = new List<RepliedMessage<object>>();
+        public RepliedMessage<object>[] RepliedMessages => repliedMessages.ToArray();
 
-        public IList<string> ForwardedMessages { get; set; } = new List<string>();
+        public string[] ForwardedMessages => forwardedMessages.ToArray();
 
         public IDictionary<string, string> IncomingHeaders { get; } = new Dictionary<string, string>();
 
@@ -53,11 +54,11 @@ namespace NServiceBus.Testing
                 {
                     var within = GetWithin(options);
 
-                    TimeoutMessages.Add(new TimeoutMessage<object>(message, options, within));
+                    timeoutMessages.Enqueue(new TimeoutMessage<object>(message, options, within));
                 }
             }
 
-            SentMessages.Add(new SentMessage<object>(message, options));
+            sentMessages.Enqueue(new SentMessage<object>(message, options));
 
             return Task.FromResult(0);
         }
@@ -69,7 +70,7 @@ namespace NServiceBus.Testing
 
         public Task Publish(object message, PublishOptions options)
         {
-            PublishedMessages.Add(new PublishedMessage<object>(message, options));
+            publishedMessages.Enqueue(new PublishedMessage<object>(message, options));
             return Task.FromResult(0);
         }
 
@@ -80,7 +81,7 @@ namespace NServiceBus.Testing
 
         public Task Reply(object message, ReplyOptions options)
         {
-            RepliedMessages.Add(new RepliedMessage<object>(message, options));
+            repliedMessages.Enqueue(new RepliedMessage<object>(message, options));
             return Task.FromResult(0);
         }
 
@@ -91,7 +92,7 @@ namespace NServiceBus.Testing
 
         public Task ForwardCurrentMessageTo(string destination)
         {
-            ForwardedMessages.Add(destination);
+            forwardedMessages.Enqueue(destination);
             return Task.FromResult(0);
         }
 
@@ -108,26 +109,23 @@ namespace NServiceBus.Testing
 
         public void Validate()
         {
-            try
+            foreach (var e in ExpectedInvocations)
             {
-                foreach (var e in ExpectedInvocations)
-                {
-                    e.Validate(this);
-                }
+                e.Validate(this);
             }
-            finally
-            {
-                Clear();
-            }
+
+            Clear();
         }
 
         public void Clear()
         {
             ExpectedInvocations.Clear();
-            RepliedMessages.Clear();
-            SentMessages.Clear();
-            PublishedMessages.Clear();
-            ForwardedMessages.Clear();
+
+            repliedMessages = new ConcurrentQueue<RepliedMessage<object>>();
+            sentMessages = new ConcurrentQueue<SentMessage<object>>();
+            publishedMessages = new ConcurrentQueue<PublishedMessage<object>>();
+            forwardedMessages = new ConcurrentQueue<string>();
+
             IncomingHeaders.Clear();
             MessageId = null;
             HandleCurrentMessageLaterWasCalled = false;
@@ -154,6 +152,12 @@ namespace NServiceBus.Testing
 
             return within.Value;
         }
+
+        ConcurrentQueue<SentMessage<object>> sentMessages = new ConcurrentQueue<SentMessage<object>>();
+        ConcurrentQueue<PublishedMessage<object>> publishedMessages = new ConcurrentQueue<PublishedMessage<object>>();
+        ConcurrentQueue<RepliedMessage<object>> repliedMessages = new ConcurrentQueue<RepliedMessage<object>>();
+        ConcurrentQueue<TimeoutMessage<object>> timeoutMessages = new ConcurrentQueue<TimeoutMessage<object>>();
+        ConcurrentQueue<string> forwardedMessages = new ConcurrentQueue<string>();
 
         IMessageCreator messageCreator;
     }
