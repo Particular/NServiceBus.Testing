@@ -5,7 +5,7 @@
     using NUnit.Framework;
 
     [TestFixture]
-    class SagaTimeoutTests
+    class WhenSagaTimesOutTests
     {
         [Test]
         public void ShouldInvokeAllRegisteredTimeouts()
