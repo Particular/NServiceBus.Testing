@@ -88,15 +88,17 @@
     <Compile Include="ExpectedInvocations\ExpectSagaData.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="ExpectedInvocations\ExpectInvocation.cs" />
-    <Compile Include="InvokedMessageExtensions.cs" />
+    <Compile Include="Fakes\OutgoingMessageExtensions.cs" />
     <Compile Include="Saga.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestableMessageHandlerContext.cs" />
+    <Compile Include="Fakes\TestableMessageHandlerContext.cs" />
+    <Compile Include="TestingContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

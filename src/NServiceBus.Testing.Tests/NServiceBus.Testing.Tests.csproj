@@ -74,6 +74,7 @@
     <Compile Include="Saga\ExpectTimeoutTests.cs" />
     <Compile Include="Saga\ExpectSagaDataTests.cs" />
     <Compile Include="Saga\WhenSagaTimesOutTests.cs" />
+    <Compile Include="Fakes\TestableMessageHandlerContextTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Testing\NServiceBus.Testing.csproj">

@@ -15,7 +15,7 @@
         internal Saga(T saga)
         {
             this.saga = saga;
-            testableMessageHandlerContext = new TestableMessageHandlerContext(messageCreator);
+            testContext = new TestingContext(messageCreator);
 
             if (saga.Entity == null)
             {
@@ -57,7 +57,7 @@
         /// </summary>
         public Saga<T> SetIncomingHeader(string key, string value)
         {
-            testableMessageHandlerContext.IncomingHeaders[key] = value;
+            testContext.MessageHeaders[key] = value;
             return this;
         }
 
@@ -66,7 +66,7 @@
         /// </summary>
         public Saga<T> ExpectSend<TMessage>(Func<TMessage, SendOptions, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSend<TMessage>(check));
+            testContext.AddExpectation(new ExpectSend<TMessage>(check));
             return this;
         }
 
@@ -92,7 +92,7 @@
         /// </summary>
         public Saga<T> ExpectNotSend<TMessage>(Func<TMessage, SendOptions, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSend<TMessage>(check));
+            testContext.AddExpectation(new ExpectNotSend<TMessage>(check));
             return this;
         }
 
@@ -118,7 +118,7 @@
         /// </summary>
         public Saga<T> ExpectReply<TMessage>(Func<TMessage, ReplyOptions, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectReply<TMessage>(check));
+            testContext.AddExpectation(new ExpectReply<TMessage>(check));
             return this;
         }
 
@@ -135,7 +135,7 @@
         /// </summary>
         public Saga<T> ExpectNotReply<TMessage>(Func<TMessage, ReplyOptions, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotReply<TMessage>(check));
+            testContext.AddExpectation(new ExpectNotReply<TMessage>(check));
             return this;
         }
 
@@ -152,7 +152,7 @@
         /// </summary>
         public Saga<T> ExpectNotForwardCurrentMessageTo(Func<string, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotForwardCurrentMessageTo(check));
+            testContext.AddExpectation(new ExpectNotForwardCurrentMessageTo(check));
             return this;
         }
 
@@ -161,7 +161,7 @@
         /// </summary>
         public Saga<T> ExpectForwardCurrentMessageTo(Func<string, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectForwardCurrentMessageTo(check));
+            testContext.AddExpectation(new ExpectForwardCurrentMessageTo(check));
             return this;
         }
 
@@ -170,7 +170,7 @@
         /// </summary>
         public Saga<T> ExpectReplyToOriginator<TMessage>(Func<TMessage, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectReplyToOriginator<TMessage>(check));
+            testContext.AddExpectation(new ExpectReplyToOriginator<TMessage>(check));
             return this;
         }
 
@@ -188,7 +188,7 @@
         /// </summary>
         public Saga<T> ExpectPublish<TMessage>(Func<TMessage, PublishOptions, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectPublish<TMessage>(check));
+            testContext.AddExpectation(new ExpectPublish<TMessage>(check));
             return this;
         }
 
@@ -214,7 +214,7 @@
         /// </summary>
         public Saga<T> ExpectNotPublish<TMessage>(Func<TMessage, PublishOptions, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotPublish<TMessage>(check));
+            testContext.AddExpectation(new ExpectNotPublish<TMessage>(check));
             return this;
         }
 
@@ -240,7 +240,7 @@
         /// </summary>
         public Saga<T> ExpectHandleCurrentMessageLater()
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectHandleCurrentMessageLater());
+            testContext.AddExpectation(new ExpectHandleCurrentMessageLater());
             return this;
         }
 
@@ -272,10 +272,10 @@
         /// </summary>
         public Saga<T> When(Func<T, IMessageHandlerContext, Task> sagaIsInvoked)
         {
-            sagaIsInvoked(saga, testableMessageHandlerContext).GetAwaiter().GetResult();
+            sagaIsInvoked(saga, testContext).GetAwaiter().GetResult();
 
-            testableMessageHandlerContext.Validate();
-            testableMessageHandlerContext.Clear();
+            testContext.Validate();
+            testContext = new TestingContext(messageCreator, testContext.TimeoutMessages);
 
             return this;
         }
@@ -307,7 +307,7 @@
         /// <param name="after">The ammount of time that has passed before the timeout is called.</param>
         public Saga<T> WhenSagaTimesOut(TimeSpan? after = null)
         {
-            testableMessageHandlerContext.TimeoutMessages
+            testContext.TimeoutMessages
                 .Where(t => t.Within <= after.GetValueOrDefault(TimeSpan.MaxValue))
                 .OrderBy(t => t.Within)
                 .ToList()
@@ -316,8 +316,8 @@
                     t.Message
                 }));
 
-            testableMessageHandlerContext.Validate();
-            testableMessageHandlerContext.Clear();
+            testContext.Validate();
+            testContext = new TestingContext(messageCreator);
 
             return this;
         }
@@ -345,7 +345,7 @@
         /// </summary>
         public Saga<T> ExpectTimeoutToBeSetIn<TMessage>(Func<TMessage, TimeSpan, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDelayDeliveryWith<TMessage>(check));
+            testContext.AddExpectation(new ExpectDelayDeliveryWith<TMessage>(check));
             return this;
         }
 
@@ -362,7 +362,7 @@
         /// </summary>
         public Saga<T> ExpectNoTimeoutToBeSetIn<TMessage>(Func<TMessage, TimeSpan, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotDelayDeliveryWith<TMessage>(check));
+            testContext.AddExpectation(new ExpectNotDelayDeliveryWith<TMessage>(check));
             return this;
         }
 
@@ -371,7 +371,7 @@
         /// </summary>
         public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectDoNotDeliverBefore<TMessage>(check));
+            testContext.AddExpectation(new ExpectDoNotDeliverBefore<TMessage>(check));
             return this;
         }
 
@@ -388,7 +388,7 @@
         /// </summary>
         public Saga<T> ExpectNoTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotDoNotDeliverBefore<TMessage>(check));
+            testContext.AddExpectation(new ExpectNotDoNotDeliverBefore<TMessage>(check));
             return this;
         }
 
@@ -398,7 +398,7 @@
         /// </summary>
         public Saga<T> ExpectSendLocal<TMessage>(Func<TMessage, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSendLocal<TMessage>(check));
+            testContext.AddExpectation(new ExpectSendLocal<TMessage>(check));
             return this;
         }
 
@@ -417,7 +417,7 @@
         /// </summary>
         public Saga<T> ExpectNotSendLocal<TMessage>(Func<TMessage, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectNotSendLocal<TMessage>(check));
+            testContext.AddExpectation(new ExpectNotSendLocal<TMessage>(check));
             return this;
         }
 
@@ -435,7 +435,7 @@
         /// </summary>
         public Saga<T> ExpectSendToDestination<TMessage>(Func<TMessage, string, bool> check = null)
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSendToDestination<TMessage>(check));
+            testContext.AddExpectation(new ExpectSendToDestination<TMessage>(check));
             return this;
         }
 
@@ -453,7 +453,7 @@
         /// </summary>
         public Saga<T> ExpectSagaData<TSagaData>(Func<TSagaData, bool> check) where TSagaData : IContainSagaData
         {
-            testableMessageHandlerContext.ExpectedInvocations.Add(new ExpectSagaData<TSagaData>(saga, check));
+            testContext.AddExpectation(new ExpectSagaData<TSagaData>(saga, check));
             return this;
         }
 
@@ -484,7 +484,7 @@
 
         void HandleTimeout<TMessage>(TMessage message)
         {
-            ((dynamic) saga).Timeout(message, testableMessageHandlerContext);
+            ((dynamic) saga).Timeout(message, testContext);
         }
 
         static Func<T1, bool> CheckActionToFunc<T1>(Action<T1> check)
@@ -509,7 +509,7 @@
 
         IMessageCreator messageCreator = new MessageMapper();
 
-        TestableMessageHandlerContext testableMessageHandlerContext;
+        TestingContext testContext;
 
         Lazy<MethodInfo> timeoutMethodInfo = new Lazy<MethodInfo>(() => typeof(Saga<T>).GetMethod("HandleTimeout", BindingFlags.Instance | BindingFlags.NonPublic));
     }
