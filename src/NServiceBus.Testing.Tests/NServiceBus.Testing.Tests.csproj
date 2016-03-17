@@ -57,6 +57,7 @@
     <Reference Include="System.Web.Services" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Fakes\TestableContextChecker.cs" />
     <Compile Include="Handler\ExpectDoNotContinueDispatchingCurrentMessageToHandlersTests.cs" />
     <Compile Include="Handler\ExpectDeferTests.cs" />
     <Compile Include="Handler\ExpectForwardCurrentMessageToTests.cs" />
