@@ -88,6 +88,8 @@
     <Compile Include="ExpectedInvocations\ExpectSagaData.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="ExpectedInvocations\ExpectInvocation.cs" />
+    <Compile Include="Fakes\OutgoingMessageExtensions.cs" />
+    <Compile Include="Fakes\MessageHandlerExtensions.cs" />
     <Compile Include="Saga.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
