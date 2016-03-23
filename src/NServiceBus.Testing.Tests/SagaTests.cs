@@ -170,6 +170,46 @@
                 .ExpectNotForwardCurrentMessageTo(dest => dest == "expectedDestination")
                 .When(s => s.Handle(new StartsSaga()));
         }
+
+        [Test]
+        public void ShouldFailExpectReplyToOriginatorIfNotRepliedToOriginator()
+        {
+            Assert.Throws<Exception>(() => Test.Saga<SagaThatDoesAReply>()
+                .ExpectReplyToOriginator<ResponseToOriginator>()
+                .When(s => s.Handle(new MyRequest())));
+        }
+
+        [Test]
+        public void ShouldFailExpectNotReplyToOriginatorIfRepliedToOriginator()
+        {
+            Assert.Throws<Exception>(() => Test.Saga<MySaga>()
+                .ExpectNotReplyToOriginator<ResponseToOriginator>()
+                .When(s => s.Handle(new StartsSaga())));
+        }
+
+        [Test]
+        public void ShouldPassExpectNotReplyToOriginatorIfUsingReply()
+        {
+            Test.Saga<SagaThatDoesAReply>()
+                .ExpectNotReplyToOriginator<ResponseToOriginator>()
+                .When(s => s.Handle(new MyRequest()));
+        }
+
+        [Test]
+        public void ShouldPassExpectNotReplyToOriginatorIfNotReplyingToOriginator()
+        {
+            Test.Saga<MySagaWithInterface>()
+                .ExpectNotReplyToOriginator<ResponseToOriginator>()
+                .WhenHandling<StartsSagaWithInterface>();
+        }
+
+        [Test]
+        public void ShouldPassExpectNotReplyToOriginatorIfFailingCheck()
+        {
+            Test.Saga<MySaga>()
+                .ExpectNotReplyToOriginator<ResponseToOriginator>(m => false)
+                .When(s => s.Handle(new StartsSaga()));
+        }
     }
 
 

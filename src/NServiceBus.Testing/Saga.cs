@@ -7,7 +7,7 @@ namespace NServiceBus.Testing
     /// <summary>
     /// Saga unit testing framework.
     /// </summary>
-    public class Saga<T> where T : Saga, new()
+    public class Saga<T> where T : Saga
     {
         private readonly T saga;
         private readonly StubBus bus;
@@ -249,7 +249,36 @@ namespace NServiceBus.Testing
         {
             return ExpectReplyToOriginator(CheckActionToFunc(check));
         }
-        
+
+        /// <summary>
+        /// Check that the saga does not reply to the originator with the given message type.
+        /// </summary>
+        public Saga<T> ExpectNotReplyToOriginator<TMessage>(Func<TMessage, bool> check = null)
+        {
+            expectedInvocations.Add(new ExpectedReplyToOriginatorInvocation<TMessage>(negate:true)
+            {
+                Check = (message, address, correlationId) =>
+                {
+                    if (address == Address.Parse(saga.Entity.Originator) && correlationId == saga.Entity.OriginalMessageId)
+                    {
+                        check = check ?? (m => true);
+                        return check(message);
+                    }
+
+                    return true;
+                }
+            });
+            return this;
+        }
+
+        /// <summary>
+        /// Check that the saga does not reply to the originator with the given message type.
+        /// </summary>
+        public Saga<T> ExpectNotReplyToOriginator<TMessage>(Action<TMessage> check)
+        {
+            return ExpectNotReplyToOriginator(CheckActionToFunc(check));
+        }
+
         /// <summary>
         /// Check that the saga publishes a message of the given type complying with the given predicate.
         /// </summary>
