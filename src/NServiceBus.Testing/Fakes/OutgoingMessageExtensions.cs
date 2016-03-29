@@ -4,12 +4,13 @@ namespace NServiceBus.Testing
     using System.Linq;
 
     /// <summary>
-    /// Extension methods for easier type safe access to instances of <see cref="OutgoingMessage{TMessage,TOptions}"/>
+    /// Extension methods for easier type safe access to instances of <see cref="OutgoingMessage{TMessage,TOptions}" />
     /// </summary>
     public static class OutgoingMessageExtensions
     {
         /// <summary>
-        /// Returns all <see cref="RepliedMessage{TMessage}"/> of the specified type contained in <paramref name="repliedMessages"/>.
+        /// Returns all <see cref="RepliedMessage{TMessage}" /> of the specified type contained in
+        /// <paramref name="repliedMessages" />.
         /// </summary>
         public static IEnumerable<RepliedMessage<TMessage>> Containing<TMessage>(this IEnumerable<RepliedMessage<object>> repliedMessages)
         {
@@ -19,7 +20,8 @@ namespace NServiceBus.Testing
         }
 
         /// <summary>
-        /// Returns all <see cref="PublishedMessage{TMessage}"/> of the specified type contained in <paramref name="publishedMessages"/>.
+        /// Returns all <see cref="PublishedMessage{TMessage}" /> of the specified type contained in
+        /// <paramref name="publishedMessages" />.
         /// </summary>
         public static IEnumerable<PublishedMessage<TMessage>> Containing<TMessage>(this IEnumerable<PublishedMessage<object>> publishedMessages)
         {
@@ -29,7 +31,7 @@ namespace NServiceBus.Testing
         }
 
         /// <summary>
-        /// Returns all <see cref="SentMessage{TMessage}"/> of the specified type contained in <paramref name="sentMessages"/>.
+        /// Returns all <see cref="SentMessage{TMessage}" /> of the specified type contained in <paramref name="sentMessages" />.
         /// </summary>
         public static IEnumerable<SentMessage<TMessage>> Containing<TMessage>(this IEnumerable<SentMessage<object>> sentMessages)
         {
@@ -46,7 +48,7 @@ namespace NServiceBus.Testing
         }
 
         /// <summary>
-        /// Tries to cast the message contained in <paramref name="sentMessage"/> to <typeparamref name="TMessage"/>.
+        /// Tries to cast the message contained in <paramref name="sentMessage" /> to <typeparamref name="TMessage" />.
         /// </summary>
         public static TMessage Message<TMessage>(this RepliedMessage<object> sentMessage) where TMessage : class
         {
@@ -54,7 +56,7 @@ namespace NServiceBus.Testing
         }
 
         /// <summary>
-        /// Tries to cast the message contained in <paramref name="sentMessage"/> to <typeparamref name="TMessage"/>.
+        /// Tries to cast the message contained in <paramref name="sentMessage" /> to <typeparamref name="TMessage" />.
         /// </summary>
         public static TMessage Message<TMessage>(this PublishedMessage<object> sentMessage) where TMessage : class
         {
@@ -62,7 +64,7 @@ namespace NServiceBus.Testing
         }
 
         /// <summary>
-        /// Tries to cast the message contained in <paramref name="sentMessage"/> to <typeparamref name="TMessage"/>.
+        /// Tries to cast the message contained in <paramref name="sentMessage" /> to <typeparamref name="TMessage" />.
         /// </summary>
         public static TMessage Message<TMessage>(this SentMessage<object> sentMessage) where TMessage : class
         {

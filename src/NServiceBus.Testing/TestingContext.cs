@@ -28,9 +28,9 @@
         {
             var headers = options.GetHeaders();
 
-            if (headers.ContainsKey(Headers.IsSagaTimeoutMessage))
+            if (headers.ContainsKey(NServiceBus.Headers.IsSagaTimeoutMessage))
             {
-                if (headers[Headers.IsSagaTimeoutMessage] == bool.TrueString)
+                if (headers[NServiceBus.Headers.IsSagaTimeoutMessage] == bool.TrueString)
                 {
                     var within = GetWithin(options);
 
@@ -73,15 +73,5 @@
         IList<ExpectInvocation> expectedInvocations = new List<ExpectInvocation>();
 
         ConcurrentQueue<TimeoutMessage<object>> timeoutMessages = new ConcurrentQueue<TimeoutMessage<object>>();
-    }
-
-    class TimeoutMessage<TMessage> : OutgoingMessage<TMessage, SendOptions>
-    {
-        public TimeoutMessage(TMessage message, SendOptions options, TimeSpan within) : base(message, options)
-        {
-            Within = within;
-        }
-
-        public TimeSpan Within { get; private set; }
     }
 }
