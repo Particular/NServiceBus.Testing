@@ -52,7 +52,7 @@
     </None>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0-unstable1656\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.6.0.0-unstable1768\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Obsolete, Version=4.0.4.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
@@ -86,43 +86,43 @@
     <Compile Include="ExpectedInvocations\ExpectReplyToOriginator.cs" />
     <Compile Include="ExpectedInvocations\ExpectDelayDeliveryWith.cs" />
     <Compile Include="ExpectedInvocations\ExpectSagaData.cs" />
-    <Compile Include="Fakes\FakeBuilder.cs" />
-    <Compile Include="Fakes\OutgoingMessage.cs" />
-    <Compile Include="Fakes\PublishedMessage.cs" />
-    <Compile Include="Fakes\RepliedMessage.cs" />
-    <Compile Include="Fakes\SentMessage.cs" />
-    <Compile Include="Fakes\TestableAuditContext.cs" />
-    <Compile Include="Fakes\TestableBatchDispatchContext.cs" />
-    <Compile Include="Fakes\TestableBehaviorContext.cs" />
-    <Compile Include="Fakes\TestableDispatchContext.cs" />
-    <Compile Include="Fakes\TestableFaultContext.cs" />
-    <Compile Include="Fakes\TestableForwardingContext.cs" />
-    <Compile Include="Fakes\TestableIncomingContext.cs" />
-    <Compile Include="Fakes\TestableIncomingLogicalMessageContext.cs" />
-    <Compile Include="Fakes\TestableIncomingPhysicalMessageContext.cs" />
-    <Compile Include="Fakes\TestableInvokeHandlerContext.cs" />
-    <Compile Include="Fakes\TestableMessageProcessingContext.cs" />
-    <Compile Include="Fakes\TestableOutgoingContext.cs" />
-    <Compile Include="Fakes\TestableOutgoingLogicalMessageContext.cs" />
-    <Compile Include="Fakes\TestableOutgoingPhysicalMessageContext.cs" />
-    <Compile Include="Fakes\TestableOutgoingPublishContext.cs" />
-    <Compile Include="Fakes\TestableOutgoingReplyContext.cs" />
-    <Compile Include="Fakes\TestableOutgoingSendContext.cs" />
-    <Compile Include="Fakes\TestablePipelineContext.cs" />
-    <Compile Include="Fakes\TestableRoutingContext.cs" />
-    <Compile Include="Fakes\TestableSatelliteProcessingContext.cs" />
-    <Compile Include="Fakes\TestableSubscribeContext.cs" />
-    <Compile Include="Fakes\TestableTransportReceiveContext.cs" />
-    <Compile Include="Fakes\TestableUnsubscribeContext.cs" />
-    <Compile Include="Fakes\TimeoutMessage.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="ExpectedInvocations\ExpectInvocation.cs" />
-    <Compile Include="Fakes\OutgoingMessageExtensions.cs" />
     <Compile Include="Saga.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Fakes\TestableMessageHandlerContext.cs" />
     <Compile Include="TestingContext.cs" />
+    <Compile Include="Testing\Fakes\FakeBuilder.cs" />
+    <Compile Include="Testing\Fakes\OutgoingMessage.cs" />
+    <Compile Include="Testing\Fakes\OutgoingMessageExtensions.cs" />
+    <Compile Include="Testing\Fakes\PublishedMessage.cs" />
+    <Compile Include="Testing\Fakes\RepliedMessage.cs" />
+    <Compile Include="Testing\Fakes\SentMessage.cs" />
+    <Compile Include="Testing\Fakes\TestableAuditContext.cs" />
+    <Compile Include="Testing\Fakes\TestableBatchDispatchContext.cs" />
+    <Compile Include="Testing\Fakes\TestableBehaviorContext.cs" />
+    <Compile Include="Testing\Fakes\TestableDispatchContext.cs" />
+    <Compile Include="Testing\Fakes\TestableFaultContext.cs" />
+    <Compile Include="Testing\Fakes\TestableForwardingContext.cs" />
+    <Compile Include="Testing\Fakes\TestableIncomingContext.cs" />
+    <Compile Include="Testing\Fakes\TestableIncomingLogicalMessageContext.cs" />
+    <Compile Include="Testing\Fakes\TestableIncomingPhysicalMessageContext.cs" />
+    <Compile Include="Testing\Fakes\TestableInvokeHandlerContext.cs" />
+    <Compile Include="Testing\Fakes\TestableMessageHandlerContext.cs" />
+    <Compile Include="Testing\Fakes\TestableMessageProcessingContext.cs" />
+    <Compile Include="Testing\Fakes\TestableOutgoingContext.cs" />
+    <Compile Include="Testing\Fakes\TestableOutgoingLogicalMessageContext.cs" />
+    <Compile Include="Testing\Fakes\TestableOutgoingPhysicalMessageContext.cs" />
+    <Compile Include="Testing\Fakes\TestableOutgoingPublishContext.cs" />
+    <Compile Include="Testing\Fakes\TestableOutgoingReplyContext.cs" />
+    <Compile Include="Testing\Fakes\TestableOutgoingSendContext.cs" />
+    <Compile Include="Testing\Fakes\TestablePipelineContext.cs" />
+    <Compile Include="Testing\Fakes\TestableRoutingContext.cs" />
+    <Compile Include="Testing\Fakes\TestableSatelliteProcessingContext.cs" />
+    <Compile Include="Testing\Fakes\TestableSubscribeContext.cs" />
+    <Compile Include="Testing\Fakes\TestableTransportReceiveContext.cs" />
+    <Compile Include="Testing\Fakes\TestableUnsubscribeContext.cs" />
+    <Compile Include="Testing\Fakes\TimeoutMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />

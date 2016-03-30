@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using NServiceBus.Pipeline;
+    using Unicast.Messages;
 
     /// <summary>
     /// A testable implementation of <see cref="IIncomingLogicalMessageContext" />.
@@ -29,5 +30,14 @@
         /// Tells if the message has been handled.
         /// </summary>
         public bool MessageHandled { get; set; }
+
+        /// <summary>
+        /// Updates the message instance contained in <see cref="LogicalMessage" />.
+        /// </summary>
+        /// <param name="newInstance">The new instance.</param>
+        public virtual void UpdateMessageInstance(object newInstance)
+        {
+            Message = new LogicalMessage(new MessageMetadata(newInstance.GetType()), newInstance);
+        }
     }
 }

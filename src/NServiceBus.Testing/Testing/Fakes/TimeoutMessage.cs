@@ -3,7 +3,7 @@
     using System;
 
     /// <summary>
-    /// Represents a message that is time out if not processed within a given timespan. Contains the message itself and it's
+    /// Represents a message that is timed out, if not processed within a given timespan. Contains the message itself and its
     /// associated options.
     /// </summary>
     /// <typeparam name="TMessage">The message type</typeparam>
