@@ -2,7 +2,6 @@
 {
     using System;
     using NServiceBus.Pipeline;
-
     /// <summary>
     /// A testable implementation of <see cref="ISubscribeContext" />.
     /// </summary>
