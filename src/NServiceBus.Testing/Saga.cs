@@ -252,8 +252,8 @@
         public Saga<T> WhenHandling<TMessage>(Action<TMessage> initializeMessage = null)
         {
             var message = messageCreator.CreateInstance(initializeMessage);
-
-            return When((s, c) => ((dynamic) s).Handle(message, c));
+            var invoker = saga.GetType().CreateInvoker(typeof(TMessage), typeof(IHandleMessages<>));
+            return When((s, c) => invoker(saga, message, c));
         }
 
         /// <summary>
@@ -263,7 +263,8 @@
         public Saga<T> WhenHandlingTimeout<TMessage>(Action<TMessage> initializeMessage = null)
         {
             var message = messageCreator.CreateInstance(initializeMessage);
-            return When((s, c) => ((dynamic) s).Timeout(message, c));
+            var invoker = saga.GetType().CreateInvoker(typeof(TMessage), typeof(IHandleTimeouts<>));
+            return When((s, c) => invoker(saga, message, c));
         }
 
         /// <summary>
@@ -282,7 +283,8 @@
         }
 
         /// <summary>
-        /// Uses the given delegate to select the message handler and invoking it with the given message. Checks all the expectations previously, and then clearing them for continued testing.
+        /// Uses the given delegate to select the message handler and invoking it with the given message. Checks all the
+        /// expectations previously, and then clearing them for continued testing.
         /// example: <c>When(s => s.Handle, new MyMessage())</c>
         /// </summary>
         public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, TMessage message)
@@ -291,7 +293,8 @@
         }
 
         /// <summary>
-        /// Uses the given delegate to select the message handler and invoking it with the specified message. Checks all the expectations previously, and then clearing them for continued testing.
+        /// Uses the given delegate to select the message handler and invoking it with the specified message. Checks all the
+        /// expectations previously, and then clearing them for continued testing.
         /// example: <c>When&lt;MyMessage>(s => s.Handle, m => { m.Value = 42 })</c>
         /// </summary>
         public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, Action<TMessage> messageInitializer = null)
@@ -304,7 +307,7 @@
         /// <summary>
         /// Expires requested timeouts for the saga by simulating that time has passed
         /// and then clears out all previous expectations.
-        /// This will only invoke timeouts set with a <see cref="TimeSpan"/> argument.
+        /// This will only invoke timeouts set with a <see cref="TimeSpan" /> argument.
         /// </summary>
         /// <param name="after">The amount of time that has passed to simulate.</param>
         public Saga<T> WhenSagaTimesOut(TimeSpan after)
@@ -319,7 +322,7 @@
         /// <summary>
         /// Expires requested timeouts for the saga by simulating the passed in date and time
         /// and then clears out all previous expectations.
-        /// This will only invoke timeouts set with a <see cref="DateTime"/> argument.
+        /// This will only invoke timeouts set with a <see cref="DateTime" /> argument.
         /// </summary>
         /// <param name="at">The Date and time to simuluate.</param>
         public Saga<T> WhenSagaTimesOut(DateTime at)
@@ -501,20 +504,17 @@
             throw new NotImplementedException();
         }
 
-        void HandleTimeout<TMessage>(TMessage message)
-        {
-            ((dynamic) saga).Timeout(message, testContext);
-        }
-
         void InvokeTimeouts(IEnumerable<TimeoutMessage<object>> messages)
         {
             messages
-               .OrderBy(t => t.Within)
-               .ToList()
-               .ForEach(t => timeoutMethodInfo.Value.MakeGenericMethod(t.Message.GetType()).Invoke(this, new[]
-               {
-                    t.Message
-               }));
+                .OrderBy(t => t.Within)
+                .ToList()
+                .ForEach(t =>
+                {
+                    var messageType = messageCreator.GetMappedTypeFor(t.Message.GetType());
+                    var invoker = saga.GetType().CreateInvoker(messageType, typeof(IHandleTimeouts<>));
+                    invoker(saga, t.Message, testContext).GetAwaiter().GetResult();
+                });
 
             testContext.Validate();
             testContext = new TestingContext(messageCreator);
@@ -540,7 +540,7 @@
 
         readonly T saga;
 
-        IMessageCreator messageCreator = new MessageMapper();
+        MessageMapper messageCreator = new MessageMapper();
 
         TestingContext testContext;
 
