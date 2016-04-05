@@ -302,10 +302,11 @@
         }
 
         /// <summary>
-        /// Invokes the saga timeout passing in the last timeout state it sent
+        /// Expires requested timeouts for the saga by simulating that time has passed
         /// and then clears out all previous expectations.
+        /// This will only invoke timeouts set with a <see cref="TimeSpan"/> argument.
         /// </summary>
-        /// <param name="after">The amount of time that has passed before the timeout is called.</param>
+        /// <param name="after">The amount of time that has passed to simulate.</param>
         public Saga<T> WhenSagaTimesOut(TimeSpan after)
         {
             InvokeTimeouts(testContext.TimeoutMessages
@@ -316,10 +317,11 @@
         }
 
         /// <summary>
-        /// Invokes the saga timeout passing in the date and time it sent
+        /// Expires requested timeouts for the saga by simulating the passed in date and time
         /// and then clears out all previous expectations.
+        /// This will only invoke timeouts set with a <see cref="DateTime"/> argument.
         /// </summary>
-        /// <param name="at">The The Date and time the timeout is called.</param>
+        /// <param name="at">The Date and time to simuluate.</param>
         public Saga<T> WhenSagaTimesOut(DateTime at)
         {
             InvokeTimeouts(testContext.TimeoutMessages
@@ -330,7 +332,7 @@
         }
 
         /// <summary>
-        /// Invokes the saga timeout passing and then clears out all previous expectations.
+        /// Expires all requested timeouts for the saga and then clears out all previous expectations.
         /// </summary>
         public Saga<T> WhenSagaTimesOut()
         {

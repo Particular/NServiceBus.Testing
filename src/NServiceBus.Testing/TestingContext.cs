@@ -56,13 +56,7 @@
             }
 
             var dateTimeOffset = options.GetDeliveryDate();
-            if (dateTimeOffset.HasValue)
-            {
-                return new TimeoutMessage<object>(message, options, dateTimeOffset.Value);
-            }
-
-
-            throw new Exception("No TimeSpan or DateTime has been set for the timeout message");
+            return new TimeoutMessage<object>(message, options, dateTimeOffset.Value);
         }
 
         IList<ExpectInvocation> expectedInvocations = new List<ExpectInvocation>();
