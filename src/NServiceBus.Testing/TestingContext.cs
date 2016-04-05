@@ -32,9 +32,7 @@
             {
                 if (headers[NServiceBus.Headers.IsSagaTimeoutMessage] == bool.TrueString)
                 {
-                    var within = GetWithin(options);
-
-                    timeoutMessages.Enqueue(new TimeoutMessage<object>(message, options, within));
+                    timeoutMessages.Enqueue(GetTimeoutMessage(message, options));
                 }
             }
 
@@ -49,25 +47,22 @@
             }
         }
 
-        static TimeSpan GetWithin(SendOptions options)
+        static TimeoutMessage<object> GetTimeoutMessage(object message, SendOptions options)
         {
             var within = options.GetDeliveryDelay();
-
-            if (!within.HasValue)
+            if (within.HasValue)
             {
-                var dateTimeOffset = options.GetDeliveryDate();
-                if (dateTimeOffset != null)
-                {
-                    within = dateTimeOffset.Value - DateTimeOffset.Now;
-                }
+                return new TimeoutMessage<object>(message, options, within.Value);
             }
 
-            if (!within.HasValue)
+            var dateTimeOffset = options.GetDeliveryDate();
+            if (dateTimeOffset.HasValue)
             {
-                throw new Exception("No time has been set for the timeout message");
+                return new TimeoutMessage<object>(message, options, dateTimeOffset.Value);
             }
 
-            return within.Value;
+
+            throw new Exception("No TimeSpan or DateTime has been set for the timeout message");
         }
 
         IList<ExpectInvocation> expectedInvocations = new List<ExpectInvocation>();

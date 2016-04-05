@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Testing
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
@@ -304,20 +305,36 @@
         /// Invokes the saga timeout passing in the last timeout state it sent
         /// and then clears out all previous expectations.
         /// </summary>
-        /// <param name="after">The ammount of time that has passed before the timeout is called.</param>
-        public Saga<T> WhenSagaTimesOut(TimeSpan? after = null)
+        /// <param name="after">The amount of time that has passed before the timeout is called.</param>
+        public Saga<T> WhenSagaTimesOut(TimeSpan after)
         {
-            testContext.TimeoutMessages
-                .Where(t => t.Within <= after.GetValueOrDefault(TimeSpan.MaxValue))
-                .OrderBy(t => t.Within)
-                .ToList()
-                .ForEach(t => timeoutMethodInfo.Value.MakeGenericMethod(t.Message.GetType()).Invoke(this, new[]
-                {
-                    t.Message
-                }));
+            InvokeTimeouts(testContext.TimeoutMessages
+                .Where(t => t.Within.HasValue)
+                .Where(t => t.Within <= after));
 
-            testContext.Validate();
-            testContext = new TestingContext(messageCreator);
+            return this;
+        }
+
+        /// <summary>
+        /// Invokes the saga timeout passing in the date and time it sent
+        /// and then clears out all previous expectations.
+        /// </summary>
+        /// <param name="at">The The Date and time the timeout is called.</param>
+        public Saga<T> WhenSagaTimesOut(DateTime at)
+        {
+            InvokeTimeouts(testContext.TimeoutMessages
+                .Where(t => t.At.HasValue)
+                .Where(t => t.At <= at));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Invokes the saga timeout passing and then clears out all previous expectations.
+        /// </summary>
+        public Saga<T> WhenSagaTimesOut()
+        {
+            InvokeTimeouts(testContext.TimeoutMessages);
 
             return this;
         }
@@ -485,6 +502,20 @@
         void HandleTimeout<TMessage>(TMessage message)
         {
             ((dynamic) saga).Timeout(message, testContext);
+        }
+
+        void InvokeTimeouts(IEnumerable<TimeoutMessage<object>> messages)
+        {
+            messages
+               .OrderBy(t => t.Within)
+               .ToList()
+               .ForEach(t => timeoutMethodInfo.Value.MakeGenericMethod(t.Message.GetType()).Invoke(this, new[]
+               {
+                    t.Message
+               }));
+
+            testContext.Validate();
+            testContext = new TestingContext(messageCreator);
         }
 
         static Func<T1, bool> CheckActionToFunc<T1>(Action<T1> check)
