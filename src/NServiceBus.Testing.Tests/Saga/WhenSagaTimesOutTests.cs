@@ -8,27 +8,31 @@
     class WhenSagaTimesOutTests
     {
         [Test]
-        public void ShouldInvokeAllRegisteredTimeouts()
+        public void ShouldInvokeAllRegisteredTimeoutsWhenNoPeriodSpecified()
         {
             Test.Saga<TimeoutSaga>()
                 .WhenHandling<TimeoutSaga.StartMessage>()
                 .ExpectSend<TimeoutSaga.SendMessage1>()
                 .ExpectSend<TimeoutSaga.SendMessage2>()
+                .ExpectSend<TimeoutSaga.SendMessageDateTime1>()
+                .ExpectSend<TimeoutSaga.SendMessageDateTime2>()
                 .WhenSagaTimesOut();
         }
 
         [Test]
-        public void ShouldOnlyInvokeTimeoutsWithinSpecifiedTimeRange()
+        public void ShouldOnlyInvokeTimeoutsWithinSpecifiedTimeSpan()
         {
             Test.Saga<TimeoutSaga>()
                 .WhenHandling<TimeoutSaga.StartMessage>()
                 .ExpectSend<TimeoutSaga.SendMessage1>()
                 .ExpectNotSend<TimeoutSaga.SendMessage2>()
+                .ExpectNotSend<TimeoutSaga.SendMessageDateTime1>()
+                .ExpectNotSend<TimeoutSaga.SendMessageDateTime2>()
                 .WhenSagaTimesOut(TimeSpan.FromDays(10));
         }
 
         [Test]
-        public void ShouldThrowAnExceptionWhenExpectingTimeoutsWithinASpecifiedTimeRange()
+        public void ShouldThrowAnExceptionWhenExpectingTimeoutsWithinASpecifiedTimeSpan()
         {
             Assert.Throws<ExpectationException>(() => Test.Saga<TimeoutSaga>()
                 .WhenHandling<TimeoutSaga.StartMessage>()
@@ -36,17 +40,43 @@
                 .ExpectSend<TimeoutSaga.SendMessage2>()
                 .WhenSagaTimesOut(TimeSpan.FromDays(10)));
         }
+
+        [Test]
+        public void ShouldOnlyInvokeTimeoutsWithinSpecifiedDateTime()
+        {
+            Test.Saga<TimeoutSaga>()
+                .WhenHandling<TimeoutSaga.StartMessage>()
+                .ExpectSend<TimeoutSaga.SendMessageDateTime1>()
+                .ExpectNotSend<TimeoutSaga.SendMessageDateTime2>()
+                .ExpectNotSend<TimeoutSaga.SendMessage1>()
+                .ExpectNotSend<TimeoutSaga.SendMessage2>()
+                .WhenSagaTimesOut(new DateTime(2010, 1, 10));
+        }
+
+        [Test]
+        public void ShouldThrowAnExceptionWhenExpectingTimeoutsWithinASpecifiedDateTime()
+        {
+            Assert.Throws<ExpectationException>(() => Test.Saga<TimeoutSaga>()
+                .WhenHandling<TimeoutSaga.StartMessage>()
+                .ExpectSend<TimeoutSaga.SendMessageDateTime1>()
+                .ExpectSend<TimeoutSaga.SendMessageDateTime2>()
+                .WhenSagaTimesOut(new DateTime(2010, 1, 10)));
+        }
     }
 
     public class TimeoutSaga : NServiceBus.Saga<TimeoutSaga.TimeoutData>,
         IHandleMessages<TimeoutSaga.StartMessage>,
         IHandleTimeouts<TimeoutSaga.TimeoutMessage1>,
-        IHandleTimeouts<TimeoutSaga.TimeoutMessage2>
+        IHandleTimeouts<TimeoutSaga.TimeoutMessage2>,
+        IHandleTimeouts<TimeoutSaga.DateTimeTimeOutMessage1>,
+        IHandleTimeouts<TimeoutSaga.DateTimeTimeOutMessage2>
     {
         public async Task Handle(StartMessage message, IMessageHandlerContext context)
         {
             await RequestTimeout(context, TimeSpan.FromDays(7), new TimeoutMessage1());
-            await RequestTimeout(context, DateTime.Now + TimeSpan.FromDays(14), new TimeoutMessage2());
+            await RequestTimeout(context, TimeSpan.FromDays(14), new TimeoutMessage2());
+            await RequestTimeout(context, new DateTime(2010, 1, 7, 0, 0, 0, DateTimeKind.Utc), new DateTimeTimeOutMessage1());
+            await RequestTimeout(context, new DateTime(2010, 1, 14, 0, 0, 0, DateTimeKind.Utc), new DateTimeTimeOutMessage2());
         }
 
         public Task Timeout(TimeoutMessage1 state, IMessageHandlerContext context)
@@ -57,6 +87,16 @@
         public Task Timeout(TimeoutMessage2 state, IMessageHandlerContext context)
         {
             return context.Send(new SendMessage2());
+        }
+
+        public Task Timeout(DateTimeTimeOutMessage1 state, IMessageHandlerContext context)
+        {
+            return context.Send(new SendMessageDateTime1());
+        }
+
+        public Task Timeout(DateTimeTimeOutMessage2 state, IMessageHandlerContext context)
+        {
+            return context.Send(new SendMessageDateTime2());
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TimeoutData> mapper)
@@ -72,24 +112,22 @@
             public string OriginalMessageId { get; set; }
         }
 
-        public class SendMessage1
-        {
-        }
+        public class SendMessage1 { }
 
-        public class SendMessage2
-        {
-        }
+        public class SendMessage2 { }
 
-        public class TimeoutMessage1
-        {
-        }
+        public class SendMessageDateTime1 { }
 
-        public class TimeoutMessage2
-        {
-        }
+        public class SendMessageDateTime2 { }
 
-        public class StartMessage
-        {
-        }
+        public class TimeoutMessage1 { }
+
+        public class TimeoutMessage2 { }
+
+        public class DateTimeTimeOutMessage1 { }
+
+        public class DateTimeTimeOutMessage2 { }
+
+        public class StartMessage { }
     }
 }

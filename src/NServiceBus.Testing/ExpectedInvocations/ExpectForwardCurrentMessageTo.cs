@@ -2,7 +2,7 @@
 {
     using System;
     using System.Linq;
-    using NServiceBus.Testing.ExpectedInvocations;
+    using ExpectedInvocations;
 
     class ExpectForwardCurrentMessageTo : ExpectInvocation
     {

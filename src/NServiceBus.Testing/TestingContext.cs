@@ -1,10 +1,9 @@
 ﻿namespace NServiceBus.Testing
 {
-    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using NServiceBus.Testing.ExpectedInvocations;
+    using ExpectedInvocations;
 
     class TestingContext : TestableMessageHandlerContext
     {
@@ -32,9 +31,7 @@
             {
                 if (headers[NServiceBus.Headers.IsSagaTimeoutMessage] == bool.TrueString)
                 {
-                    var within = GetWithin(options);
-
-                    timeoutMessages.Enqueue(new TimeoutMessage<object>(message, options, within));
+                    timeoutMessages.Enqueue(GetTimeoutMessage(message, options));
                 }
             }
 
@@ -49,25 +46,16 @@
             }
         }
 
-        static TimeSpan GetWithin(SendOptions options)
+        static TimeoutMessage<object> GetTimeoutMessage(object message, SendOptions options)
         {
             var within = options.GetDeliveryDelay();
-
-            if (!within.HasValue)
+            if (within.HasValue)
             {
-                var dateTimeOffset = options.GetDeliveryDate();
-                if (dateTimeOffset != null)
-                {
-                    within = dateTimeOffset.Value - DateTimeOffset.Now;
-                }
+                return new TimeoutMessage<object>(message, options, within.Value);
             }
 
-            if (!within.HasValue)
-            {
-                throw new Exception("No time has been set for the timeout message");
-            }
-
-            return within.Value;
+            var dateTimeOffset = options.GetDeliveryDate();
+            return new TimeoutMessage<object>(message, options, dateTimeOffset.Value);
         }
 
         IList<ExpectInvocation> expectedInvocations = new List<ExpectInvocation>();
