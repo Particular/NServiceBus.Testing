@@ -123,6 +123,7 @@
     <Compile Include="Testing\Fakes\TestableTransportReceiveContext.cs" />
     <Compile Include="Testing\Fakes\TestableUnsubscribeContext.cs" />
     <Compile Include="Testing\Fakes\TimeoutMessage.cs" />
+    <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
