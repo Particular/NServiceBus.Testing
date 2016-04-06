@@ -1,14 +1,15 @@
-﻿namespace NServiceBus.Testing
+﻿// ReSharper disable PartialTypeWithSinglePart
+namespace NServiceBus.Testing
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using NServiceBus.ObjectBuilder;
+    using ObjectBuilder;
 
     /// <summary>
     /// A fake implementation of <see cref="IBuilder" /> for testing purposes.
     /// </summary>
-    public class FakeBuilder : IBuilder
+    public partial class FakeBuilder : IBuilder
     {
         /// <summary>
         /// Returns an instantiation of the given type.
@@ -147,7 +148,8 @@
             factories.Add(typeof(T), factory);
         }
 
-        IDictionary<Type, object[]> instances = new Dictionary<Type, object[]>();
-        IDictionary<Type, Func<object[]>> factories = new Dictionary<Type, Func<object[]>>();
+        Dictionary<Type, Func<object[]>> factories = new Dictionary<Type, Func<object[]>>();
+
+        Dictionary<Type, object[]> instances = new Dictionary<Type, object[]>();
     }
 }

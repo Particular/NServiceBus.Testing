@@ -1,15 +1,16 @@
-﻿namespace NServiceBus.Testing
+﻿// ReSharper disable PartialTypeWithSinglePart
+namespace NServiceBus.Testing
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using NServiceBus.Persistence;
-    using NServiceBus.Pipeline;
-    using NServiceBus.Unicast.Messages;
+    using Persistence;
+    using Pipeline;
+    using Unicast.Messages;
 
     /// <summary>
     /// A testable implementation of <see cref="IInvokeHandlerContext" />.
     /// </summary>
-    public class TestableInvokeHandlerContext : TestableIncomingContext, IInvokeHandlerContext
+    public partial class TestableInvokeHandlerContext : TestableIncomingContext, IInvokeHandlerContext
     {
         /// <summary>
         /// Creates a new instance of <see cref="TestableInvokeHandlerContext" />.
@@ -56,7 +57,7 @@
         /// <summary>
         /// The current <see cref="T:NServiceBus.IHandleMessages`1" /> being executed.
         /// </summary>
-        public MessageHandler MessageHandler { get; set; }
+        public MessageHandler MessageHandler { get; set; } = new MessageHandler((instance, message, context) => Task.FromResult(0), typeof(object));
 
         /// <summary>
         /// Message headers.
@@ -78,6 +79,6 @@
         /// <summary>
         /// Metadata for the incoming message.
         /// </summary>
-        public MessageMetadata MessageMetadata { get; set; }
+        public MessageMetadata MessageMetadata { get; set; } = new MessageMetadata(typeof(object));
     }
 }

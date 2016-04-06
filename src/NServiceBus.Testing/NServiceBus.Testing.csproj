@@ -52,7 +52,7 @@
     </None>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0-unstable1768\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.6.0.0-unstable1786\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Obsolete, Version=4.0.4.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
@@ -66,6 +66,36 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\FakeBuilder.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\OutgoingMessage.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\OutgoingMessageExtensions.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\PublishedMessage.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\RepliedMessage.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\SentMessage.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableAuditContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableBatchDispatchContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableBehaviorContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableDispatchContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableFaultContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableForwardingContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableIncomingContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableIncomingLogicalMessageContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableIncomingPhysicalMessageContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableInvokeHandlerContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableMessageHandlerContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableMessageProcessingContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableOutgoingContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableOutgoingLogicalMessageContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableOutgoingPhysicalMessageContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableOutgoingPublishContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableOutgoingReplyContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableOutgoingSendContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestablePipelineContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableRoutingContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableSatelliteProcessingContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableSubscribeContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableTransportReceiveContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-unstable1786\TestableUnsubscribeContext.cs" />
     <Compile Include="ExpectationException.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotDoNotDeliverBefore.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotDelayDeliveryWith.cs" />
@@ -92,37 +122,8 @@
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestingContext.cs" />
-    <Compile Include="Testing\Fakes\FakeBuilder.cs" />
-    <Compile Include="Testing\Fakes\OutgoingMessage.cs" />
-    <Compile Include="Testing\Fakes\OutgoingMessageExtensions.cs" />
-    <Compile Include="Testing\Fakes\PublishedMessage.cs" />
-    <Compile Include="Testing\Fakes\RepliedMessage.cs" />
-    <Compile Include="Testing\Fakes\SentMessage.cs" />
-    <Compile Include="Testing\Fakes\TestableAuditContext.cs" />
-    <Compile Include="Testing\Fakes\TestableBatchDispatchContext.cs" />
-    <Compile Include="Testing\Fakes\TestableBehaviorContext.cs" />
-    <Compile Include="Testing\Fakes\TestableDispatchContext.cs" />
-    <Compile Include="Testing\Fakes\TestableFaultContext.cs" />
-    <Compile Include="Testing\Fakes\TestableForwardingContext.cs" />
-    <Compile Include="Testing\Fakes\TestableIncomingContext.cs" />
-    <Compile Include="Testing\Fakes\TestableIncomingLogicalMessageContext.cs" />
-    <Compile Include="Testing\Fakes\TestableIncomingPhysicalMessageContext.cs" />
-    <Compile Include="Testing\Fakes\TestableInvokeHandlerContext.cs" />
-    <Compile Include="Testing\Fakes\TestableMessageHandlerContext.cs" />
-    <Compile Include="Testing\Fakes\TestableMessageProcessingContext.cs" />
-    <Compile Include="Testing\Fakes\TestableOutgoingContext.cs" />
-    <Compile Include="Testing\Fakes\TestableOutgoingLogicalMessageContext.cs" />
-    <Compile Include="Testing\Fakes\TestableOutgoingPhysicalMessageContext.cs" />
-    <Compile Include="Testing\Fakes\TestableOutgoingPublishContext.cs" />
-    <Compile Include="Testing\Fakes\TestableOutgoingReplyContext.cs" />
-    <Compile Include="Testing\Fakes\TestableOutgoingSendContext.cs" />
-    <Compile Include="Testing\Fakes\TestablePipelineContext.cs" />
-    <Compile Include="Testing\Fakes\TestableRoutingContext.cs" />
-    <Compile Include="Testing\Fakes\TestableSatelliteProcessingContext.cs" />
-    <Compile Include="Testing\Fakes\TestableSubscribeContext.cs" />
-    <Compile Include="Testing\Fakes\TestableTransportReceiveContext.cs" />
-    <Compile Include="Testing\Fakes\TestableUnsubscribeContext.cs" />
-    <Compile Include="Testing\Fakes\TimeoutMessage.cs" />
+    <Compile Include="TimeoutMessageExtensions.cs" />
+    <Compile Include="TimeoutMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />

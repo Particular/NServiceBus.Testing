@@ -1,3 +1,4 @@
+// ReSharper disable PartialTypeWithSinglePart
 namespace NServiceBus.Testing
 {
     using System;
@@ -9,7 +10,7 @@ namespace NServiceBus.Testing
     /// <summary>
     /// Testable implementation of <see cref="IMessageProcessingContext" />.
     /// </summary>
-    public class TestableMessageProcessingContext : TestablePipelineContext, IMessageProcessingContext
+    public partial class TestableMessageProcessingContext : TestablePipelineContext, IMessageProcessingContext
     {
         /// <summary>
         /// Creates a new instance of <see cref="TestableMessageProcessingContext" />.
@@ -77,8 +78,8 @@ namespace NServiceBus.Testing
         public string ReplyToAddress { get; set; } = "reply address";
 
         IReadOnlyDictionary<string, string> IMessageProcessingContext.MessageHeaders => new ReadOnlyDictionary<string, string>(MessageHeaders);
+        ConcurrentQueue<string> forwardedMessages = new ConcurrentQueue<string>();
 
         ConcurrentQueue<RepliedMessage<object>> repliedMessages = new ConcurrentQueue<RepliedMessage<object>>();
-        ConcurrentQueue<string> forwardedMessages = new ConcurrentQueue<string>();
     }
 }

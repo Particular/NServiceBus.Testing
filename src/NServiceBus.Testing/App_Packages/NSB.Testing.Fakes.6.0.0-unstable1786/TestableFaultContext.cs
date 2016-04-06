@@ -1,14 +1,15 @@
-﻿namespace NServiceBus.Testing
+﻿// ReSharper disable PartialTypeWithSinglePart
+namespace NServiceBus.Testing
 {
     using System;
     using System.Collections.Generic;
-    using NServiceBus.Pipeline;
-    using NServiceBus.Transports;
+    using Pipeline;
+    using Transports;
 
     /// <summary>
     /// A testable implementation of <see cref="IFaultContext" />.
     /// </summary>
-    public class TestableFaultContext : TestableBehaviorContext, IFaultContext
+    public partial class TestableFaultContext : TestableBehaviorContext, IFaultContext
     {
         /// <summary>
         /// Contains data added by <see cref="AddFaultData" />.
