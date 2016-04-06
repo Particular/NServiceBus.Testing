@@ -1,25 +1,25 @@
-﻿namespace NServiceBus.Testing
+﻿// ReSharper disable PartialTypeWithSinglePart
+namespace NServiceBus.Testing
 {
-    using NServiceBus.ObjectBuilder;
-    using NServiceBus.Pipeline;
+    using Extensibility;
+    using ObjectBuilder;
+    using Pipeline;
 
     /// <summary>
-    /// Base implementation for contexts implementing <see cref="IIncomingContext" />.
+    /// A base implementation for contexts implementing <see cref="IBehaviorContext" />.
     /// </summary>
-    public abstract class TestableIncomingContext : TestableMessageProcessingContext, IIncomingContext
+    public abstract partial class TestableBehaviorContext : IBehaviorContext
     {
-        /// <summary>
-        /// Creates a new instance of <see cref="TestableIncomingContext" />.
-        /// </summary>
-        protected TestableIncomingContext(IMessageCreator messageCreator = null) : base(messageCreator)
-        {
-        }
-
         /// <summary>
         /// A fake <see cref="IBuilder" /> implementation. If you want to provide your own <see cref="IBuilder" /> implementation
         /// override <see cref="GetBuilder" />.
         /// </summary>
         public FakeBuilder Builder { get; set; } = new FakeBuilder();
+
+        /// <summary>
+        /// A <see cref="T:NServiceBus.Extensibility.ContextBag" /> which can be used to extend the current object.
+        /// </summary>
+        public ContextBag Extensions { get; set; } = new ContextBag();
 
         IBuilder IBehaviorContext.Builder => GetBuilder();
 

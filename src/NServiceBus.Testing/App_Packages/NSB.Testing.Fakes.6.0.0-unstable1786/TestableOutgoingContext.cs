@@ -1,14 +1,15 @@
-﻿namespace NServiceBus.Testing
+﻿// ReSharper disable PartialTypeWithSinglePart
+namespace NServiceBus.Testing
 {
     using System;
     using System.Collections.Generic;
-    using NServiceBus.ObjectBuilder;
-    using NServiceBus.Pipeline;
+    using ObjectBuilder;
+    using Pipeline;
 
     /// <summary>
     /// A base implementation for all behaviors implementing <see cref="IOutgoingContext" />.
     /// </summary>
-    public class TestableOutgoingContext : TestablePipelineContext, IOutgoingContext
+    public partial class TestableOutgoingContext : TestablePipelineContext, IOutgoingContext
     {
         /// <summary>
         /// A fake <see cref="IBuilder" /> implementation. If you want to provide your own <see cref="IBuilder" /> implementation

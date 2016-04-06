@@ -1,12 +1,13 @@
-﻿namespace NServiceBus.Testing
+﻿// ReSharper disable PartialTypeWithSinglePart
+namespace NServiceBus.Testing
 {
     using System;
-    using NServiceBus.Pipeline;
+    using Pipeline;
 
     /// <summary>
     /// A testable implementation of <see cref="IUnsubscribeContext" />.
     /// </summary>
-    public class TestableUnsubscribeContext : TestableBehaviorContext, IUnsubscribeContext
+    public partial class TestableUnsubscribeContext : TestableBehaviorContext, IUnsubscribeContext
     {
         /// <summary>
         /// The type of the event.

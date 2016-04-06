@@ -1,13 +1,14 @@
-﻿namespace NServiceBus.Testing
+﻿// ReSharper disable PartialTypeWithSinglePart
+namespace NServiceBus.Testing
 {
     using System.Collections.Generic;
-    using NServiceBus.Pipeline;
-    using NServiceBus.Transports;
+    using Pipeline;
+    using Transports;
 
     /// <summary>
     /// A testable implementation of <see cref="IDispatchContext" />.
     /// </summary>
-    public class TestableDispatchContext : TestableBehaviorContext, IDispatchContext
+    public partial class TestableDispatchContext : TestableBehaviorContext, IDispatchContext
     {
         /// <summary>
         /// The operations to be dispatched to the transport.

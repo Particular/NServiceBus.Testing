@@ -1,13 +1,14 @@
-﻿namespace NServiceBus.Testing
+﻿// ReSharper disable PartialTypeWithSinglePart
+namespace NServiceBus.Testing
 {
     using System.Collections.Generic;
-    using NServiceBus.Pipeline;
+    using Pipeline;
     using Unicast.Messages;
 
     /// <summary>
     /// A testable implementation of <see cref="IIncomingLogicalMessageContext" />.
     /// </summary>
-    public class TestableIncomingLogicalMessageContext : TestableIncomingContext, IIncomingLogicalMessageContext
+    public partial class TestableIncomingLogicalMessageContext : TestableIncomingContext, IIncomingLogicalMessageContext
     {
         /// <summary>
         /// Creates a new instance of <see cref="TestableIncomingLogicalMessageContext" />.
@@ -19,7 +20,7 @@
         /// <summary>
         /// Message being handled.
         /// </summary>
-        public LogicalMessage Message { get; set; }
+        public LogicalMessage Message { get; set; } = new LogicalMessage(new MessageMetadata(typeof(object)), new object());
 
         /// <summary>
         /// Headers for the incoming message.

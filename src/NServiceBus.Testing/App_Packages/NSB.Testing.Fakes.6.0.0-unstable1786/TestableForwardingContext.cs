@@ -1,14 +1,15 @@
-﻿namespace NServiceBus.Testing
+﻿// ReSharper disable PartialTypeWithSinglePart
+namespace NServiceBus.Testing
 {
     using System;
     using System.Collections.Generic;
-    using NServiceBus.Pipeline;
-    using NServiceBus.Transports;
+    using Pipeline;
+    using Transports;
 
     /// <summary>
     /// A testable implementation for <see cref="IForwardingContext" />.
     /// </summary>
-    public class TestableForwardingContext : TestableBehaviorContext, IForwardingContext
+    public partial class TestableForwardingContext : TestableBehaviorContext, IForwardingContext
     {
         /// <summary>
         /// The message to be forwarded.
