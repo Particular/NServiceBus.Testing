@@ -122,8 +122,8 @@
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestingContext.cs" />
-    <Compile Include="TimeoutMessageExtensions.cs" />
     <Compile Include="TimeoutMessage.cs" />
+    <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />

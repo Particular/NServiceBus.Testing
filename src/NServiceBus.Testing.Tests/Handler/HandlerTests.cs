@@ -3,7 +3,7 @@ namespace NServiceBus.Testing.Tests.Handler
     using System;
     using System.Collections.Concurrent;
     using System.Threading.Tasks;
-    using NServiceBus.Testing.Tests.Saga;
+    using Saga;
     using NUnit.Framework;
 
     [TestFixture]

@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus.Testing
 {
     using System;
-    using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
+    using MessageInterfaces.MessageMapper.Reflection;
 
     /// <summary>
     /// Entry class used for unit testing

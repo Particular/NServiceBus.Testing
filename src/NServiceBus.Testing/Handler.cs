@@ -2,11 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Threading.Tasks;
-    using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
-    using NServiceBus.Testing.ExpectedInvocations;
+    using MessageInterfaces.MessageMapper.Reflection;
+    using ExpectedInvocations;
 
     /// <summary>
     /// Message handler unit testing framework.
@@ -258,7 +255,7 @@
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
         /// <param name="initializedMessage">A message to be used with message handler.</param>
         /// <remarks>
-        /// This is different from <see cref="OnMessage{TMessage}(System.Action{TMessage})"/> in a way that
+        /// This is different from <see cref="OnMessage{TMessage}(System.Action{TMessage})" /> in a way that
         /// it uses the message, and not calls to an action.
         /// </remarks>
         /// <example><![CDATA[var message = new TestMessage {//...}; Test.Handler<EmptyHandler>().OnMessage<TestMessage>(message);]]></example>
@@ -276,7 +273,7 @@
             testableMessageHandlerContext.MessageId = messageId;
 
             var messageType = messageCreator.GetMappedTypeFor(message.GetType());
-            var handleMethod = GetMethod(handler.GetType(), messageType, typeof(IHandleMessages<>));
+            var handleMethod = handler.GetType().CreateInvoker(messageType, typeof(IHandleMessages<>));
             if (handleMethod == null)
             {
                 return;
@@ -331,36 +328,7 @@
             throw new NotImplementedException();
         }
 
-        static Func<object, object, IMessageHandlerContext, Task> GetMethod(Type targetType, Type messageType, Type interfaceGenericType)
-        {
-            var interfaceType = interfaceGenericType.MakeGenericType(messageType);
-
-            if (!interfaceType.IsAssignableFrom(targetType))
-            {
-                return null;
-            }
-
-            var methodInfo = targetType.GetInterfaceMap(interfaceType).TargetMethods.FirstOrDefault();
-            if (methodInfo == null)
-            {
-                return null;
-            }
-
-            var target = Expression.Parameter(typeof(object));
-            var messageParam = Expression.Parameter(typeof(object));
-            var contextParam = Expression.Parameter(typeof(IMessageHandlerContext));
-
-            var castTarget = Expression.Convert(target, targetType);
-
-            var methodParameters = methodInfo.GetParameters();
-            var messageCastParam = Expression.Convert(messageParam, methodParameters.ElementAt(0).ParameterType);
-
-            Expression body = Expression.Call(castTarget, methodInfo, messageCastParam, contextParam);
-
-            return Expression.Lambda<Func<object, object, IMessageHandlerContext, Task>>(body, target, messageParam, contextParam).Compile();
-        }
-
-        private readonly T handler;
+        readonly T handler;
 
         MessageMapper messageCreator = new MessageMapper();
 

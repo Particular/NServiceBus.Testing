@@ -18,8 +18,21 @@
         }
 
         /// <summary>
+        /// Creates a new instance for the given message and options.
+        /// </summary>
+        public TimeoutMessage(TMessage message, SendOptions options, DateTimeOffset at) : base(message, options)
+        {
+            At = at;
+        }
+
+        /// <summary>
         /// Specifies a <see cref="TimeSpan" /> for the message to be processed, before timeout.
         /// </summary>
-        public TimeSpan Within { get; private set; }
+        public TimeSpan? Within { get; private set; }
+        
+        /// <summary>
+        /// Specifies a <see cref="DateTime" /> for the message to be processed at.
+        /// </summary>
+        public DateTimeOffset? At { get; private set; }
     }
 }
