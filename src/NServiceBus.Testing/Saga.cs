@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Threading.Tasks;
     using MessageInterfaces.MessageMapper.Reflection;
-    using ExpectedInvocations;
 
     /// <summary>
     /// Saga unit testing framework.
