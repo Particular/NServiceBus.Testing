@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Testing.ExpectedInvocations
+﻿namespace NServiceBus.Testing
 {
     using System;
     using System.Linq;

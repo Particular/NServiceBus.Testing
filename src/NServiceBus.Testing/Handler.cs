@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using MessageInterfaces.MessageMapper.Reflection;
-    using ExpectedInvocations;
 
     /// <summary>
     /// Message handler unit testing framework.

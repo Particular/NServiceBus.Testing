@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq;
-    using ExpectedInvocations;
 
     class ExpectNotForwardCurrentMessageTo : ExpectInvocation
     {
