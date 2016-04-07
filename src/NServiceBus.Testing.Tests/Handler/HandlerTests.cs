@@ -61,6 +61,28 @@ namespace NServiceBus.Testing.Tests.Handler
         }
 
         [Test]
+        public void ShouldBeAbleToConfigureMessageHandlerContext()
+        {
+            var messageId = Guid.NewGuid().ToString();
+            var replyToAddress = "0118 999 881 999 119 725 3";
+            var handler = new ContextAccessingHandler();
+            TestableMessageHandlerContext contextInstance = null;
+
+            Test.Handler(handler)
+                .ConfigureHandlerContext(c =>
+                {
+                    c.MessageId = messageId;
+                    c.ReplyToAddress = replyToAddress;
+                    contextInstance = c;
+                })
+                .OnMessage<TestMessage>();
+
+            Assert.AreEqual(messageId, handler.Context.MessageId);
+            Assert.AreEqual(replyToAddress, handler.Context.ReplyToAddress);
+            Assert.AreSame(contextInstance, handler.Context);
+        }
+
+        [Test]
         public void OnMessageShouldAwaitAsyncTasks()
         {
             Test.Handler<AsyncHandler>()
@@ -73,6 +95,17 @@ namespace NServiceBus.Testing.Tests.Handler
     {
         public string Header1 { get; set; }
         public string Header2 { get; set; }
+    }
+
+    public class ContextAccessingHandler : IHandleMessages<TestMessage>
+    {
+        public IMessageHandlerContext Context { get; private set; }
+
+        public Task Handle(TestMessage message, IMessageHandlerContext context)
+        {
+            Context = context;
+            return Task.FromResult(0);
+        }
     }
 
     public class EmptyHandler : IHandleMessages<TestMessage>
@@ -193,13 +226,5 @@ namespace NServiceBus.Testing.Tests.Handler
 
             return Task.FromResult(0);
         }
-
-        // be made to pass, but it looks like a design decision based on commit
-
-        // Unit test fails if this is uncommented; seems to me that this should
-        // revision 1210.
-        //public void Handle(TestMessage message) {
-        //    throw new System.Exception("Shouldn't call this.");
-        //}
     }
 }

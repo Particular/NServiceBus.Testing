@@ -27,6 +27,7 @@ namespace NServiceBus.Testing
     }
     public class Handler<T>
     {
+        public NServiceBus.Testing.Handler<T> ConfigureHandlerContext(System.Action<NServiceBus.Testing.TestableMessageHandlerContext> contextInitializer) { }
         public NServiceBus.Testing.Handler<T> ExpectDefer<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectDefer<TMessage>(System.Func<TMessage, System.DateTime, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectDoNotContinueDispatchingCurrentMessageToHandlers() { }
@@ -56,10 +57,10 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Handler<T> ExpectSendToDestination<TMessage>(System.Func<TMessage, string, bool> check) { }
         [System.ObsoleteAttribute(@"ExpectSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6. Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectSendToSites<TMessage>(System.Func<TMessage, System.Collections.Generic.IEnumerable<string>, bool> check) { }
-        public void OnMessage<TMessage>(System.Action<TMessage> initializeMessage = null) { }
         public void OnMessage<TMessage>(string messageId, System.Action<TMessage> initializeMessage = null) { }
-        public void OnMessage<TMessage>(TMessage initializedMessage) { }
+        public void OnMessage<TMessage>(System.Action<TMessage> initializeMessage = null) { }
         public void OnMessage<TMessage>(TMessage message, string messageId) { }
+        public void OnMessage<TMessage>(TMessage initializedMessage) { }
         public NServiceBus.Testing.Handler<T> SetIncomingHeader(string key, string value) { }
         public NServiceBus.Testing.Handler<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
     }
