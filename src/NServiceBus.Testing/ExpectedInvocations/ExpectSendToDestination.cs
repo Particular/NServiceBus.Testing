@@ -21,7 +21,7 @@ namespace NServiceBus.Testing
 
             if (!sentMessages.Any(i => check(i.Message, i.Options.GetDestination())))
             {
-                Fail($"Expected a message of type {typeof(TMessage).Name} to be sent to a specific destination but a message matching your constraints was found.");
+                Fail($"Expected a message of type {typeof(TMessage).Name} to be sent to a specific destination but a message matching your constraints was not found.");
             }
         }
     }
