@@ -1,0 +1,355 @@
+﻿[assembly: System.CLSCompliantAttribute(true)]
+[assembly: System.Runtime.InteropServices.ComVisibleAttribute(false)]
+[assembly: System.Runtime.Versioning.TargetFrameworkAttribute(".NETFramework,Version=v4.5.2", FrameworkDisplayName=".NET Framework 4.5.2")]
+namespace NServiceBus.Testing
+{
+    public class ExpectationException : System.Exception
+    {
+        public ExpectationException() { }
+        public ExpectationException(string message) { }
+    }
+    public class FakeBuilder : NServiceBus.ObjectBuilder.IBuilder, System.IDisposable
+    {
+        public FakeBuilder() { }
+        public virtual object Build(System.Type typeToBuild) { }
+        public virtual T Build<T>() { }
+        public virtual System.Collections.Generic.IEnumerable<object> BuildAll(System.Type typeToBuild) { }
+        public virtual System.Collections.Generic.IEnumerable<T> BuildAll<T>() { }
+        public virtual void BuildAndDispatch(System.Type typeToBuild, System.Action<object> action) { }
+        public virtual NServiceBus.ObjectBuilder.IBuilder CreateChildBuilder() { }
+        public virtual void Dispose() { }
+        public void Register<T>(params T[] instance)
+            where T :  class { }
+        public void Register<T>(System.Func<T> factory) { }
+        public void Register<T>(System.Func<T[]> factory)
+            where T :  class { }
+        public virtual void Release(object instance) { }
+    }
+    public class Handler<T>
+    {
+        public NServiceBus.Testing.Handler<T> ExpectDefer<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectDefer<TMessage>(System.Func<TMessage, System.DateTime, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectDoNotContinueDispatchingCurrentMessageToHandlers() { }
+        public NServiceBus.Testing.Handler<T> ExpectForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
+        public NServiceBus.Testing.Handler<T> ExpectHandleCurrentMessageLater() { }
+        public NServiceBus.Testing.Handler<T> ExpectNotDefer<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotDefer<TMessage>(System.Func<TMessage, System.DateTime, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotPublish<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotReply<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
+        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
+        public NServiceBus.Testing.Handler<T> ExpectNotSendToSites<TMessage>(System.Func<TMessage, System.Collections.Generic.IEnumerable<string>, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
+        public NServiceBus.Testing.Handler<T> ExpectPublish<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
+        public NServiceBus.Testing.Handler<T> ExpectReply<TMessage>(System.Func<TMessage, bool> check) { }
+        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
+        public NServiceBus.Testing.Handler<T> ExpectReturn<TEnum>(System.Func<TEnum, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
+        public NServiceBus.Testing.Handler<T> ExpectSend<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Handler<T> ExpectSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
+        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
+        public NServiceBus.Testing.Handler<T> ExpectSendToDestination<TMessage>(System.Func<TMessage, string, bool> check) { }
+        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
+        public NServiceBus.Testing.Handler<T> ExpectSendToSites<TMessage>(System.Func<TMessage, System.Collections.Generic.IEnumerable<string>, bool> check) { }
+        public void OnMessage<TMessage>(System.Action<TMessage> initializeMessage = null) { }
+        public void OnMessage<TMessage>(string messageId, System.Action<TMessage> initializeMessage = null) { }
+        public void OnMessage<TMessage>(TMessage initializedMessage) { }
+        public void OnMessage<TMessage>(TMessage message, string messageId) { }
+        public NServiceBus.Testing.Handler<T> SetIncomingHeader(string key, string value) { }
+        public NServiceBus.Testing.Handler<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
+    }
+    public class OutgoingMessage<TMessage, TOptions>
+        where TOptions : NServiceBus.Extensibility.ExtendableOptions
+    {
+        protected OutgoingMessage(TMessage message, TOptions options) { }
+        public TMessage Message { get; }
+        public TOptions Options { get; }
+    }
+    public class static OutgoingMessageExtensions
+    {
+        public static System.Collections.Generic.IEnumerable<NServiceBus.Testing.RepliedMessage<TMessage>> Containing<TMessage>(this System.Collections.Generic.IEnumerable<NServiceBus.Testing.RepliedMessage<object>> repliedMessages) { }
+        public static System.Collections.Generic.IEnumerable<NServiceBus.Testing.PublishedMessage<TMessage>> Containing<TMessage>(this System.Collections.Generic.IEnumerable<NServiceBus.Testing.PublishedMessage<object>> publishedMessages) { }
+        public static System.Collections.Generic.IEnumerable<NServiceBus.Testing.SentMessage<TMessage>> Containing<TMessage>(this System.Collections.Generic.IEnumerable<NServiceBus.Testing.SentMessage<object>> sentMessages) { }
+        public static TMessage Message<TMessage>(this NServiceBus.Testing.RepliedMessage<object> sentMessage)
+            where TMessage :  class { }
+        public static TMessage Message<TMessage>(this NServiceBus.Testing.PublishedMessage<object> sentMessage)
+            where TMessage :  class { }
+        public static TMessage Message<TMessage>(this NServiceBus.Testing.SentMessage<object> sentMessage)
+            where TMessage :  class { }
+    }
+    public class PublishedMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.PublishOptions>
+    {
+        public PublishedMessage(TMessage message, NServiceBus.PublishOptions options) { }
+    }
+    public class RepliedMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.ReplyOptions>
+    {
+        public RepliedMessage(TMessage message, NServiceBus.ReplyOptions options) { }
+    }
+    public class Saga<T>
+        where T : NServiceBus.Saga
+    {
+        public NServiceBus.Testing.Saga<T> AssertSagaCompletionIs(bool complete) { }
+        public NServiceBus.Testing.Saga<T> ExpectForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectHandleCurrentMessageLater() { }
+        public NServiceBus.Testing.Saga<T> ExpectNotForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectNoTimeoutToBeSetAt<TMessage>(System.Func<TMessage, System.DateTime, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectNoTimeoutToBeSetIn<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotPublish<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotPublish<TMessage>(System.Action<TMessage> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotReply<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotSend<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotSend<TMessage>(System.Action<TMessage> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotSendLocal<TMessage>(System.Action<TMessage> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectPublish<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectPublish<TMessage>(System.Action<TMessage> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectReply<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectReplyToOriginator<TMessage>(System.Func<TMessage, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectReplyToOriginator<TMessage>(System.Action<TMessage> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectSagaData<TSagaData>(System.Func<TSagaData, bool> check)
+            where TSagaData : NServiceBus.IContainSagaData { }
+        public NServiceBus.Testing.Saga<T> ExpectSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectSend<TMessage>(System.Func<TMessage, bool> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectSend<TMessage>(System.Action<TMessage> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectSendLocal<TMessage>(System.Action<TMessage> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectSendToDestination<TMessage>(System.Func<TMessage, string, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectSendToDestination<TMessage>(System.Action<TMessage, string> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetAt<TMessage>(System.Func<TMessage, System.DateTime, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetAt<TMessage>(System.Action<TMessage, System.DateTime> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetIn<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetIn<TMessage>(System.Action<TMessage, System.TimeSpan> check) { }
+        public NServiceBus.Testing.Saga<T> SetIncomingHeader(string key, string value) { }
+        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
+        public NServiceBus.Testing.Saga<T> SetMessageId(string messageId) { }
+        public NServiceBus.Testing.Saga<T> When(System.Func<T, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task> sagaIsInvoked) { }
+        public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, TMessage message) { }
+        public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, System.Action<TMessage> messageInitializer = null) { }
+        [System.ObsoleteAttribute("Please use `When(Action<T, IMessageHandlerContext> sagaIsInvoked)` instead. Will " +
+            "be removed in version 7.0.0.", true)]
+        public NServiceBus.Testing.Saga<T> When(System.Action<T> sagaIsInvoked) { }
+        public NServiceBus.Testing.Saga<T> WhenHandling<TMessage>(System.Action<TMessage> initializeMessage = null) { }
+        public NServiceBus.Testing.Saga<T> WhenHandlingTimeout<TMessage>(System.Action<TMessage> initializeMessage = null) { }
+        public NServiceBus.Testing.Saga<T> WhenReceivesMessageFrom(string client) { }
+        public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.TimeSpan after) { }
+        public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.DateTime at) { }
+        public NServiceBus.Testing.Saga<T> WhenSagaTimesOut() { }
+        public NServiceBus.Testing.Saga<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
+    }
+    public class SentMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.SendOptions>
+    {
+        public SentMessage(TMessage message, NServiceBus.SendOptions options) { }
+    }
+    public class Test
+    {
+        public Test() { }
+        public static TMessage CreateInstance<TMessage>() { }
+        public static TMessage CreateInstance<TMessage>(System.Action<TMessage> action) { }
+        public static NServiceBus.Testing.Handler<THandler> Handler<THandler>()
+            where THandler : new() { }
+        public static NServiceBus.Testing.Handler<THandler> Handler<THandler>(THandler handler) { }
+        [System.ObsoleteAttribute("Test initialization is no longer required and can be removed. Will be removed in " +
+            "version 7.0.0.", true)]
+        public static void Initialize(System.Action<NServiceBus.EndpointConfiguration> customisations = null) { }
+        public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>()
+            where TSaga : NServiceBus.Saga, new () { }
+        public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>(TSaga saga)
+            where TSaga : NServiceBus.Saga { }
+        public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>(System.Guid sagaId)
+            where TSaga : NServiceBus.Saga, new () { }
+        public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>(NServiceBus.IContainSagaData sagaData)
+            where TSaga : NServiceBus.Saga, new () { }
+    }
+    public class TestableAuditContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IAuditContext, NServiceBus.Pipeline.IBehaviorContext
+    {
+        public TestableAuditContext() { }
+        public System.Collections.Generic.IDictionary<string, string> AddedAuditData { get; }
+        public string AuditAddress { get; set; }
+        public NServiceBus.Transports.OutgoingMessage Message { get; set; }
+        public void AddAuditData(string key, string value) { }
+    }
+    public class TestableBatchDispatchContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBatchDispatchContext, NServiceBus.Pipeline.IBehaviorContext
+    {
+        public TestableBatchDispatchContext() { }
+        public System.Collections.Generic.IList<NServiceBus.Transports.TransportOperation> Operations { get; set; }
+    }
+    public abstract class TestableBehaviorContext : NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext
+    {
+        protected TestableBehaviorContext() { }
+        public NServiceBus.Testing.FakeBuilder Builder { get; set; }
+        public NServiceBus.Extensibility.ContextBag Extensions { get; set; }
+        protected virtual NServiceBus.ObjectBuilder.IBuilder GetBuilder() { }
+    }
+    public class TestableDispatchContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IDispatchContext
+    {
+        public TestableDispatchContext() { }
+        public System.Collections.Generic.IList<NServiceBus.Transports.TransportOperation> Operations { get; set; }
+    }
+    public class TestableFaultContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IFaultContext
+    {
+        public TestableFaultContext() { }
+        public string ErrorQueueAddress { get; set; }
+        public System.Exception Exception { get; set; }
+        public System.Collections.Generic.IDictionary<string, string> FaultData { get; }
+        public NServiceBus.Transports.OutgoingMessage Message { get; set; }
+        public virtual void AddFaultData(string key, string value) { }
+    }
+    public class TestableForwardingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IForwardingContext
+    {
+        public TestableForwardingContext() { }
+        public string Address { get; set; }
+        public NServiceBus.Transports.OutgoingMessage Message { get; set; }
+    }
+    public abstract class TestableIncomingContext : NServiceBus.Testing.TestableMessageProcessingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext
+    {
+        protected TestableIncomingContext(NServiceBus.IMessageCreator messageCreator = null) { }
+        public NServiceBus.Testing.FakeBuilder Builder { get; set; }
+        protected virtual NServiceBus.ObjectBuilder.IBuilder GetBuilder() { }
+    }
+    public class TestableIncomingLogicalMessageContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IIncomingLogicalMessageContext
+    {
+        public TestableIncomingLogicalMessageContext(NServiceBus.IMessageCreator messageCreator = null) { }
+        public System.Collections.Generic.Dictionary<string, string> Headers { get; set; }
+        public NServiceBus.Pipeline.LogicalMessage Message { get; set; }
+        public bool MessageHandled { get; set; }
+        public virtual void UpdateMessageInstance(object newInstance) { }
+    }
+    public class TestableIncomingPhysicalMessageContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IIncomingPhysicalMessageContext
+    {
+        public TestableIncomingPhysicalMessageContext() { }
+        public NServiceBus.Transports.IncomingMessage Message { get; set; }
+        public virtual void UpdateMessage(byte[] body) { }
+    }
+    public class TestableInvokeHandlerContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageHandlerContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IInvokeHandlerContext
+    {
+        public TestableInvokeHandlerContext(NServiceBus.IMessageCreator messageCreator = null) { }
+        public bool DoNotContinueDispatchingCurrentMessageToHandlersWasCalled { get; set; }
+        public bool HandleCurrentMessageLaterWasCalled { get; set; }
+        public bool HandlerInvocationAborted { get; }
+        public System.Collections.Generic.Dictionary<string, string> Headers { get; set; }
+        public object MessageBeingHandled { get; set; }
+        public NServiceBus.Pipeline.MessageHandler MessageHandler { get; set; }
+        public NServiceBus.Unicast.Messages.MessageMetadata MessageMetadata { get; set; }
+        public NServiceBus.Persistence.SynchronizedStorageSession SynchronizedStorageSession { get; set; }
+        public void DoNotContinueDispatchingCurrentMessageToHandlers() { }
+        public virtual System.Threading.Tasks.Task HandleCurrentMessageLater() { }
+    }
+    public class TestableMessageHandlerContext : NServiceBus.Testing.TestableInvokeHandlerContext
+    {
+        public TestableMessageHandlerContext(NServiceBus.IMessageCreator messageCreator = null) { }
+    }
+    public class TestableMessageProcessingContext : NServiceBus.Testing.TestablePipelineContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext
+    {
+        public TestableMessageProcessingContext(NServiceBus.IMessageCreator messageCreator = null) { }
+        public virtual string[] ForwardedMessages { get; }
+        public System.Collections.Generic.IDictionary<string, string> MessageHeaders { get; set; }
+        public string MessageId { get; set; }
+        public virtual NServiceBus.Testing.RepliedMessage<>[] RepliedMessages { get; }
+        public string ReplyToAddress { get; set; }
+        public virtual System.Threading.Tasks.Task ForwardCurrentMessageTo(string destination) { }
+        public virtual System.Threading.Tasks.Task Reply(object message, NServiceBus.ReplyOptions options) { }
+        public virtual System.Threading.Tasks.Task Reply<T>(System.Action<T> messageConstructor, NServiceBus.ReplyOptions options) { }
+    }
+    public class TestableOutgoingContext : NServiceBus.Testing.TestablePipelineContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext
+    {
+        public TestableOutgoingContext() { }
+        public NServiceBus.Testing.FakeBuilder Builder { get; set; }
+        public System.Collections.Generic.Dictionary<string, string> Headers { get; set; }
+        public string MessageId { get; set; }
+        protected virtual NServiceBus.ObjectBuilder.IBuilder GetBuilder() { }
+    }
+    public class TestableOutgoingLogicalMessageContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingLogicalMessageContext
+    {
+        public TestableOutgoingLogicalMessageContext() { }
+        public NServiceBus.Pipeline.OutgoingLogicalMessage Message { get; set; }
+        public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
+        public virtual void UpdateMessage(object newInstance) { }
+    }
+    public class TestableOutgoingPhysicalMessageContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingPhysicalMessageContext
+    {
+        public TestableOutgoingPhysicalMessageContext() { }
+        public byte[] Body { get; set; }
+        public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
+        public virtual void UpdateMessage(byte[] body) { }
+    }
+    public class TestableOutgoingPublishContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingPublishContext
+    {
+        public TestableOutgoingPublishContext() { }
+        public NServiceBus.Pipeline.OutgoingLogicalMessage Message { get; set; }
+    }
+    public class TestableOutgoingReplyContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingReplyContext
+    {
+        public TestableOutgoingReplyContext() { }
+        public NServiceBus.Pipeline.OutgoingLogicalMessage Message { get; set; }
+    }
+    public class TestableOutgoingSendContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingSendContext
+    {
+        public TestableOutgoingSendContext() { }
+        public NServiceBus.Pipeline.OutgoingLogicalMessage Message { get; set; }
+    }
+    public class TestablePipelineContext : NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext
+    {
+        protected NServiceBus.IMessageCreator messageCreator;
+        public TestablePipelineContext(NServiceBus.IMessageCreator messageCreator = null) { }
+        public NServiceBus.Extensibility.ContextBag Extensions { get; set; }
+        public virtual NServiceBus.Testing.PublishedMessage<>[] PublishedMessages { get; }
+        public virtual NServiceBus.Testing.SentMessage<>[] SentMessages { get; }
+        public virtual System.Threading.Tasks.Task Publish(object message, NServiceBus.PublishOptions options) { }
+        public virtual System.Threading.Tasks.Task Publish<T>(System.Action<T> messageConstructor, NServiceBus.PublishOptions publishOptions) { }
+        public virtual System.Threading.Tasks.Task Send(object message, NServiceBus.SendOptions options) { }
+        public virtual System.Threading.Tasks.Task Send<T>(System.Action<T> messageConstructor, NServiceBus.SendOptions options) { }
+    }
+    public class TestableRoutingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IRoutingContext
+    {
+        public TestableRoutingContext() { }
+        public NServiceBus.Transports.OutgoingMessage Message { get; set; }
+        public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
+    }
+    public class TestableSatelliteProcessingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISatelliteProcessingContext
+    {
+        public TestableSatelliteProcessingContext() { }
+        public NServiceBus.Transports.IncomingMessage Message { get; set; }
+    }
+    public class TestableSubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISubscribeContext
+    {
+        public TestableSubscribeContext() { }
+        public System.Type EventType { get; set; }
+    }
+    public class TestableTransportReceiveContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ITransportReceiveContext
+    {
+        public TestableTransportReceiveContext() { }
+        public NServiceBus.Transports.IncomingMessage Message { get; set; }
+        public bool ReceiveOperationAborted { get; set; }
+        public virtual void AbortReceiveOperation() { }
+    }
+    public class TestableUnsubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IUnsubscribeContext
+    {
+        public TestableUnsubscribeContext() { }
+        public System.Type EventType { get; set; }
+    }
+    public class TestingLoggerFactory : NServiceBus.Logging.LoggingFactoryDefinition
+    {
+        public TestingLoggerFactory() { }
+        protected override NServiceBus.Logging.ILoggerFactory GetLoggingFactory() { }
+        public void Level(NServiceBus.Logging.LogLevel level) { }
+        public void WriteTo(System.IO.TextWriter writer) { }
+    }
+    public class TimeoutMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.SendOptions>
+    {
+        public TimeoutMessage(TMessage message, NServiceBus.SendOptions options, System.TimeSpan within) { }
+        public TimeoutMessage(TMessage message, NServiceBus.SendOptions options, System.DateTimeOffset at) { }
+        public System.Nullable<System.DateTimeOffset> At { get; }
+        public System.Nullable<System.TimeSpan> Within { get; }
+    }
+}
