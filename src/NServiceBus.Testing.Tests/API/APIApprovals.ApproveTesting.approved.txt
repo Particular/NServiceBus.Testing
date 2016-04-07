@@ -95,6 +95,7 @@ namespace NServiceBus.Testing
         where T : NServiceBus.Saga
     {
         public NServiceBus.Testing.Saga<T> AssertSagaCompletionIs(bool complete) { }
+        public NServiceBus.Testing.Saga<T> ConfigureHandlerContext(System.Action<NServiceBus.Testing.TestableMessageHandlerContext> contextInitializer) { }
         public NServiceBus.Testing.Saga<T> ExpectForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectHandleCurrentMessageLater() { }
         public NServiceBus.Testing.Saga<T> ExpectNotForwardCurrentMessageTo(System.Func<string, bool> check = null) { }

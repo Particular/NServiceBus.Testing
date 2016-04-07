@@ -68,6 +68,34 @@
             Assert.IsTrue(containsCustomHeader);
             Assert.AreEqual(expectedHeaderValue, receivedHeaderValue);
         }
+
+        [Test]
+        public void ConfigureHandlerContext()
+        {
+            var messageId = Guid.NewGuid().ToString();
+            var replyToAddress = "0118 999 881 999 119 725 3";
+            TestableMessageHandlerContext configuredContextInstance = null;
+            IMessageHandlerContext receivedContextInstance = null;
+
+            Test.Saga<CustomSaga<MyRequest, MySagaData>>()
+                .WithExternalDependencies(s =>
+                    s.HandlerAction = (request, context, data) =>
+                    {
+                        receivedContextInstance = context;
+                        return Task.FromResult(0);
+                    })
+                .ConfigureHandlerContext(c =>
+                {
+                    c.MessageId = messageId;
+                    c.ReplyToAddress = replyToAddress;
+                    configuredContextInstance = c;
+                })
+                .When<MyRequest>(s => s.Handle);
+
+            Assert.AreEqual(messageId, receivedContextInstance.MessageId);
+            Assert.AreEqual(replyToAddress, receivedContextInstance.ReplyToAddress);
+            Assert.AreSame(receivedContextInstance, configuredContextInstance);
+        }
     }
 
     public class MyRequest

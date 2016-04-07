@@ -51,6 +51,15 @@
         }
 
         /// <summary>
+        /// Provides a way to customize the <see cref="IMessageHandlerContext" /> instance received by the message handler.
+        /// </summary>
+        public Saga<T> ConfigureHandlerContext(Action<TestableMessageHandlerContext> contextInitializer)
+        {
+            contextInitializer(testContext);
+            return this;
+        }
+
+        /// <summary>
         /// Set the headers on an incoming message that will be return
         /// when code calls Bus.CurrentMessageContext.Headers
         /// </summary>
