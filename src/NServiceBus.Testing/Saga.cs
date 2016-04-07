@@ -505,7 +505,8 @@
         /// </summary>
         [ObsoleteEx(
             RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6")]
+            TreatAsErrorFromVersion = "6",
+            Message = "Set the message ID on the context by using ConfigureHandlerContext")]
         public Saga<T> SetMessageId(string messageId)
         {
             throw new NotImplementedException();
