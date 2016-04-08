@@ -89,7 +89,6 @@
     <Compile Include="ApprovalTestConfig.cs" />
     <Compile Include="App_Packages\ApiApprover.3.0.1\PublicApiApprover.cs" />
     <Compile Include="App_Packages\ApiApprover.3.0.1\PublicApiGenerator.cs" />
-    <Compile Include="Fakes\TestableContextChecker.cs" />
     <Compile Include="Handler\ExpectDoNotContinueDispatchingCurrentMessageToHandlersTests.cs" />
     <Compile Include="Handler\ExpectDeferTests.cs" />
     <Compile Include="Handler\ExpectForwardCurrentMessageToTests.cs" />
@@ -108,7 +107,6 @@
     <Compile Include="Saga\ExpectTimeoutTests.cs" />
     <Compile Include="Saga\ExpectSagaDataTests.cs" />
     <Compile Include="Saga\WhenSagaTimesOutTests.cs" />
-    <Compile Include="Fakes\TestableMessageHandlerContextTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.Testing\NServiceBus.Testing.csproj">
