@@ -29,6 +29,16 @@
         }
 
         /// <summary>
+        /// Provides a way to customize the <see cref="IMessageHandlerContext" /> instance received by the message handler.
+        /// </summary>
+        public Handler<T> ConfigureHandlerContext(Action<TestableMessageHandlerContext> contextInitializer)
+        {
+            contextInitializer(testableMessageHandlerContext);
+
+            return this;
+        }
+
+        /// <summary>
         /// Set the headers on an incoming message that will be return
         /// when code calls Bus.CurrentMessageContext.Headers
         /// </summary>
@@ -242,22 +252,34 @@
         }
 
         /// <summary>
-        /// Activates the test that has been set up passing in the given message.
-        /// </summary>
-        public void OnMessage<TMessage>(Action<TMessage> initializeMessage = null)
-        {
-            OnMessage(Guid.NewGuid().ToString("N"), initializeMessage);
-        }
-
-        /// <summary>
         /// Activates the test that has been set up passing in the given message,
         /// setting the incoming headers and the message Id.
         /// </summary>
         public void OnMessage<TMessage>(string messageId, Action<TMessage> initializeMessage = null)
         {
+            testableMessageHandlerContext.MessageId = messageId;
+            OnMessage(initializeMessage);
+        }
+
+        /// <summary>
+        /// Activates the test that has been set up passing in the given message.
+        /// </summary>
+        public void OnMessage<TMessage>(Action<TMessage> initializeMessage = null)
+        {
             var message = messageCreator.CreateInstance<TMessage>();
             initializeMessage?.Invoke(message);
-            OnMessage(message, messageId);
+            OnMessage(message);
+        }
+
+        /// <summary>
+        /// Activates the test that has been set up passing in given message,
+        /// setting the incoming headers and the message Id.
+        /// </summary>
+        public void OnMessage<TMessage>(TMessage message, string messageId)
+        {
+            testableMessageHandlerContext.MessageId = messageId;
+
+            OnMessage(message);
         }
 
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
@@ -269,28 +291,17 @@
         /// <example><![CDATA[var message = new TestMessage {//...}; Test.Handler<EmptyHandler>().OnMessage<TestMessage>(message);]]></example>
         public void OnMessage<TMessage>(TMessage initializedMessage)
         {
-            OnMessage(initializedMessage, Guid.NewGuid().ToString("N"));
-        }
-
-        /// <summary>
-        /// Activates the test that has been set up passing in given message,
-        /// setting the incoming headers and the message Id.
-        /// </summary>
-        public void OnMessage<TMessage>(TMessage message, string messageId)
-        {
-            testableMessageHandlerContext.MessageId = messageId;
-
-            var messageType = messageCreator.GetMappedTypeFor(message.GetType());
+            var messageType = messageCreator.GetMappedTypeFor(initializedMessage.GetType());
             var handleMethod = handler.GetType().CreateInvoker(messageType, typeof(IHandleMessages<>));
             if (handleMethod == null)
             {
                 return;
             }
 
-            handleMethod(handler, message, testableMessageHandlerContext).GetAwaiter().GetResult();
-
+            handleMethod(handler, initializedMessage, testableMessageHandlerContext).GetAwaiter().GetResult();
             testableMessageHandlerContext.Validate();
         }
+
 
         /// <summary>
         /// Check that the handler uses the bus to return the appropriate error code.
