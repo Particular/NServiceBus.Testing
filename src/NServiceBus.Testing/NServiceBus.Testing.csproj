@@ -74,10 +74,12 @@
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\PublishedMessage.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\RepliedMessage.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\SentMessage.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\Subscription.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableAuditContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableBatchDispatchContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableBehaviorContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableDispatchContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableEndpointInstance.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableFaultContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableForwardingContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableIncomingContext.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableInvokeHandlerContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableMessageHandlerContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableMessageProcessingContext.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableMessageSession.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableOutgoingContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableOutgoingLogicalMessageContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableOutgoingPhysicalMessageContext.cs" />
@@ -100,6 +103,7 @@
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestableUnsubscribeContext.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TestingLoggerFactory.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\TextWriterLogger.cs" />
+    <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0-beta0001\Unsubscription.cs" />
     <Compile Include="ExpectationException.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotDoNotDeliverBefore.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotDelayDeliveryWith.cs" />

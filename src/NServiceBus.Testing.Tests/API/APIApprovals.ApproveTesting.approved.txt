@@ -153,6 +153,10 @@ namespace NServiceBus.Testing
     {
         public SentMessage(TMessage message, NServiceBus.SendOptions options) { }
     }
+    public class Subscription : NServiceBus.Testing.OutgoingMessage<System.Type, NServiceBus.SubscribeOptions>
+    {
+        public Subscription(System.Type message, NServiceBus.SubscribeOptions options) { }
+    }
     public class Test
     {
         public Test() { }
@@ -197,6 +201,12 @@ namespace NServiceBus.Testing
     {
         public TestableDispatchContext() { }
         public System.Collections.Generic.IList<NServiceBus.Transports.TransportOperation> Operations { get; set; }
+    }
+    public class TestableEndpointInstance : NServiceBus.Testing.TestableMessageSession, NServiceBus.IEndpointInstance, NServiceBus.IMessageSession
+    {
+        public TestableEndpointInstance() { }
+        public bool EndpointStopped { get; }
+        public virtual System.Threading.Tasks.Task Stop() { }
     }
     public class TestableFaultContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IFaultContext
     {
@@ -262,6 +272,14 @@ namespace NServiceBus.Testing
         public virtual System.Threading.Tasks.Task ForwardCurrentMessageTo(string destination) { }
         public virtual System.Threading.Tasks.Task Reply(object message, NServiceBus.ReplyOptions options) { }
         public virtual System.Threading.Tasks.Task Reply<T>(System.Action<T> messageConstructor, NServiceBus.ReplyOptions options) { }
+    }
+    public class TestableMessageSession : NServiceBus.Testing.TestablePipelineContext, NServiceBus.IMessageSession
+    {
+        public TestableMessageSession() { }
+        public virtual NServiceBus.Testing.Subscription[] Subscriptions { get; }
+        public virtual NServiceBus.Testing.Unsubscription[] Unsubscription { get; }
+        public virtual System.Threading.Tasks.Task Subscribe(System.Type eventType, NServiceBus.SubscribeOptions options) { }
+        public virtual System.Threading.Tasks.Task Unsubscribe(System.Type eventType, NServiceBus.UnsubscribeOptions options) { }
     }
     public class TestableOutgoingContext : NServiceBus.Testing.TestablePipelineContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext
     {
@@ -353,5 +371,9 @@ namespace NServiceBus.Testing
         public TimeoutMessage(TMessage message, NServiceBus.SendOptions options, System.DateTimeOffset at) { }
         public System.Nullable<System.DateTimeOffset> At { get; }
         public System.Nullable<System.TimeSpan> Within { get; }
+    }
+    public class Unsubscription : NServiceBus.Testing.OutgoingMessage<System.Type, NServiceBus.UnsubscribeOptions>
+    {
+        public Unsubscription(System.Type message, NServiceBus.UnsubscribeOptions options) { }
     }
 }

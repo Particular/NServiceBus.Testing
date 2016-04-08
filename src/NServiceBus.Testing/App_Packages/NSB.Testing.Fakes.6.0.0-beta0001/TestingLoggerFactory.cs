@@ -36,7 +36,7 @@
         }
 
         /// <summary>
-        /// Returns a <see cref="ILoggerFactory"/>.
+        /// Constructs an instance of <see cref="ILoggerFactory" /> for use by <see cref="LogManager.Use{T}" />.
         /// </summary>
         protected override ILoggerFactory GetLoggingFactory()
         {
