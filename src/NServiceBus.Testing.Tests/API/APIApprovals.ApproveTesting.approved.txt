@@ -132,7 +132,8 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetIn<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetIn<TMessage>(System.Action<TMessage, System.TimeSpan> check) { }
         public NServiceBus.Testing.Saga<T> SetIncomingHeader(string key, string value) { }
-        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
+        [System.ObsoleteAttribute("Set the message ID on the context by using ConfigureHandlerContext. Will be remov" +
+            "ed in version 7.0.0.", true)]
         public NServiceBus.Testing.Saga<T> SetMessageId(string messageId) { }
         public NServiceBus.Testing.Saga<T> When(System.Func<T, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task> sagaIsInvoked) { }
         public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, TMessage message) { }
