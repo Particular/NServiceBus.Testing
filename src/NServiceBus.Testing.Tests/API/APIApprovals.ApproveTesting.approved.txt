@@ -42,20 +42,19 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectNotSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
-        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
+        [System.ObsoleteAttribute(@"ExpectNotSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6. Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectNotSendToSites<TMessage>(System.Func<TMessage, System.Collections.Generic.IEnumerable<string>, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectPublish<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectReply<TMessage>(System.Func<TMessage, bool> check) { }
-        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
+        [System.ObsoleteAttribute("Please use `ExpectReply` instead. Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectReturn<TEnum>(System.Func<TEnum, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectSend<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
-        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectSendToDestination<TMessage>(System.Func<TMessage, string, bool> check) { }
-        [System.ObsoleteAttribute("Will be removed in version 7.0.0.", true)]
+        [System.ObsoleteAttribute(@"ExpectSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6. Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectSendToSites<TMessage>(System.Func<TMessage, System.Collections.Generic.IEnumerable<string>, bool> check) { }
         public void OnMessage<TMessage>(System.Action<TMessage> initializeMessage = null) { }
         public void OnMessage<TMessage>(string messageId, System.Action<TMessage> initializeMessage = null) { }
