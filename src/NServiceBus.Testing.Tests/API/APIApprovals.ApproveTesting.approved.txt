@@ -43,19 +43,20 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectNotSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
-        [System.ObsoleteAttribute(@"ExpectNotSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6. Will be removed in version 7.0.0.", true)]
+        [System.ObsoleteAttribute(@"ExpectNotSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6. The member currently throws a NotImplementedException. Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectNotSendToSites<TMessage>(System.Func<TMessage, System.Collections.Generic.IEnumerable<string>, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectPublish<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectReply<TMessage>(System.Func<TMessage, bool> check) { }
-        [System.ObsoleteAttribute("Please use `ExpectReply` instead. Will be removed in version 7.0.0.", true)]
+        [System.ObsoleteAttribute("Use `ExpectReply` instead. The member currently throws a NotImplementedException." +
+            " Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectReturn<TEnum>(System.Func<TEnum, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectSend<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectSendToDestination<TMessage>(System.Func<TMessage, string, bool> check) { }
-        [System.ObsoleteAttribute(@"ExpectSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6. Will be removed in version 7.0.0.", true)]
+        [System.ObsoleteAttribute(@"ExpectSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6. The member currently throws a NotImplementedException. Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectSendToSites<TMessage>(System.Func<TMessage, System.Collections.Generic.IEnumerable<string>, bool> check) { }
         public void OnMessage<TMessage>(string messageId, System.Action<TMessage> initializeMessage = null) { }
         public void OnMessage<TMessage>(System.Action<TMessage> initializeMessage = null) { }
@@ -132,14 +133,14 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetIn<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetIn<TMessage>(System.Action<TMessage, System.TimeSpan> check) { }
         public NServiceBus.Testing.Saga<T> SetIncomingHeader(string key, string value) { }
-        [System.ObsoleteAttribute("Set the message ID on the context by using ConfigureHandlerContext. Will be remov" +
-            "ed in version 7.0.0.", true)]
+        [System.ObsoleteAttribute("Set the message ID on the context by using ConfigureHandlerContext. The member cu" +
+            "rrently throws a NotImplementedException. Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Saga<T> SetMessageId(string messageId) { }
         public NServiceBus.Testing.Saga<T> When(System.Func<T, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task> sagaIsInvoked) { }
         public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, TMessage message) { }
         public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, System.Action<TMessage> messageInitializer = null) { }
-        [System.ObsoleteAttribute("Please use `When(Action<T, IMessageHandlerContext> sagaIsInvoked)` instead. Will " +
-            "be removed in version 7.0.0.", true)]
+        [System.ObsoleteAttribute("Use `When(Action<T, IMessageHandlerContext> sagaIsInvoked)` instead. The member c" +
+            "urrently throws a NotImplementedException. Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Saga<T> When(System.Action<T> sagaIsInvoked) { }
         public NServiceBus.Testing.Saga<T> WhenHandling<TMessage>(System.Action<TMessage> initializeMessage = null) { }
         public NServiceBus.Testing.Saga<T> WhenHandlingTimeout<TMessage>(System.Action<TMessage> initializeMessage = null) { }
@@ -165,8 +166,8 @@ namespace NServiceBus.Testing
         public static NServiceBus.Testing.Handler<THandler> Handler<THandler>()
             where THandler : new() { }
         public static NServiceBus.Testing.Handler<THandler> Handler<THandler>(THandler handler) { }
-        [System.ObsoleteAttribute("Test initialization is no longer required and can be removed. Will be removed in " +
-            "version 7.0.0.", true)]
+        [System.ObsoleteAttribute("Test initialization is no longer required and can be removed. The member currentl" +
+            "y throws a NotImplementedException. Will be removed in version 7.0.0.", true)]
         public static void Initialize(System.Action<NServiceBus.EndpointConfiguration> customisations = null) { }
         public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>()
             where TSaga : NServiceBus.Saga, new () { }
