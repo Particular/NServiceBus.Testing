@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus.Testing.Tests.Handler
 {
     using System.Threading;
-    using NServiceBus.Testing.Tests.Saga;
+    using Saga;
     using NUnit.Framework;
 
     [TestFixture]
