@@ -252,6 +252,15 @@
         }
 
         /// <summary>
+        /// Check that the handler does not send the given message type to the given destination.
+        /// </summary>
+        public Handler<T> ExpectNotSendToDestination<TMessage>(Func<TMessage, string, bool> check)
+        {
+            testableMessageHandlerContext.AddExpectation(new ExpectNotSendToDestination<TMessage>(check));
+            return this;
+        }
+
+        /// <summary>
         /// Activates the test that has been set up passing in the given message,
         /// setting the incoming headers and the message Id.
         /// </summary>
