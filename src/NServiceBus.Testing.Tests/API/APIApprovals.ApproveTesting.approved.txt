@@ -212,10 +212,10 @@ namespace NServiceBus.Testing
     public class TestableFaultContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IFaultContext
     {
         public TestableFaultContext() { }
-        public string ErrorQueueAddress { get; set; }
         public System.Exception Exception { get; set; }
         public System.Collections.Generic.IDictionary<string, string> FaultData { get; }
         public NServiceBus.Transports.OutgoingMessage Message { get; set; }
+        public string SourceQueueAddress { get; set; }
         public virtual void AddFaultData(string key, string value) { }
     }
     public class TestableForwardingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IForwardingContext
