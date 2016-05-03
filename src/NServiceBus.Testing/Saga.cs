@@ -469,6 +469,25 @@
         }
 
         /// <summary>
+        /// Check that the saga does not send the given message type to the given destination.
+        /// </summary>
+        /// <param name="check">An action that performs assertions on the message.</param>
+        public Saga<T> ExpectNotSendToDestination<TMessage>(Action<TMessage, string> check)
+        {
+            return ExpectNotSendToDestination(CheckActionToFunc(check));
+        }
+
+
+        /// <summary>
+        /// Check that the saga does not send the given message type to the given destination.
+        /// </summary>
+        public Saga<T> ExpectNotSendToDestination<TMessage>(Func<TMessage, string, bool> check = null)
+        {
+            testContext.AddExpectation(new ExpectNotSendToDestination<TMessage>(check));
+            return this;
+        }
+
+        /// <summary>
         /// Check that the saga sends the given message type to the appropriate destination.
         /// </summary>
         /// <param name="check">An action that performs assertions on the message.</param>

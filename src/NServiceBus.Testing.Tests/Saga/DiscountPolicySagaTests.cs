@@ -54,6 +54,20 @@
         }
 
         [Test]
+        public void NotRemoteOrder()
+        {
+            decimal total = 100;
+
+            Test.Saga<DiscountPolicy>()
+                .ExpectNotSendToDestination<ProcessOrder>((m, a) => m.Total == total && a == "remote.orderQueue")
+                .When((s, c) => s.Handle(new SubmitOrder
+                {
+                    Total = total,
+                    IsRemoteOrder = false
+                }, c));
+        }
+
+        [Test]
         public void RemoteOrderWithAssertions()
         {
             decimal total = 100;
