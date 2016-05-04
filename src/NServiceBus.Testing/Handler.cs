@@ -254,7 +254,7 @@
         /// <summary>
         /// Check that the handler does not send the given message type to the given destination.
         /// </summary>
-        public Handler<T> ExpectNotSendToDestination<TMessage>(Func<TMessage, string, bool> check)
+        public Handler<T> ExpectNotSendToDestination<TMessage>(Func<TMessage, string, bool> check = null)
         {
             testableMessageHandlerContext.AddExpectation(new ExpectNotSendToDestination<TMessage>(check));
             return this;
