@@ -43,6 +43,7 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
         public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectNotSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
+        public NServiceBus.Testing.Handler<T> ExpectNotSendToDestination<TMessage>(System.Func<TMessage, string, bool> check = null) { }
         [System.ObsoleteAttribute(@"ExpectNotSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6. The member currently throws a NotImplementedException. Will be removed in version 7.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectNotSendToSites<TMessage>(System.Func<TMessage, System.Collections.Generic.IEnumerable<string>, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
@@ -112,6 +113,8 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Saga<T> ExpectNotSend<TMessage>(System.Action<TMessage> check) { }
         public NServiceBus.Testing.Saga<T> ExpectNotSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectNotSendLocal<TMessage>(System.Action<TMessage> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotSendToDestination<TMessage>(System.Action<TMessage, string> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotSendToDestination<TMessage>(System.Func<TMessage, string, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectPublish<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Saga<T> ExpectPublish<TMessage>(System.Action<TMessage> check) { }
