@@ -42,7 +42,7 @@ namespace NServiceBus.Testing.Tests.Handler
         {
             Test.Handler<SendingHandler<TestMessage>>()
                 .WithExternalDependencies(h => h.SendAnything = false)
-                .ExpectNotSendToDestination<Send1>((message, destination) => true)
+                .ExpectNotSendToDestination<Send1>()
                 .OnMessage<TestMessage>();
         }
 
