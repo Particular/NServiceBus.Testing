@@ -92,6 +92,7 @@
     <Compile Include="Handler\ExpectDoNotContinueDispatchingCurrentMessageToHandlersTests.cs" />
     <Compile Include="Handler\ExpectDeferTests.cs" />
     <Compile Include="Handler\ExpectForwardCurrentMessageToTests.cs" />
+    <Compile Include="Handler\ExpectNotSendToDestinationTests.cs" />
     <Compile Include="Handler\ExpectPublishTests.cs" />
     <Compile Include="Handler\ExpectReplyTests.cs" />
     <Compile Include="Handler\ExpectHandleCurrentMessageLaterTests.cs" />
