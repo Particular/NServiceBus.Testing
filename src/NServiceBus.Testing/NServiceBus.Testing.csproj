@@ -120,6 +120,7 @@
     <Compile Include="ExpectedInvocations\ExpectReply.cs" />
     <Compile Include="ExpectedInvocations\ExpectSend.cs" />
     <Compile Include="ExpectedInvocations\ExpectSendLocal.cs" />
+    <Compile Include="ExpectedInvocations\ExpectNotSendToDestination.cs" />
     <Compile Include="ExpectedInvocations\ExpectSendToDestination.cs" />
     <Compile Include="ExpectedInvocations\ExpectReplyToOriginator.cs" />
     <Compile Include="ExpectedInvocations\ExpectDelayDeliveryWith.cs" />
