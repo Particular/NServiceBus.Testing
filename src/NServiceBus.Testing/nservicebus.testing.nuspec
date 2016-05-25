@@ -11,7 +11,7 @@
     <iconUrl>$iconUrl$</iconUrl>
     <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
-    <description>The testing for the NServiceBus, The most popular open-source service bus for .net</description>
+    <description>Testing helpers for the NServiceBus, The most popular open-source service bus for .net</description>
     <releaseNotes></releaseNotes>
     <tags>$tags$</tags>
     <dependencies>
@@ -19,6 +19,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\binaries\NServiceBus.Testing.???" target="lib\net45" />
+    <file src="..\..\binaries\NServiceBus.Testing.???" target="lib\net452" />
   </files>
 </package>

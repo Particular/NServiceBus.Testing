@@ -16,6 +16,7 @@
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void ApproveTesting()
         {
+            Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
             var assemblyPath = Path.GetFullPath(typeof(Test).Assembly.Location);
             var asm = AssemblyDefinition.ReadAssembly(assemblyPath);
             var publicApi = Filter(PublicApiGenerator.CreatePublicApiForAssembly(asm));
