@@ -240,7 +240,7 @@ namespace NServiceBus.Testing
                 );
             return this;
         }
-        
+
         /// <summary>
         /// Check that the saga replies to the originator with the given message type.
         /// </summary>
@@ -362,9 +362,14 @@ namespace NServiceBus.Testing
         public Saga<T> WhenSagaTimesOut()
         {
             var state = bus.PopTimeout();
-            
+
+            if (state == null)
+            {
+                throw new Exception("Unable to find a matching timeout state. Make sure 'When(Action<T> sagaIsInvoked)' or 'WhenHandling<TMessage>(Action<TMessage> initializeMessage = null)' for a message which requests a timeout is invoked before 'WhenSagasTimeout()'.");
+            }
+
             var method = saga.GetType().GetMethod("Timeout", new[] {state.GetType()});
-            
+
             return When(s => method.Invoke(s, new[] {state}));
         }
 
@@ -378,7 +383,7 @@ namespace NServiceBus.Testing
 
             if (saga.Completed)
                 throw new Exception("Assert failed. Saga has been completed.");
-            
+
             throw new Exception("Assert failed. Saga has not been completed.");
         }
 
@@ -442,7 +447,7 @@ namespace NServiceBus.Testing
                 return true;
             };
         }
-        
+
         private static Func<T1, T2, bool> CheckActionToFunc<T1, T2>(Action<T1, T2> check)
         {
             return (arg1, arg2) =>

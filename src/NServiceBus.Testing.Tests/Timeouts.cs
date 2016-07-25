@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Testing.Tests
 {
     using System;
+    using System.Collections.Generic;
     using NUnit.Framework;
     using Saga;
 
@@ -37,6 +38,17 @@
             Test.Saga<TimeoutSaga>()
                 .ExpectTimeoutToBeSetIn<MyTimeout>((state, expiresIn) => state.SomeProperty == "Test")
                 .When(saga => saga.Handle(new StartMessage()));
+        }
+
+        [Test]
+        public void WhenSagasTimesOut_is_invoked_without_previous_when_should_throw_meaningful_exception()
+        {
+            Assert.That(() =>
+                Test.Saga<TimeoutSaga>()
+                    .ExpectTimeoutToBeSetIn<MyTimeout>((state, expiresIn) => expiresIn == TimeSpan.FromDays(1))
+                    .WhenSagaTimesOut()
+                    .AssertSagaCompletionIs(false)
+            , Throws.Exception.TypeOf<Exception>().With.Message.StartsWith("Unable to find a matching timeout state.").And.Not.TypeOf<KeyNotFoundException>());
         }
     }
 
