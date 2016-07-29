@@ -5,7 +5,7 @@ namespace NServiceBus.Testing
     using System.Collections.Generic;
     using System.IO;
     using Pipeline;
-    using Transports;
+    using Transport;
 
     /// <summary>
     /// A testable implementation of <see cref="IIncomingPhysicalMessageContext" />.
@@ -13,16 +13,24 @@ namespace NServiceBus.Testing
     public partial class TestableIncomingPhysicalMessageContext : TestableIncomingContext, IIncomingPhysicalMessageContext
     {
         /// <summary>
+        /// Creates a new instance of <see cref="TestableIncomingPhysicalMessageContext"/>.
+        /// </summary>
+        public TestableIncomingPhysicalMessageContext()
+        {
+            Message = new IncomingMessage(Guid.NewGuid().ToString(), new Dictionary<string, string>(), new byte[0]);
+        }
+
+        /// <summary>
         /// Updates the message with the given body.
         /// </summary>
         public virtual void UpdateMessage(byte[] body)
         {
-            Message.Body = body;
+            Message = new IncomingMessage(Message.MessageId, Message.Headers, body);
         }
 
         /// <summary>
         /// The physical message being processed.
         /// </summary>
-        public IncomingMessage Message { get; set; } = new IncomingMessage(Guid.NewGuid().ToString(), new Dictionary<string, string>(), Stream.Null);
+        public IncomingMessage Message { get; set; }
     }
 }
