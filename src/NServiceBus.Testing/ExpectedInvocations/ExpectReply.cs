@@ -2,6 +2,7 @@ namespace NServiceBus.Testing
 {
     using System;
     using System.Linq;
+    using System.Runtime.ExceptionServices;
 
     class ExpectReply<TMessage> : ExpectInvocation
     {
@@ -10,7 +11,7 @@ namespace NServiceBus.Testing
             this.check = check ?? ((message, options) => true);
         }
 
-        public override void Validate(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context, ExceptionDispatchInfo exceptionInfo)
         {
             var invokedMessages = context.RepliedMessages.Containing<TMessage>().ToList();
 

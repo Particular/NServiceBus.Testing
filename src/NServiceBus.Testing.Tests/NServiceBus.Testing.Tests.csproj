@@ -99,6 +99,7 @@
     <Compile Include="Handler\ExpectHandleCurrentMessageLaterTests.cs" />
     <Compile Include="Handler\ExpectSendTests.cs" />
     <Compile Include="Handler\ExpectSendToDestinationTests.cs" />
+    <Compile Include="Handler\ExpectThrows.cs" />
     <Compile Include="Saga\ExpectForwardCurrentMessageToTests.cs" />
     <Compile Include="Saga\SagaTests.cs" />
     <Compile Include="Handler\HandlerTests.cs" />

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Runtime.ExceptionServices;
 
     class ExpectNotForwardCurrentMessageTo : ExpectInvocation
     {
@@ -10,7 +11,7 @@
             this.check = check ?? (s => true);
         }
 
-        public override void Validate(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context, ExceptionDispatchInfo exceptionInfo)
         {
             if (context.ForwardedMessages.Any(m => check(m)))
             {

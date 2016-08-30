@@ -2,6 +2,7 @@ namespace NServiceBus.Testing
 {
     using System;
     using System.Linq;
+    using System.Runtime.ExceptionServices;
 
     class ExpectNotSendToDestination<TMessage> : ExpectInvocation
     {
@@ -12,7 +13,7 @@ namespace NServiceBus.Testing
             this.check = check ?? ((m, s) => true);
         }
 
-        public override void Validate(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context, ExceptionDispatchInfo exceptionInfo)
         {
             var sentMessages = context.SentMessages.Containing<TMessage>()
                 .Where(i => string.IsNullOrWhiteSpace(i.Options.GetCorrelationId()) &&

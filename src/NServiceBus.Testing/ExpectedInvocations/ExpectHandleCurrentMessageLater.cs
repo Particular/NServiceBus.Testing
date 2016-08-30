@@ -1,8 +1,10 @@
 ﻿namespace NServiceBus.Testing
 {
+    using System.Runtime.ExceptionServices;
+
     class ExpectHandleCurrentMessageLater : ExpectInvocation
     {
-        public override void Validate(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context, ExceptionDispatchInfo exceptionInfo)
         {
             if (!context.HandleCurrentMessageLaterWasCalled)
             {

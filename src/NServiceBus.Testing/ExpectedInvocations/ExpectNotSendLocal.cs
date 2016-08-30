@@ -2,6 +2,7 @@ namespace NServiceBus.Testing
 {
     using System;
     using System.Linq;
+    using System.Runtime.ExceptionServices;
 
     class ExpectNotSendLocal<TMessage> : ExpectInvocation
     {
@@ -10,7 +11,7 @@ namespace NServiceBus.Testing
             this.check = check ?? (x => true);
         }
 
-        public override void Validate(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context, ExceptionDispatchInfo exceptionInfo)
         {
             var sentMessages = context.SentMessages.Containing<TMessage>();
 

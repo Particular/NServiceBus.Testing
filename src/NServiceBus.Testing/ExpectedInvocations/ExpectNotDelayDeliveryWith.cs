@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Runtime.ExceptionServices;
 
     class ExpectNotDelayDeliveryWith<TMessage> : ExpectInvocation
     {
@@ -10,7 +11,7 @@
             this.check = check ?? ((m, t) => true);
         }
 
-        public override void Validate(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context, ExceptionDispatchInfo exceptionInfo)
         {
             var sentMessages = context.SentMessages
                 .Containing<TMessage>()

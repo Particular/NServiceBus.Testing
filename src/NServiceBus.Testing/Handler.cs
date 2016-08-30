@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.ExceptionServices;
     using MessageInterfaces.MessageMapper.Reflection;
 
     /// <summary>
@@ -261,6 +262,27 @@
         }
 
         /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public Handler<T> ExpectThrows()
+        {
+            return ExpectThrows<Exception>();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public Handler<T> ExpectThrows<TException>(Func<TException, bool> check = null)
+            where TException : Exception
+        {
+            interceptException = true;
+            testableMessageHandlerContext.AddExpectation(new ExpectFail<TException>(check));
+            return this;
+        }
+
+        /// <summary>
         /// Activates the test that has been set up passing in the given message,
         /// setting the incoming headers and the message Id.
         /// </summary>
@@ -307,8 +329,22 @@
                 return;
             }
 
-            handleMethod(handler, initializedMessage, testableMessageHandlerContext).GetAwaiter().GetResult();
-            testableMessageHandlerContext.Validate();
+            ExceptionDispatchInfo info = null;
+            try
+            {
+                handleMethod(handler, initializedMessage, testableMessageHandlerContext).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                info = ExceptionDispatchInfo.Capture(ex);
+            }
+
+            if (!interceptException)
+            {
+                info?.Throw();
+            }
+
+            testableMessageHandlerContext.Validate(info);
         }
 
 
@@ -353,5 +389,7 @@
         MessageMapper messageCreator = new MessageMapper();
 
         TestingContext testableMessageHandlerContext;
+
+        bool interceptException;
     }
 }
