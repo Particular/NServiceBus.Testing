@@ -89,6 +89,12 @@ namespace NServiceBus.Testing.Tests.Handler
                 .ExpectSend<Send1>(m => true)
                 .OnMessage<MyCommand>();
         }
+
+        [Test]
+        public void OnMessageShouldThrowInnerException()
+        {
+            Assert.Throws<InvalidOperationException>(() => Test.Handler<ThrowingHandler>().OnMessage<TestMessage>());
+        }
     }
 
     class MyCommand : ICommand
@@ -113,6 +119,14 @@ namespace NServiceBus.Testing.Tests.Handler
         public Task Handle(TestMessage message, IMessageHandlerContext context)
         {
             return Task.FromResult(0);
+        }
+    }
+
+    public class ThrowingHandler : IHandleMessages<TestMessage>
+    {
+        public Task Handle(TestMessage message, IMessageHandlerContext context)
+        {
+            throw new InvalidOperationException();
         }
     }
 

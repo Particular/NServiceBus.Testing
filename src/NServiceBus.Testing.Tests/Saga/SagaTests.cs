@@ -96,6 +96,13 @@
             Assert.AreEqual(replyToAddress, receivedContextInstance.ReplyToAddress);
             Assert.AreSame(receivedContextInstance, configuredContextInstance);
         }
+
+        [Test]
+        public void WhenShouldThrowInnerException()
+        {
+            Assert.Throws<InvalidOperationException>(() => Test.Saga<SagaThatThrows>()
+                .When((s, c) => s.Handle(new StartsSaga(), c)));
+        }
     }
 
     public class MyRequest
@@ -146,6 +153,20 @@
         {
             await context.Publish<Event>();
             MarkAsComplete();
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
+        {
+        }
+    }
+
+
+    public class SagaThatThrows : NServiceBus.Saga<MySagaData>,
+        IAmStartedByMessages<StartsSaga>
+    {
+        public Task Handle(StartsSaga message, IMessageHandlerContext context)
+        {
+            throw new InvalidOperationException();
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
