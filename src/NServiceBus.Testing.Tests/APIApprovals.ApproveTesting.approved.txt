@@ -331,11 +331,6 @@ namespace NServiceBus.Testing
         public NServiceBus.Transport.OutgoingMessage Message { get; set; }
         public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
     }
-    public class TestableSatelliteProcessingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISatelliteProcessingContext
-    {
-        public TestableSatelliteProcessingContext() { }
-        public NServiceBus.Transport.IncomingMessage Message { get; set; }
-    }
     public class TestableSubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISubscribeContext
     {
         public TestableSubscribeContext() { }
