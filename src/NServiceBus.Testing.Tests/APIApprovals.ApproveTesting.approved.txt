@@ -186,13 +186,13 @@ namespace NServiceBus.Testing
         public TestableAuditContext() { }
         public System.Collections.Generic.IDictionary<string, string> AddedAuditData { get; }
         public string AuditAddress { get; set; }
-        public NServiceBus.Transports.OutgoingMessage Message { get; set; }
+        public NServiceBus.Transport.OutgoingMessage Message { get; set; }
         public void AddAuditData(string key, string value) { }
     }
     public class TestableBatchDispatchContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBatchDispatchContext, NServiceBus.Pipeline.IBehaviorContext
     {
         public TestableBatchDispatchContext() { }
-        public System.Collections.Generic.IList<NServiceBus.Transports.TransportOperation> Operations { get; set; }
+        public System.Collections.Generic.IList<NServiceBus.Transport.TransportOperation> Operations { get; set; }
     }
     public abstract class TestableBehaviorContext : NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext
     {
@@ -204,7 +204,7 @@ namespace NServiceBus.Testing
     public class TestableDispatchContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IDispatchContext
     {
         public TestableDispatchContext() { }
-        public System.Collections.Generic.IList<NServiceBus.Transports.TransportOperation> Operations { get; set; }
+        public System.Collections.Generic.IList<NServiceBus.Transport.TransportOperation> Operations { get; set; }
     }
     public class TestableEndpointInstance : NServiceBus.Testing.TestableMessageSession, NServiceBus.IEndpointInstance, NServiceBus.IMessageSession
     {
@@ -212,20 +212,11 @@ namespace NServiceBus.Testing
         public bool EndpointStopped { get; }
         public virtual System.Threading.Tasks.Task Stop() { }
     }
-    public class TestableFaultContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IFaultContext
-    {
-        public TestableFaultContext() { }
-        public System.Exception Exception { get; set; }
-        public System.Collections.Generic.IDictionary<string, string> FaultData { get; }
-        public NServiceBus.Transports.OutgoingMessage Message { get; set; }
-        public string SourceQueueAddress { get; set; }
-        public virtual void AddFaultData(string key, string value) { }
-    }
     public class TestableForwardingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IForwardingContext
     {
         public TestableForwardingContext() { }
         public string Address { get; set; }
-        public NServiceBus.Transports.OutgoingMessage Message { get; set; }
+        public NServiceBus.Transport.OutgoingMessage Message { get; set; }
     }
     public abstract class TestableIncomingContext : NServiceBus.Testing.TestableMessageProcessingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext
     {
@@ -244,7 +235,7 @@ namespace NServiceBus.Testing
     public class TestableIncomingPhysicalMessageContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IIncomingPhysicalMessageContext
     {
         public TestableIncomingPhysicalMessageContext() { }
-        public NServiceBus.Transports.IncomingMessage Message { get; set; }
+        public NServiceBus.Transport.IncomingMessage Message { get; set; }
         public virtual void UpdateMessage(byte[] body) { }
     }
     public class TestableInvokeHandlerContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageHandlerContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IInvokeHandlerContext
@@ -337,13 +328,8 @@ namespace NServiceBus.Testing
     public class TestableRoutingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IRoutingContext
     {
         public TestableRoutingContext() { }
-        public NServiceBus.Transports.OutgoingMessage Message { get; set; }
+        public NServiceBus.Transport.OutgoingMessage Message { get; set; }
         public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
-    }
-    public class TestableSatelliteProcessingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISatelliteProcessingContext
-    {
-        public TestableSatelliteProcessingContext() { }
-        public NServiceBus.Transports.IncomingMessage Message { get; set; }
     }
     public class TestableSubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISubscribeContext
     {
@@ -353,7 +339,7 @@ namespace NServiceBus.Testing
     public class TestableTransportReceiveContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ITransportReceiveContext
     {
         public TestableTransportReceiveContext() { }
-        public NServiceBus.Transports.IncomingMessage Message { get; set; }
+        public NServiceBus.Transport.IncomingMessage Message { get; set; }
         public bool ReceiveOperationAborted { get; set; }
         public virtual void AbortReceiveOperation() { }
     }

@@ -35,7 +35,7 @@
 
             if (prop != null)
             {
-                sagaData = Activator.CreateInstance(prop.PropertyType) as IContainSagaData;
+                sagaData = (IContainSagaData)Activator.CreateInstance(prop.PropertyType);
                 sagaData.Id = sagaId;
             }
 
@@ -94,8 +94,9 @@
         /// </summary>
         [ObsoleteEx(
             Message = "Test initialization is no longer required and can be removed.",
-            RemoveInVersion = "7", 
+            RemoveInVersion = "7",
             TreatAsErrorFromVersion = "6")]
+        // ReSharper disable once UnusedParameter.Global
         public static void Initialize(Action<EndpointConfiguration> customisations = null)
         {
             throw new NotImplementedException();

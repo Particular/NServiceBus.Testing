@@ -8,7 +8,7 @@
     public class ExpectReplyTests
     {
         [Test]
-        public void ShouldPassExpectReplyWhenReypling()
+        public void ShouldPassExpectReplyWhenReplying()
         {
             Test.Handler<ReplyingHandler>()
                 .ExpectReply<MyReply>()
