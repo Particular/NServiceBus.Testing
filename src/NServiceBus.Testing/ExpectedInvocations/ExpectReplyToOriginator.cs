@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Runtime.ExceptionServices;
 
     class ExpectReplyToOriginator<TMessage> : ExpectInvocation
     {
@@ -10,7 +11,7 @@
             this.check = check ?? (m => true);
         }
 
-        public override void Validate(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context, ExceptionDispatchInfo exceptionInfo)
         {
             var repliedMessages = context.RepliedMessages
                 .Containing<TMessage>()

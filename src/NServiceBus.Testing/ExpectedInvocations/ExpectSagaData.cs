@@ -1,6 +1,7 @@
 namespace NServiceBus.Testing
 {
     using System;
+    using System.Runtime.ExceptionServices;
 
     class ExpectSagaData<TSagaData> : ExpectInvocation where TSagaData : IContainSagaData
     {
@@ -13,7 +14,7 @@ namespace NServiceBus.Testing
             this.check = check;
         }
 
-        public override void Validate(TestableMessageHandlerContext context)
+        public override void Validate(TestableMessageHandlerContext context, ExceptionDispatchInfo exceptionInfo)
         {
             if (!check((TSagaData)saga.Entity))
             {

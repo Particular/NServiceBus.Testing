@@ -2,6 +2,7 @@
 {
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Runtime.ExceptionServices;
     using System.Threading.Tasks;
 
     class TestingContext : TestableMessageHandlerContext
@@ -37,11 +38,11 @@
             return base.Send(message, options);
         }
 
-        public void Validate()
+        public void Validate(ExceptionDispatchInfo info = null)
         {
             foreach (var e in expectedInvocations)
             {
-                e.Validate(this);
+                e.Validate(this, info);
             }
         }
 

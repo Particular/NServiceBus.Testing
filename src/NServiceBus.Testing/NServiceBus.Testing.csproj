@@ -103,11 +103,13 @@
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0\TextWriterLogger.cs" />
     <Compile Include="App_Packages\NSB.Testing.Fakes.6.0.0\Unsubscription.cs" />
     <Compile Include="ExpectationException.cs" />
+    <Compile Include="ExpectedInvocations\ExpectFail.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotDoNotDeliverBefore.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotDelayDeliveryWith.cs" />
     <Compile Include="ExpectedInvocations\ExpectDoNotContinueDispatching.cs" />
     <Compile Include="ExpectedInvocations\ExpectDoNotDeliverBefore.cs" />
     <Compile Include="ExpectedInvocations\ExpectHandleCurrentMessageLater.cs" />
+    <Compile Include="ExpectedInvocations\ExpectNotFail.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotForwardCurrentMessageTo.cs" />
     <Compile Include="ExpectedInvocations\ExpectForwardCurrentMessageTo.cs" />
     <Compile Include="ExpectedInvocations\ExpectNotPublish.cs" />
