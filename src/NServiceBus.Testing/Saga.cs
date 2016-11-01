@@ -259,9 +259,9 @@
         public Saga<T> WhenHandling<TMessage>(Action<TMessage> initializeMessage = null)
         {
             var message = messageCreator.CreateInstance(initializeMessage);
-            var invoker = saga.GetType().CreateInvoker(typeof(TMessage), typeof(IHandleMessages<>));
+            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleMessages<>));
 
-            return When((s, c) => invoker(saga, message, c));
+            return When((s, c) => invokers.InvokeSerially(saga, message, c));
         }
 
         /// <summary>
@@ -271,9 +271,9 @@
         public Saga<T> WhenHandlingTimeout<TMessage>(Action<TMessage> initializeMessage = null)
         {
             var message = messageCreator.CreateInstance(initializeMessage);
-            var invoker = saga.GetType().CreateInvoker(typeof(TMessage), typeof(IHandleTimeouts<>));
+            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleTimeouts<>));
 
-            return When((s, c) => invoker(saga, message, c));
+            return When((s, c) => invokers.InvokeSerially(saga, message, c));
         }
 
         /// <summary>
@@ -539,8 +539,8 @@
                 .ForEach(t =>
                 {
                     var messageType = messageCreator.GetMappedTypeFor(t.Message.GetType());
-                    var invoker = saga.GetType().CreateInvoker(messageType, typeof(IHandleTimeouts<>));
-                    invoker(saga, t.Message, testContext).GetAwaiter().GetResult();
+                    var invokers = saga.GetType().CreateInvokers(messageType, typeof(IHandleTimeouts<>));
+                    invokers.InvokeSerially(saga, t.Message, testContext).GetAwaiter().GetResult();
                 });
 
             testContext.Validate();
