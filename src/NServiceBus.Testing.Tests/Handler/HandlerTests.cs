@@ -89,6 +89,47 @@ namespace NServiceBus.Testing.Tests.Handler
                 .ExpectSend<Send1>(m => true)
                 .OnMessage<MyCommand>();
         }
+
+        [Test]
+        public void ShouldHandleInterfaceImplementingMessages()
+        {
+            var handler = new InterfaceMessageHandler();
+            Test.Handler(handler)
+                .OnMessage(new InterfaceImplementingMessage());
+
+            Assert.IsTrue(handler.HandlerInvoked);
+        }
+
+        public void ShouldHandleBaseClassImplementingMessages()
+        {
+            var handler = new InterfaceMessageHandler();
+            Test.Handler(handler)
+                .OnMessage(new BaseClassImplementingMessage());
+
+            Assert.IsTrue(handler.HandlerInvoked);
+        }
+
+        [Test]
+        public void ShouldInvokeAllHandlerMethodsWhenHandlingSubclassedMessage()
+        {
+            var handler = new MessageHierarchyHandler();
+            Test.Handler(handler)
+                .OnMessage(new BaseClassImplementingMessage());
+
+            Assert.IsTrue(handler.BaseClassMessageHandlerInvoked);
+            Assert.IsTrue(handler.BaseClassImplementingMessageHandlerInvoked);
+        }
+
+        [Test]
+        public void ShouldOnlyInvokeBaseClassHandlerMethofWhenHandlingBaseClassMessage()
+        {
+            var handler = new MessageHierarchyHandler();
+            Test.Handler(handler)
+                .OnMessage(new BaseClassMessage());
+
+            Assert.IsTrue(handler.BaseClassMessageHandlerInvoked);
+            Assert.IsFalse(handler.BaseClassImplementingMessageHandlerInvoked);
+        }
     }
 
     class MyCommand : ICommand
@@ -226,5 +267,67 @@ namespace NServiceBus.Testing.Tests.Handler
 
             return Task.FromResult(0);
         }
+    }
+
+    public class InterfaceMessageHandler : IHandleMessages<IMessageInterface>
+    {
+        public bool HandlerInvoked { get; private set; }
+
+        public Task Handle(IMessageInterface message, IMessageHandlerContext context)
+        {
+            HandlerInvoked = true;
+
+            return Task.FromResult(0);
+        }
+    }
+
+    public interface IMessageInterface : IMessage
+    {
+    }
+
+    public class InterfaceImplementingMessage : IMessageInterface
+    {
+    }
+
+    public class BaseClassMessageHandler : IHandleMessages<BaseClassMessage>
+    {
+        public bool HandlerInvoked { get; private set; }
+
+        public Task Handle(BaseClassMessage message, IMessageHandlerContext context)
+        {
+            HandlerInvoked = true;
+
+            return Task.FromResult(0);
+        }
+    }
+
+    public class MessageHierarchyHandler :
+        IHandleMessages<BaseClassMessage>,
+        IHandleMessages<BaseClassImplementingMessage>
+    {
+        public bool BaseClassMessageHandlerInvoked { get; private set; }
+        public bool BaseClassImplementingMessageHandlerInvoked { get; private set; }
+
+        public Task Handle(BaseClassMessage message, IMessageHandlerContext context)
+        {
+            BaseClassMessageHandlerInvoked = true;
+
+            return Task.FromResult(0);
+        }
+
+        public Task Handle(BaseClassImplementingMessage message, IMessageHandlerContext context)
+        {
+            BaseClassImplementingMessageHandlerInvoked = true;
+
+            return Task.FromResult(0);
+        }
+    }
+
+    public class BaseClassMessage : IMessage
+    {
+    }
+
+    public class BaseClassImplementingMessage : BaseClassMessage
+    {
     }
 }
