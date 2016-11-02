@@ -41,7 +41,7 @@
          {
             foreach (var invocation in invokers)
             {
-                await invocation(instance, message, context);
+                await invocation(instance, message, context).ConfigureAwait(false);
             }
         }
      }
