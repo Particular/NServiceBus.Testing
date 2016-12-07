@@ -96,6 +96,47 @@
             Assert.AreEqual(replyToAddress, receivedContextInstance.ReplyToAddress);
             Assert.AreSame(receivedContextInstance, configuredContextInstance);
         }
+
+        [Test]
+        public void ShouldInvokeAllHandlerMethodsWhenHandlingSubclassedMessage()
+        {
+            var saga = new MessageHierarchySaga();
+            Test.Saga(saga)
+                .WhenHandling<BaseClassImplementingMessage>();
+
+            Assert.IsTrue(saga.BaseClassMessageHandlerInvoked);
+            Assert.IsTrue(saga.BaseClassImplementingMessageHandlerInvoked);
+        }
+
+        [Test]
+        public void ShouldOnlyInvokeBaseClassHandlerMethofWhenHandlingBaseClassMessage()
+        {
+            var saga = new MessageHierarchySaga();
+            Test.Saga(saga)
+                .WhenHandling<BaseClassMessage>();
+
+            Assert.IsTrue(saga.BaseClassMessageHandlerInvoked);
+            Assert.IsFalse(saga.BaseClassImplementingMessageHandlerInvoked);
+        }
+
+        [Test]
+        public void ShouldInvokeBaseClassHandlerForSubclassedMessages()
+        {
+            var handlerInvoked = false;
+            var saga = new CustomSaga<IMessageInterface, MySagaData>
+            {
+                HandlerAction = (request, context, data) =>
+                {
+                    handlerInvoked = true;
+                    return Task.FromResult(0);
+                }
+            };
+
+            Test.Saga(saga)
+                .WhenHandling<InterfaceImplementingMessage>();
+
+            Assert.IsTrue(handlerInvoked);
+        }
     }
 
     public class MyRequest
@@ -193,5 +234,48 @@
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TSagaData> mapper)
         {
         }
+    }
+
+    public class MessageHierarchySaga :
+        NServiceBus.Saga<MySagaData>,
+        IAmStartedByMessages<BaseClassMessage>,
+        IAmStartedByMessages<BaseClassImplementingMessage>
+    {
+        public bool BaseClassMessageHandlerInvoked { get; private set; }
+        public bool BaseClassImplementingMessageHandlerInvoked { get; private set; }
+
+        public Task Handle(BaseClassMessage message, IMessageHandlerContext context)
+        {
+            BaseClassMessageHandlerInvoked = true;
+
+            return Task.FromResult(0);
+        }
+
+        public Task Handle(BaseClassImplementingMessage message, IMessageHandlerContext context)
+        {
+            BaseClassImplementingMessageHandlerInvoked = true;
+
+            return Task.FromResult(0);
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
+        {
+        }
+    }
+
+    public class BaseClassMessage : IMessage
+    {
+    }
+
+    public class BaseClassImplementingMessage : BaseClassMessage
+    {
+    }
+
+    public interface IMessageInterface : IMessage
+    {
+    }
+
+    public class InterfaceImplementingMessage : IMessageInterface
+    {
     }
 }

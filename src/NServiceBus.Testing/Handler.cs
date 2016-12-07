@@ -301,13 +301,10 @@
         public void OnMessage<TMessage>(TMessage initializedMessage)
         {
             var messageType = messageCreator.GetMappedTypeFor(initializedMessage.GetType());
-            var handleMethod = handler.GetType().CreateInvoker(messageType, typeof(IHandleMessages<>));
-            if (handleMethod == null)
-            {
-                return;
-            }
+            var handleMethods = handler.GetType().CreateInvokers(messageType, typeof(IHandleMessages<>));
 
-            handleMethod(handler, initializedMessage, testableMessageHandlerContext).GetAwaiter().GetResult();
+            handleMethods.InvokeSerially(handler, initializedMessage, testableMessageHandlerContext).GetAwaiter().GetResult();
+
             testableMessageHandlerContext.Validate();
         }
 
