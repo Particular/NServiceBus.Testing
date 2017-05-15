@@ -19,7 +19,7 @@
 
             if (sentMessages.Any(s => check(s.Message, s.Options.GetDeliveryDelay().Value)))
             {
-                Fail($"Expected no message of type {typeof(TMessage).Name} to be deferred but a message matching your constraints was deferred.");
+                Fail($"Expected no message of type {typeof(TMessage).Name} to be deferred, but a message matching your constraints was deferred.");
             }
         }
 
