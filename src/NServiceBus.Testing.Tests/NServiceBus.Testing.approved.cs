@@ -1,8 +1,10 @@
 ﻿[assembly: System.CLSCompliantAttribute(true)]
 [assembly: System.Runtime.InteropServices.ComVisibleAttribute(false)]
 [assembly: System.Runtime.Versioning.TargetFrameworkAttribute(".NETFramework,Version=v4.5.2", FrameworkDisplayName=".NET Framework 4.5.2")]
+
 namespace NServiceBus.Testing
 {
+    
     public class ExpectationException : System.Exception
     {
         public ExpectationException() { }
@@ -26,6 +28,7 @@ namespace NServiceBus.Testing
         public virtual void Release(object instance) { }
     }
     public class Handler<T>
+    
     {
         public NServiceBus.Testing.Handler<T> ConfigureHandlerContext(System.Action<NServiceBus.Testing.TestableMessageHandlerContext> contextInitializer) { }
         public NServiceBus.Testing.Handler<T> ExpectDefer<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check) { }
@@ -67,6 +70,7 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Handler<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
     }
     public class OutgoingMessage<TMessage, TOptions>
+    
         where TOptions : NServiceBus.Extensibility.ExtendableOptions
     {
         protected OutgoingMessage(TMessage message, TOptions options) { }
@@ -86,10 +90,12 @@ namespace NServiceBus.Testing
             where TMessage :  class { }
     }
     public class PublishedMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.PublishOptions>
+    
     {
         public PublishedMessage(TMessage message, NServiceBus.PublishOptions options) { }
     }
     public class RepliedMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.ReplyOptions>
+    
     {
         public RepliedMessage(TMessage message, NServiceBus.ReplyOptions options) { }
     }
@@ -154,6 +160,7 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Saga<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
     }
     public class SentMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.SendOptions>
+    
     {
         public SentMessage(TMessage message, NServiceBus.SendOptions options) { }
     }
@@ -356,6 +363,7 @@ namespace NServiceBus.Testing
         public void WriteTo(System.IO.TextWriter writer) { }
     }
     public class TimeoutMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.SendOptions>
+    
     {
         public TimeoutMessage(TMessage message, NServiceBus.SendOptions options, System.TimeSpan within) { }
         public TimeoutMessage(TMessage message, NServiceBus.SendOptions options, System.DateTimeOffset at) { }
