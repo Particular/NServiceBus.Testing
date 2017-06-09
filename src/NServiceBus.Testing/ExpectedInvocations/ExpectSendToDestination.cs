@@ -1,3 +1,4 @@
+#pragma warning disable 618
 namespace NServiceBus.Testing
 {
     using System;

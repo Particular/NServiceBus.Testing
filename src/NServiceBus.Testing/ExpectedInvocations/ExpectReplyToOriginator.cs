@@ -1,4 +1,5 @@
-﻿namespace NServiceBus.Testing
+﻿#pragma warning disable 618
+namespace NServiceBus.Testing
 {
     using System;
     using System.Linq;
