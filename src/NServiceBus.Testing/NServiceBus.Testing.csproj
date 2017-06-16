@@ -1,28 +1,26 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
-    <AssemblyName>NServiceBus.Testing</AssemblyName>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Company>NServiceBus Ltd</Company>
+    <Product>NServiceBus.Testing</Product>
+    <Copyright>Copyright 2010-2017 NServiceBus. All rights reserved</Copyright>
+    <Description>A testing framework for NServiceBus</Description>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <DebugType>full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <OutputPath>..\..\binaries\</OutputPath>
-    <NoWarn>CS0419</NoWarn>
-    <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+
   <ItemGroup>
-    <None Include="..\..\GitVersion.yml" Link="GitVersion.yml" />
-    <None Include="..\..\packaging\nuget\nservicebus.testing.nuspec" Link="nservicebus.testing.nuspec" />
+    <PackageReference Include="Fody" Version="2.1.0" PrivateAssets="All" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" PrivateAssets="All" />
     <PackageReference Include="NServiceBus" Version="6.3.4" />
-    <PackageReference Include="Particular.CodeRules" Version="0.2.0" />
-    <PackageReference Include="NuGetPackager" Version="0.6.3" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" />
-    <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="6.3.4" />
-    <PackageReference Include="Fody" Version="2.1.0" />
-    <PackageReference Include="Obsolete.Fody" Version="4.2.2" />
+    <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="6.3.4" PrivateAssets="All" />
+    <PackageReference Include="NuGetPackager" Version="0.6.3" PrivateAssets="All" />
+    <PackageReference Include="Obsolete.Fody" Version="4.2.2" PrivateAssets="All" />
+    <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
   </ItemGroup>
+
 </Project>

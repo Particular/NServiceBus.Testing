@@ -2,7 +2,7 @@
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>NServiceBus.Testing</id>
-    <title>NServiceBus Testing</title>
+    <title>NServiceBus.Testing</title>
     <version>$version$</version>
     <authors>$authors$</authors>
     <owners>$owners$</owners>
@@ -10,7 +10,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <iconUrl>$iconUrl$</iconUrl>
     <requireLicenseAcceptance>$requireLicenseAcceptance$</requireLicenseAcceptance>
-    <description>The testing for the NServiceBus</description>
+    <description>A testing framework for NServiceBus</description>
     <releaseNotes></releaseNotes>
     <copyright>$copyright$</copyright>
     <tags>$tags$</tags>
