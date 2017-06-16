@@ -118,7 +118,7 @@
         /// <param name="check">An action containing assertions on the message.</param>
         public Saga<T> ExpectNotSend<TMessage>(Action<TMessage> check)
         {
-            return ExpectSend(CheckActionToFunc(check));
+            return ExpectNotSend(CheckActionToFunc(check));
         }
 
         /// <summary>
