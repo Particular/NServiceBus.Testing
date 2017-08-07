@@ -14,7 +14,7 @@
         {
             var repliedMessages = context.RepliedMessages
                 .Containing<TMessage>()
-                .Where(i => !string.IsNullOrWhiteSpace(i.Options.GetDestination()))
+                .Where(i => i.Options.GetDestination() == SagaConsts.Originator)
                 .ToList();
 
             if (!repliedMessages.Any(i => check(i.Message)))

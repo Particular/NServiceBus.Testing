@@ -6,6 +6,11 @@
     using System.Threading.Tasks;
     using MessageInterfaces.MessageMapper.Reflection;
 
+    internal static class SagaConsts
+    {
+        public const string Originator = "NServiceBus.Testing.SagaOriginator";
+    }
+
     /// <summary>
     /// Saga unit testing framework.
     /// </summary>
@@ -29,7 +34,7 @@
             }
 
             saga.Entity.OriginalMessageId = Guid.NewGuid().ToString();
-            saga.Entity.Originator = "client";
+            saga.Entity.Originator = SagaConsts.Originator;
         }
 
         /// <summary>
@@ -479,7 +484,6 @@
         {
             return ExpectNotSendToDestination(CheckActionToFunc(check));
         }
-
 
         /// <summary>
         /// Check that the saga does not send the given message type to the given destination.
