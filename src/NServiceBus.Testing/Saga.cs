@@ -512,32 +512,6 @@
             return this;
         }
 
-        /// <summary>
-        /// Uses the given delegate to invoke the saga, checking all the expectations previously set up,
-        /// and then clearing them for continued testing.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            ReplacementTypeOrMember = "When(Action<T, IMessageHandlerContext> sagaIsInvoked)")]
-        public Saga<T> When(Action<T> sagaIsInvoked)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Sets the Id of the incoming message that will be returned
-        /// when code calls Bus.CurrentMessageContext.Id
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            Message = "Set the message ID on the context by using ConfigureHandlerContext")]
-        public Saga<T> SetMessageId(string messageId)
-        {
-            throw new NotImplementedException();
-        }
-
         void InvokeTimeouts(IEnumerable<TimeoutMessage<object>> messages)
         {
             messages
