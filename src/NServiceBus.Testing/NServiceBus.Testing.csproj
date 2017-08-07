@@ -12,7 +12,6 @@
   <PropertyGroup>
     <PackageId>NServiceBus.Testing</PackageId>
     <Description>A testing framework for NServiceBus</Description>
-    <RepositoryUrl>https://github.com/Particular/NServiceBus.Testing</RepositoryUrl>
   </PropertyGroup>
   
   <ItemGroup>
