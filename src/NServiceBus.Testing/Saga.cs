@@ -319,7 +319,8 @@
         /// <param name="after">The amount of time that has passed to simulate.</param>
         public Saga<T> WhenSagaTimesOut(TimeSpan after)
         {
-            InvokeTimeouts(testContext.TimeoutMessages
+            var allTimeouts = testContext.TimeoutMessages.Concat(testContext.previousTimeouts);
+            InvokeTimeouts(allTimeouts
                 .Where(t => t.Within.HasValue)
                 .Where(t => t.Within <= after));
 
@@ -334,7 +335,8 @@
         /// <param name="at">The Date and time to simuluate.</param>
         public Saga<T> WhenSagaTimesOut(DateTime at)
         {
-            InvokeTimeouts(testContext.TimeoutMessages
+            var allTimeouts = testContext.TimeoutMessages.Concat(testContext.previousTimeouts);
+            InvokeTimeouts(allTimeouts
                 .Where(t => t.At.HasValue)
                 .Where(t => t.At <= at));
 
@@ -346,7 +348,8 @@
         /// </summary>
         public Saga<T> WhenSagaTimesOut()
         {
-            InvokeTimeouts(testContext.TimeoutMessages);
+            var allTimeouts = testContext.TimeoutMessages.Concat(testContext.previousTimeouts);
+            InvokeTimeouts(allTimeouts);
 
             return this;
         }
