@@ -1,4 +1,3 @@
-#pragma warning disable 618
 namespace NServiceBus.Testing
 {
     using System;
@@ -16,8 +15,7 @@ namespace NServiceBus.Testing
         public override void Validate(TestableMessageHandlerContext context)
         {
             var sentMessages = context.SentMessages.Containing<TMessage>()
-                .Where(i => string.IsNullOrWhiteSpace(i.Options.GetCorrelationId()) &&
-                    !string.IsNullOrWhiteSpace(i.Options.GetDestination()))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Options.GetDestination()))
                 .ToList();
 
             if (!sentMessages.Any(i => check(i.Message, i.Options.GetDestination())))

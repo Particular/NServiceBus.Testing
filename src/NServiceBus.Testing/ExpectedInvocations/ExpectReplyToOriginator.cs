@@ -1,5 +1,4 @@
-﻿#pragma warning disable 618
-namespace NServiceBus.Testing
+﻿namespace NServiceBus.Testing
 {
     using System;
     using System.Linq;
@@ -15,8 +14,7 @@ namespace NServiceBus.Testing
         {
             var repliedMessages = context.RepliedMessages
                 .Containing<TMessage>()
-                .Where(i => !string.IsNullOrWhiteSpace(i.Options.GetCorrelationId()) &&
-                            !string.IsNullOrWhiteSpace(i.Options.GetDestination()))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Options.GetDestination()))
                 .ToList();
 
             if (!repliedMessages.Any(i => check(i.Message)))
