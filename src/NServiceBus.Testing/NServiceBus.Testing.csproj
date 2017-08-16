@@ -12,6 +12,7 @@
   <PropertyGroup>
     <PackageId>NServiceBus.Testing</PackageId>
     <Description>A testing framework for NServiceBus</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   
   <ItemGroup>
