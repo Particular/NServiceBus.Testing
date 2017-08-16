@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Optimize>False</Optimize>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
