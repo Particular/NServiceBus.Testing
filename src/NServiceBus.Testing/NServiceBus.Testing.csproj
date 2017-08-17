@@ -1,11 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
-    <Company>NServiceBus Ltd</Company>
-    <Product>NServiceBus.Testing</Product>
-    <Copyright>Copyright 2010-2017 NServiceBus. All rights reserved</Copyright>
-    <Description>A testing framework for NServiceBus</Description>
+    <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\..\binaries\</OutputPath>
@@ -13,13 +9,18 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>NServiceBus.Testing</PackageId>
+    <Description>A testing framework for NServiceBus</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  
   <ItemGroup>
-    <PackageReference Include="Fody" Version="2.1.0" PrivateAssets="All" />
+    <PackageReference Include="Fody" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" PrivateAssets="All" />
-    <PackageReference Include="NServiceBus" Version="6.3.4" />
-    <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="6.3.4" PrivateAssets="All" />
-    <PackageReference Include="NuGetPackager" Version="0.6.3" PrivateAssets="All" />
-    <PackageReference Include="Obsolete.Fody" Version="4.2.2" PrivateAssets="All" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-alpharelease0051" />
+    <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="7.0.0-alpharelease0051" PrivateAssets="All" />
+    <PackageReference Include="Obsolete.Fody" Version="4.2.4" PrivateAssets="All" />
     <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
   </ItemGroup>
 

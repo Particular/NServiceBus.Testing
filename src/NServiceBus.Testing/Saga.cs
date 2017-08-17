@@ -6,6 +6,11 @@
     using System.Threading.Tasks;
     using MessageInterfaces.MessageMapper.Reflection;
 
+    internal static class SagaConsts
+    {
+        public const string Originator = "NServiceBus.Testing.SagaOriginator";
+    }
+
     /// <summary>
     /// Saga unit testing framework.
     /// </summary>
@@ -29,7 +34,7 @@
             }
 
             saga.Entity.OriginalMessageId = Guid.NewGuid().ToString();
-            saga.Entity.Originator = "client";
+            saga.Entity.Originator = SagaConsts.Originator;
         }
 
         /// <summary>
@@ -286,7 +291,7 @@
             sagaIsInvoked(saga, testContext).GetAwaiter().GetResult();
 
             testContext.Validate();
-            testContext = new TestingContext(messageCreator, testContext.TimeoutMessages);
+            testContext = new TestingContext(messageCreator, testContext.previousTimeouts.Concat(testContext.TimeoutMessages).ToArray());
 
             return this;
         }
@@ -319,7 +324,7 @@
         /// <param name="after">The amount of time that has passed to simulate.</param>
         public Saga<T> WhenSagaTimesOut(TimeSpan after)
         {
-            InvokeTimeouts(testContext.TimeoutMessages
+            InvokeTimeouts(testContext.previousTimeouts
                 .Where(t => t.Within.HasValue)
                 .Where(t => t.Within <= after));
 
@@ -334,7 +339,7 @@
         /// <param name="at">The Date and time to simuluate.</param>
         public Saga<T> WhenSagaTimesOut(DateTime at)
         {
-            InvokeTimeouts(testContext.TimeoutMessages
+            InvokeTimeouts(testContext.previousTimeouts
                 .Where(t => t.At.HasValue)
                 .Where(t => t.At <= at));
 
@@ -346,7 +351,7 @@
         /// </summary>
         public Saga<T> WhenSagaTimesOut()
         {
-            InvokeTimeouts(testContext.TimeoutMessages);
+            InvokeTimeouts(testContext.previousTimeouts);
 
             return this;
         }
@@ -477,7 +482,6 @@
             return ExpectNotSendToDestination(CheckActionToFunc(check));
         }
 
-
         /// <summary>
         /// Check that the saga does not send the given message type to the given destination.
         /// </summary>
@@ -503,32 +507,6 @@
         {
             testContext.AddExpectation(new ExpectSagaData<TSagaData>(saga, check));
             return this;
-        }
-
-        /// <summary>
-        /// Uses the given delegate to invoke the saga, checking all the expectations previously set up,
-        /// and then clearing them for continued testing.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            ReplacementTypeOrMember = "When(Action<T, IMessageHandlerContext> sagaIsInvoked)")]
-        public Saga<T> When(Action<T> sagaIsInvoked)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Sets the Id of the incoming message that will be returned
-        /// when code calls Bus.CurrentMessageContext.Id
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            Message = "Set the message ID on the context by using ConfigureHandlerContext")]
-        public Saga<T> SetMessageId(string messageId)
-        {
-            throw new NotImplementedException();
         }
 
         void InvokeTimeouts(IEnumerable<TimeoutMessage<object>> messages)

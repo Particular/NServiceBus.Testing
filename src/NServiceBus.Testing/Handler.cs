@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Testing
 {
     using System;
-    using System.Collections.Generic;
     using MessageInterfaces.MessageMapper.Reflection;
 
     /// <summary>
@@ -306,43 +305,6 @@
             handleMethods.InvokeSerially(handler, initializedMessage, testableMessageHandlerContext).GetAwaiter().GetResult();
 
             testableMessageHandlerContext.Validate();
-        }
-
-
-        /// <summary>
-        /// Check that the handler uses the bus to return the appropriate error code.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            ReplacementTypeOrMember = "ExpectReply")]
-        public Handler<T> ExpectReturn<TEnum>(Func<TEnum, bool> check)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Check that the handler sends a message of the given type to sites.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            Message = "ExpectSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6.")]
-        public Handler<T> ExpectSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Check that the handler doesn't send a message of the given type to sites.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            Message = "ExpectNotSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6.")]
-        public Handler<T> ExpectNotSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
-        {
-            throw new NotImplementedException();
         }
 
         readonly T handler;
