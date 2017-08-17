@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using ApprovalTests;
 using NUnit.Framework;
@@ -12,7 +14,9 @@ public class APIApprovals
     [MethodImpl(MethodImplOptions.NoInlining)]
     public void Approve()
     {
-        var publicApi = Filter(ApiGenerator.GeneratePublicApi(typeof(NServiceBus.Testing.Test).Assembly));
+        var combine = Path.Combine(TestContext.CurrentContext.TestDirectory, "NServiceBus.Testing.dll");
+        var assembly = Assembly.LoadFile(combine);
+        var publicApi = Filter(ApiGenerator.GeneratePublicApi(assembly));
         Approvals.Verify(publicApi);
 
     }
