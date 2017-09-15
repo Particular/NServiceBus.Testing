@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET452
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -31,3 +32,4 @@ public class APIApprovals
             );
     }
 }
+#endif
