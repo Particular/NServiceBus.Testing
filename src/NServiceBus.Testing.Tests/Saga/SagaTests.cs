@@ -17,8 +17,8 @@
                 .ExpectSend<Command>()
                 .When((s, c) => s.Handle(new StartsSaga(), c))
                 .ExpectPublish<Event>()
-                .WhenHandlingTimeout<StartsSaga>()
-                .AssertSagaCompletionIs(true);
+                .ExpectSagaCompleted()
+                .WhenHandlingTimeout<StartsSaga>();
         }
 
         [Test]
@@ -222,7 +222,7 @@
     {
     }
 
-    public class CustomSaga<TMessage, TSagaData> : NServiceBus.Saga<TSagaData>, IHandleMessages<TMessage> where TSagaData : IContainSagaData, new()
+    public class CustomSaga<TMessage, TSagaData> : NServiceBus.Saga<TSagaData>, IHandleMessages<TMessage> where TSagaData : class, IContainSagaData, new()
     {
         public Func<TMessage, IMessageHandlerContext, TSagaData, Task> HandlerAction { get; set; }
 

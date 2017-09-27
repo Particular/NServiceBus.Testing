@@ -14,7 +14,7 @@
     /// <summary>
     /// Saga unit testing framework.
     /// </summary>
-    public class Saga<T> where T : Saga
+    public partial class Saga<T> where T : Saga
     {
         internal Saga(T saga)
         {
@@ -357,22 +357,23 @@
         }
 
         /// <summary>
-        /// Asserts that the saga is either complete or not.
+        /// Verifies that the saga has been completed.
         /// </summary>
-        public Saga<T> AssertSagaCompletionIs(bool complete)
+        public Saga<T> ExpectSagaCompleted()
         {
-            if (saga.Completed == complete)
-            {
-                return this;
-            }
-
-            if (saga.Completed)
-            {
-                throw new Exception("Assert failed. Saga has been completed.");
-            }
-
-            throw new Exception("Assert failed. Saga has not been completed.");
+            testContext.AddExpectation(new ExpectSagaCompleted<T>(saga, true));
+            return this;
         }
+
+        /// <summary>
+        /// Verifies that the saga has not been completed.
+        /// </summary>
+        /// <returns></returns>
+        public Saga<T> ExpectSagaNotCompleted()
+        {
+            testContext.AddExpectation(new ExpectSagaCompleted<T>(saga, false));
+            return this;
+        }      
 
         /// <summary>
         /// Verifies that the saga is setting the specified timeout

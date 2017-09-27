@@ -89,6 +89,8 @@ namespace NServiceBus.Testing
     public class Saga<T>
         where T : NServiceBus.Saga
     {
+        [System.ObsoleteAttribute("Use \'ExpectSagaCompleted\' or \'ExpectSagaNotCompleted\' instead. The member current" +
+            "ly throws a NotImplementedException. Will be removed in version 8.0.0.", true)]
         public NServiceBus.Testing.Saga<T> AssertSagaCompletionIs(bool complete) { }
         public NServiceBus.Testing.Saga<T> ConfigureHandlerContext(System.Action<NServiceBus.Testing.TestableMessageHandlerContext> contextInitializer) { }
         public NServiceBus.Testing.Saga<T> ExpectForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
@@ -115,8 +117,10 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Saga<T> ExpectReply<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Saga<T> ExpectReplyToOriginator<TMessage>(System.Func<TMessage, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectReplyToOriginator<TMessage>(System.Action<TMessage> check) { }
+        public NServiceBus.Testing.Saga<T> ExpectSagaCompleted() { }
         public NServiceBus.Testing.Saga<T> ExpectSagaData<TSagaData>(System.Func<TSagaData, bool> check)
             where TSagaData : NServiceBus.IContainSagaData { }
+        public NServiceBus.Testing.Saga<T> ExpectSagaNotCompleted() { }
         public NServiceBus.Testing.Saga<T> ExpectSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectSend<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Saga<T> ExpectSend<TMessage>(System.Action<TMessage> check) { }
