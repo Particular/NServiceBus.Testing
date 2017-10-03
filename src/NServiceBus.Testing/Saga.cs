@@ -249,15 +249,6 @@
         }
 
         /// <summary>
-        /// Check that the saga tells the bus to handle the current message later.
-        /// </summary>
-        public Saga<T> ExpectHandleCurrentMessageLater()
-        {
-            testContext.AddExpectation(new ExpectHandleCurrentMessageLater());
-            return this;
-        }
-
-        /// <summary>
         /// Initializes the given message type and checks all the expectations previously set up,
         /// and then clears them for continued testing.
         /// </summary>

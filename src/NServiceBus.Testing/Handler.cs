@@ -6,7 +6,7 @@
     /// <summary>
     /// Message handler unit testing framework.
     /// </summary>
-    public class Handler<T>
+    public partial class Handler<T>
     {
         /// <summary>
         /// Creates a new instance of the handler tester.
@@ -178,14 +178,6 @@
             return this;
         }
 
-        /// <summary>
-        /// Check that the handler tells the bus to handle the current message later.
-        /// </summary>
-        public Handler<T> ExpectHandleCurrentMessageLater()
-        {
-            testableMessageHandlerContext.AddExpectation(new ExpectHandleCurrentMessageLater());
-            return this;
-        }
 
         /// <summary>
         /// Check that the handler defers a message of the given type.
