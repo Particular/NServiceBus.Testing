@@ -32,6 +32,7 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Handler<T> ExpectDefer<TMessage>(System.Func<TMessage, System.DateTime, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectDoNotContinueDispatchingCurrentMessageToHandlers() { }
         public NServiceBus.Testing.Handler<T> ExpectForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
+        [System.ObsoleteAttribute("HandleCurrentMessageLater has been deprecated. Will be removed in version 8.0.0.", true)]
         public NServiceBus.Testing.Handler<T> ExpectHandleCurrentMessageLater() { }
         public NServiceBus.Testing.Handler<T> ExpectNotDefer<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check) { }
         public NServiceBus.Testing.Handler<T> ExpectNotDefer<TMessage>(System.Func<TMessage, System.DateTime, bool> check) { }
@@ -94,6 +95,7 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Saga<T> AssertSagaCompletionIs(bool complete) { }
         public NServiceBus.Testing.Saga<T> ConfigureHandlerContext(System.Action<NServiceBus.Testing.TestableMessageHandlerContext> contextInitializer) { }
         public NServiceBus.Testing.Saga<T> ExpectForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
+        [System.ObsoleteAttribute("HandleCurrentMessageLater has been deprecated. Will be removed in version 8.0.0.", true)]
         public NServiceBus.Testing.Saga<T> ExpectHandleCurrentMessageLater() { }
         public NServiceBus.Testing.Saga<T> ExpectNotForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectNoTimeoutToBeSetAt<TMessage>(System.Func<TMessage, System.DateTime, bool> check = null) { }
@@ -230,7 +232,7 @@ namespace NServiceBus.Testing
     {
         public TestableInvokeHandlerContext(NServiceBus.IMessageCreator messageCreator = null) { }
         public bool DoNotContinueDispatchingCurrentMessageToHandlersWasCalled { get; set; }
-        public bool HandleCurrentMessageLaterWasCalled { get; set; }
+        public bool HandleCurrentMessageLaterWasCalled { get; }
         public bool HandlerInvocationAborted { get; }
         public System.Collections.Generic.Dictionary<string, string> Headers { get; set; }
         public object MessageBeingHandled { get; set; }
@@ -238,7 +240,7 @@ namespace NServiceBus.Testing
         public NServiceBus.Unicast.Messages.MessageMetadata MessageMetadata { get; set; }
         public NServiceBus.Persistence.SynchronizedStorageSession SynchronizedStorageSession { get; set; }
         public void DoNotContinueDispatchingCurrentMessageToHandlers() { }
-        public virtual System.Threading.Tasks.Task HandleCurrentMessageLater() { }
+        public System.Threading.Tasks.Task HandleCurrentMessageLater() { }
     }
     public class TestableMessageHandlerContext : NServiceBus.Testing.TestableInvokeHandlerContext
     {

@@ -7,12 +7,12 @@
     <OutputPath>..\..\binaries\</OutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- can be removed again once TestableInvokeHandlerContext doesn't have a public property without docs anymore -->
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>NServiceBus.Testing</PackageId>
     <Description>A testing framework for NServiceBus</Description>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   
   <ItemGroup>
@@ -21,6 +21,7 @@
     <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="7.0.0-*" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
     <PackageReference Include="Particular.CodeRules" Version="0.*" PrivateAssets="All" />
+    <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
