@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-beta0008" />
     <PackageReference Include="ApprovalTests" Version="3.0.13" NoWarn="NU1701" />
     <PackageReference Include="ApprovalUtilities" Version="3.0.13" NoWarn="NU1701" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />

@@ -7,8 +7,6 @@
     <OutputPath>..\..\binaries\</OutputPath>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <!-- can be removed again once TestableInvokeHandlerContext doesn't have a public property without docs anymore -->
-    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -17,8 +15,8 @@
   
   <ItemGroup>
     <PackageReference Include="Fody" Version="2.*" PrivateAssets="All" />
-    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
-    <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="7.0.0-*" PrivateAssets="All" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-beta0008" />
+    <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="7.0.0-beta0008" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
     <PackageReference Include="Particular.CodeRules" Version="0.*" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
