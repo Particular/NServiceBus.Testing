@@ -18,7 +18,7 @@
     <PackageReference Include="NServiceBus" Version="7.0.0-beta0008" />
     <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="7.0.0-beta0008" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
-    <PackageReference Include="Particular.CodeRules" Version="0.*" PrivateAssets="All" />
+    <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
   </ItemGroup>
 
