@@ -5,16 +5,12 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\..\binaries\</OutputPath>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <Description>A testing framework for NServiceBus</Description>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Fody" Version="2.1.3" PrivateAssets="All" />
-    <PackageReference Include="NServiceBus" Version="7.0.0-beta0008" />
+    <PackageReference Include="NServiceBus" Version="[7.0.0-beta0008, 8)" />
     <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="7.0.0-beta0008" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.3.2" PrivateAssets="All" />
     <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />

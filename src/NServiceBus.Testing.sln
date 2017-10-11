@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.0
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 15.0.26430.12
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.Testing", "NServiceBus.Testing\NServiceBus.Testing.csproj", "{8B815173-9AFA-4D95-BAB4-686C298F17DA}"
 EndProject
@@ -9,6 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.Testing.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B483C1D9-DDB1-484B-A1AC-2CFB6C8993F3}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
 		..\GitVersion.yml = ..\GitVersion.yml
 	EndProjectSection
 EndProject
