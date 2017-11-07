@@ -255,8 +255,15 @@
         public Saga<T> WhenHandling<TMessage>(Action<TMessage> initializeMessage = null)
         {
             var message = messageCreator.CreateInstance(initializeMessage);
-            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleMessages<>));
+            return WhenHandling(message);
+        }
 
+        /// <summary>
+        /// Checks all the expectations previously set up, and then clears them for continued testing.
+        /// </summary>
+        public Saga<T> WhenHandling<TMessage>(TMessage message)
+        {
+            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleMessages<>));
             return When((s, c) => invokers.InvokeSerially(saga, message, c));
         }
 
@@ -267,8 +274,15 @@
         public Saga<T> WhenHandlingTimeout<TMessage>(Action<TMessage> initializeMessage = null)
         {
             var message = messageCreator.CreateInstance(initializeMessage);
-            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleTimeouts<>));
+            return WhenHandlingTimeout(message);
+        }
 
+        /// <summary>
+        /// Checks all the expectations previously set up, and then clears them for continued testing.
+        /// </summary>
+        public Saga<T> WhenHandlingTimeout<TMessage>(TMessage message)
+        {
+            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleTimeouts<>));
             return When((s, c) => invokers.InvokeSerially(saga, message, c));
         }
 

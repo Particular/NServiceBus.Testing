@@ -139,7 +139,9 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, TMessage message) { }
         public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, System.Action<TMessage> messageInitializer = null) { }
         public NServiceBus.Testing.Saga<T> WhenHandling<TMessage>(System.Action<TMessage> initializeMessage = null) { }
+        public NServiceBus.Testing.Saga<T> WhenHandling<TMessage>(TMessage message) { }
         public NServiceBus.Testing.Saga<T> WhenHandlingTimeout<TMessage>(System.Action<TMessage> initializeMessage = null) { }
+        public NServiceBus.Testing.Saga<T> WhenHandlingTimeout<TMessage>(TMessage message) { }
         public NServiceBus.Testing.Saga<T> WhenReceivesMessageFrom(string client) { }
         public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.TimeSpan after) { }
         public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.DateTime at) { }
