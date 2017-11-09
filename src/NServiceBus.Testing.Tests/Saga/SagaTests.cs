@@ -15,7 +15,7 @@
                 .ExpectTimeoutToBeSetIn<StartsSaga>((state, span) => span == TimeSpan.FromDays(7))
                 .ExpectPublish<Event>()
                 .ExpectSend<Command>()
-                .When((s, c) => s.Handle(new StartsSaga(), c))
+                .WhenHandling(new StartsSaga())
                 .ExpectPublish<Event>()
                 .ExpectSagaCompleted()
                 .WhenHandlingTimeout<StartsSaga>();
@@ -26,7 +26,7 @@
         {
             Test.Saga<MySaga>()
                 .ExpectTimeoutToBeSetIn<StartsSaga>((state, span) => span == TimeSpan.FromDays(7))
-                .When((s, c) => s.Handle(new StartsSaga(), c));
+                .WhenHandling(new StartsSaga());
         }
 
         [Test]
@@ -63,7 +63,7 @@
 
             Test.Saga(saga)
                 .SetIncomingHeader(customHeaderKey, expectedHeaderValue)
-                .When((s, c) => s.Handle(new MyRequest(), c));
+                .WhenHandling(new MyRequest());
 
             Assert.IsTrue(containsCustomHeader);
             Assert.AreEqual(expectedHeaderValue, receivedHeaderValue);
