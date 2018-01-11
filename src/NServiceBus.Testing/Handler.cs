@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Testing
+namespace NServiceBus.Testing
 {
     using System;
     using MessageInterfaces.MessageMapper.Reflection;
@@ -191,7 +191,7 @@
         /// <summary>
         /// Check that the handler defers a message of the given type.
         /// </summary>
-        public Handler<T> ExpectDefer<TMessage>(Func<TMessage, DateTime, bool> check)
+        public Handler<T> ExpectDefer<TMessage>(Func<TMessage, DateTimeOffset, bool> check)
         {
             testableMessageHandlerContext.AddExpectation(new ExpectDoNotDeliverBefore<TMessage>(check));
             return this;
@@ -209,7 +209,7 @@
         /// <summary>
         /// Check that the handler doesn't defer a message of the given type.
         /// </summary>
-        public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, DateTime, bool> check)
+        public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, DateTimeOffset, bool> check)
         {
             testableMessageHandlerContext.AddExpectation(new ExpectNotDoNotDeliverBefore<TMessage>(check));
             return this;

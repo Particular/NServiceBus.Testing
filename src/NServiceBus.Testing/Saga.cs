@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Testing
+namespace NServiceBus.Testing
 {
     using System;
     using System.Collections.Generic;
@@ -409,7 +409,7 @@
         /// <summary>
         /// Verifies that the saga is setting the specified timeout
         /// </summary>
-        public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
+        public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTimeOffset, bool> check = null)
         {
             testContext.AddExpectation(new ExpectDoNotDeliverBefore<TMessage>(check));
             return this;
@@ -418,7 +418,7 @@
         /// <summary>
         /// Verifies that the saga is setting the specified timeout
         /// </summary>
-        public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Action<TMessage, DateTime> check)
+        public Saga<T> ExpectTimeoutToBeSetAt<TMessage>(Action<TMessage, DateTimeOffset> check)
         {
             return ExpectTimeoutToBeSetAt(CheckActionToFunc(check));
         }
@@ -426,7 +426,7 @@
         /// <summary>
         /// Verifies that the saga is not setting the specified timeout
         /// </summary>
-        public Saga<T> ExpectNoTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTime, bool> check = null)
+        public Saga<T> ExpectNoTimeoutToBeSetAt<TMessage>(Func<TMessage, DateTimeOffset, bool> check = null)
         {
             testContext.AddExpectation(new ExpectNotDoNotDeliverBefore<TMessage>(check));
             return this;
