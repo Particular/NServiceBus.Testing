@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Testing.Tests.Handler
+namespace NServiceBus.Testing.Tests.Handler
 {
     using System;
     using System.Threading.Tasks;
@@ -21,6 +21,16 @@
         public void ShouldAssertDeferWasCalledWithDateTime()
         {
             var datetime = DateTime.UtcNow;
+            Test.Handler<DeferringDateTimeHandler>()
+                .WithExternalDependencies(h => h.Defer = datetime)
+                .ExpectDefer<TestMessage>((m, t) => t == datetime)
+                .OnMessage<TestMessage>();
+        }
+
+        [Test]
+        public void ShouldAssertDeferWasCalledWithLocalDateTime()
+        {
+            var datetime = DateTime.Now;
             Test.Handler<DeferringDateTimeHandler>()
                 .WithExternalDependencies(h => h.Defer = datetime)
                 .ExpectDefer<TestMessage>((m, t) => t == datetime)

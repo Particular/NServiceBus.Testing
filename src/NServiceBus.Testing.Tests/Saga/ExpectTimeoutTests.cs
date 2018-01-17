@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Testing.Tests.Saga
+namespace NServiceBus.Testing.Tests.Saga
 {
     using System;
     using System.Threading.Tasks;
@@ -40,6 +40,20 @@
         public void TimeoutInTheFuture()
         {
             var expected = DateTime.UtcNow.AddDays(3);
+            var message = new TheMessage
+            {
+                TimeoutAt = expected
+            };
+
+            Test.Saga<TimeoutSaga>()
+                .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => at == expected)
+                .When((s, c) => s.Handle(message, c));
+        }
+
+        [Test]
+        public void TimeoutInLocalTimeInTheFuture()
+        {
+            var expected = DateTime.Now.AddDays(3);
             var message = new TheMessage
             {
                 TimeoutAt = expected
