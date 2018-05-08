@@ -10,8 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="Fody" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="NServiceBus" Version="[7.0.0-rc0001, 8.0.0)" />
-    <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="7.0.0-rc0001" PrivateAssets="All" />
+    <PackageReference Include="NServiceBus" Version="[7.0.0, 8.0.0)" />
+    <PackageReference Include="NServiceBus.Testing.Fakes.Sources" Version="7.0.0" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.3.2" PrivateAssets="All" />
     <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
