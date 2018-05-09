@@ -1,13 +1,12 @@
-﻿namespace NServiceBus.Testing
+namespace NServiceBus.Testing
 {
     using System;
-    using System.Collections.Generic;
     using MessageInterfaces.MessageMapper.Reflection;
 
     /// <summary>
     /// Message handler unit testing framework.
     /// </summary>
-    public class Handler<T>
+    public partial class Handler<T>
     {
         /// <summary>
         /// Creates a new instance of the handler tester.
@@ -179,14 +178,6 @@
             return this;
         }
 
-        /// <summary>
-        /// Check that the handler tells the bus to handle the current message later.
-        /// </summary>
-        public Handler<T> ExpectHandleCurrentMessageLater()
-        {
-            testableMessageHandlerContext.AddExpectation(new ExpectHandleCurrentMessageLater());
-            return this;
-        }
 
         /// <summary>
         /// Check that the handler defers a message of the given type.
@@ -200,7 +191,7 @@
         /// <summary>
         /// Check that the handler defers a message of the given type.
         /// </summary>
-        public Handler<T> ExpectDefer<TMessage>(Func<TMessage, DateTime, bool> check)
+        public Handler<T> ExpectDefer<TMessage>(Func<TMessage, DateTimeOffset, bool> check)
         {
             testableMessageHandlerContext.AddExpectation(new ExpectDoNotDeliverBefore<TMessage>(check));
             return this;
@@ -218,7 +209,7 @@
         /// <summary>
         /// Check that the handler doesn't defer a message of the given type.
         /// </summary>
-        public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, DateTime, bool> check)
+        public Handler<T> ExpectNotDefer<TMessage>(Func<TMessage, DateTimeOffset, bool> check)
         {
             testableMessageHandlerContext.AddExpectation(new ExpectNotDoNotDeliverBefore<TMessage>(check));
             return this;
@@ -306,43 +297,6 @@
             handleMethods.InvokeSerially(handler, initializedMessage, testableMessageHandlerContext).GetAwaiter().GetResult();
 
             testableMessageHandlerContext.Validate();
-        }
-
-
-        /// <summary>
-        /// Check that the handler uses the bus to return the appropriate error code.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            ReplacementTypeOrMember = "ExpectReply")]
-        public Handler<T> ExpectReturn<TEnum>(Func<TEnum, bool> check)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Check that the handler sends a message of the given type to sites.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            Message = "ExpectSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6.")]
-        public Handler<T> ExpectSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Check that the handler doesn't send a message of the given type to sites.
-        /// </summary>
-        [ObsoleteEx(
-            RemoveInVersion = "7",
-            TreatAsErrorFromVersion = "6",
-            Message = "ExpectNotSendToSites is no longer supported by the NServiceBus Testing Framework. You can access the configured sites on the SendOptions by calling 'GetSitesRoutingTo()'. Check the documentation to find out more about writing Unit Tests without the Testing Framework in NServiceBus 6.")]
-        public Handler<T> ExpectNotSendToSites<TMessage>(Func<TMessage, IEnumerable<string>, bool> check)
-        {
-            throw new NotImplementedException();
         }
 
         readonly T handler;

@@ -15,10 +15,10 @@
                 .ExpectTimeoutToBeSetIn<StartsSaga>((state, span) => span == TimeSpan.FromDays(7))
                 .ExpectPublish<Event>()
                 .ExpectSend<Command>()
-                .When((s, c) => s.Handle(new StartsSaga(), c))
+                .WhenHandling(new StartsSaga())
                 .ExpectPublish<Event>()
-                .WhenHandlingTimeout<StartsSaga>()
-                .AssertSagaCompletionIs(true);
+                .ExpectSagaCompleted()
+                .WhenHandlingTimeout<StartsSaga>();
         }
 
         [Test]
@@ -26,7 +26,7 @@
         {
             Test.Saga<MySaga>()
                 .ExpectTimeoutToBeSetIn<StartsSaga>((state, span) => span == TimeSpan.FromDays(7))
-                .When((s, c) => s.Handle(new StartsSaga(), c));
+                .WhenHandling(new StartsSaga());
         }
 
         [Test]
@@ -63,7 +63,7 @@
 
             Test.Saga(saga)
                 .SetIncomingHeader(customHeaderKey, expectedHeaderValue)
-                .When((s, c) => s.Handle(new MyRequest(), c));
+                .WhenHandling(new MyRequest());
 
             Assert.IsTrue(containsCustomHeader);
             Assert.AreEqual(expectedHeaderValue, receivedHeaderValue);
@@ -222,7 +222,7 @@
     {
     }
 
-    public class CustomSaga<TMessage, TSagaData> : NServiceBus.Saga<TSagaData>, IHandleMessages<TMessage> where TSagaData : IContainSagaData, new()
+    public class CustomSaga<TMessage, TSagaData> : NServiceBus.Saga<TSagaData>, IHandleMessages<TMessage> where TSagaData : class, IContainSagaData, new()
     {
         public Func<TMessage, IMessageHandlerContext, TSagaData, Task> HandlerAction { get; set; }
 
