@@ -7,7 +7,6 @@
     <OutputPath>..\..\binaries\</OutputPath>
     <Description>A testing framework for NServiceBus</Description>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Fody" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="NServiceBus" Version="[7.0.0, 8.0.0)" />
