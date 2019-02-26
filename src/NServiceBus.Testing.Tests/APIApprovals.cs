@@ -1,38 +1,17 @@
 ﻿namespace NServiceBus.Testing.Tests.API
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Runtime.CompilerServices;
-    using ApiApprover;
-    using ApprovalTests;
-    using Mono.Cecil;
     using NUnit.Framework;
+    using Particular.Approvals;
+    using PublicApiGenerator;
 
     [TestFixture]
     public class APIApprovals
     {
         [Test]
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public void ApproveTesting()
         {
-            Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
-            var assemblyPath = Path.GetFullPath(typeof(Test).Assembly.Location);
-            var asm = AssemblyDefinition.ReadAssembly(assemblyPath);
-            var publicApi = Filter(PublicApiGenerator.CreatePublicApiForAssembly(asm));
-            Approvals.Verify(publicApi);
+            var publicApi = ApiGenerator.GeneratePublicApi(typeof(Test).Assembly);
+            Approver.Verify(publicApi);
         }
-
-        string Filter(string text)
-        {
-            return string.Join(Environment.NewLine, text.Split(new[]
-            {
-                Environment.NewLine
-            }, StringSplitOptions.RemoveEmptyEntries)
-                .Where(l => !l.StartsWith("[assembly: ReleaseDateAttribute("))
-                .Where(l => !string.IsNullOrWhiteSpace(l))
-                );
-        }
-
     }
 }
