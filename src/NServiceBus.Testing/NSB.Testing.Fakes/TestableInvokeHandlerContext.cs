@@ -29,15 +29,23 @@ namespace NServiceBus.Testing
         /// Moves the message being handled to the back of the list of available
         /// messages so it can be handled later.
         /// </summary>
+        [ObsoleteEx(
+            Message = "HandleCurrentMessageLater has been deprecated.",
+            RemoveInVersion = "8",
+            TreatAsErrorFromVersion = "7")]
         public Task HandleCurrentMessageLater()
         {
-            throw new NotSupportedException("HandleCurrentMessageLater has been deprecated and will be removed in NServiceBus.Core Version 8.");
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Indicates if <see cref="IMessageHandlerContext.HandleCurrentMessageLater" /> has been called.
         /// </summary>
-        public bool HandleCurrentMessageLaterWasCalled => throw new NotSupportedException("HandleCurrentMessageLater has been deprecated and will be removed in NServiceBus.Core Version 8.");
+        [ObsoleteEx(
+            Message = "HandleCurrentMessageLater has been deprecated.",
+            RemoveInVersion = "8",
+            TreatAsErrorFromVersion = "7")]
+        public bool HandleCurrentMessageLaterWasCalled => throw new NotImplementedException();
 
         /// <summary>
         /// Tells the endpoint to stop dispatching the current message to additional
