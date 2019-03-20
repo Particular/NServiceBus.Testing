@@ -233,6 +233,8 @@ namespace NServiceBus.Testing
     {
         public TestableInvokeHandlerContext(NServiceBus.IMessageCreator messageCreator = null) { }
         public bool DoNotContinueDispatchingCurrentMessageToHandlersWasCalled { get; set; }
+        [System.ObsoleteAttribute("HandleCurrentMessageLater has been deprecated. The member currently throws a NotI" +
+            "mplementedException. Will be removed in version 8.0.0.", true)]
         public bool HandleCurrentMessageLaterWasCalled { get; }
         public bool HandlerInvocationAborted { get; }
         public System.Collections.Generic.Dictionary<string, string> Headers { get; set; }
@@ -241,6 +243,8 @@ namespace NServiceBus.Testing
         public NServiceBus.Unicast.Messages.MessageMetadata MessageMetadata { get; set; }
         public NServiceBus.Persistence.SynchronizedStorageSession SynchronizedStorageSession { get; set; }
         public void DoNotContinueDispatchingCurrentMessageToHandlers() { }
+        [System.ObsoleteAttribute("HandleCurrentMessageLater has been deprecated. The member currently throws a NotI" +
+            "mplementedException. Will be removed in version 8.0.0.", true)]
         public System.Threading.Tasks.Task HandleCurrentMessageLater() { }
     }
     public class TestableMessageHandlerContext : NServiceBus.Testing.TestableInvokeHandlerContext
