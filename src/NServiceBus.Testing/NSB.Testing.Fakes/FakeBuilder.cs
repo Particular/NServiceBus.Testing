@@ -141,11 +141,30 @@ namespace NServiceBus.Testing
         }
 
         /// <summary>
+        /// Registers a factory method which will be invoked every time an instance of <paramref name="type"/> is resolved.
+        /// </summary>
+        public void Register(Type type, Func<object> factory)
+        {
+            factories.Add(type, () => new []
+            {
+                factory()
+            });
+        }
+
+        /// <summary>
         /// Registers a factory method which will be invoked every time an instance of <typeparamref name="T" /> is resolved.
         /// </summary>
         public void Register<T>(Func<T[]> factory) where T : class
         {
             factories.Add(typeof(T), factory);
+        }
+
+        /// <summary>
+        /// Registers a factory method which will be invoked every time an instance of <paramref name="type"/> is resolved.
+        /// </summary>
+        public void Register(Type type, Func<object[]> factory)
+        {
+            factories.Add(type, factory);
         }
 
         Dictionary<Type, Func<object[]>> factories = new Dictionary<Type, Func<object[]>>();
