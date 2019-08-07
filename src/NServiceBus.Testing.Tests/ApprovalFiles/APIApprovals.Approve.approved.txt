@@ -20,8 +20,10 @@ namespace NServiceBus.Testing
         public void Register<T>(params T[] instance)
             where T :  class { }
         public void Register<T>(System.Func<T> factory) { }
+        public void Register(System.Type type, System.Func<object> factory) { }
         public void Register<T>(System.Func<T[]> factory)
             where T :  class { }
+        public void Register(System.Type type, System.Func<object[]> factory) { }
         public virtual void Release(object instance) { }
     }
     public class Handler<T>
