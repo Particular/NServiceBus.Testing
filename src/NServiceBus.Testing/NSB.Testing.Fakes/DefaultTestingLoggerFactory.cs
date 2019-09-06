@@ -6,16 +6,14 @@ namespace NServiceBus.Testing
 
     class DefaultTestingLoggerFactory : ILoggerFactory
     {
-        public DefaultTestingLoggerFactory(LogLevel filterLevel, TextWriter textWriter)
-        {
-            this.filterLevel = filterLevel;
-            textWriterLogger = new TextWriterLogger(textWriter);
-            isDebugEnabled = LogLevel.Debug >= filterLevel;
-            isInfoEnabled = LogLevel.Info >= filterLevel;
-            isWarnEnabled = LogLevel.Warn >= filterLevel;
-            isErrorEnabled = LogLevel.Error >= filterLevel;
-            isFatalEnabled = LogLevel.Fatal >= filterLevel;
-        }
+
+        public static bool IsDebugEnabled => LogLevel.Debug >= FilterLevel();
+
+        public static bool IsInfoEnabled => LogLevel.Info >= FilterLevel();
+
+        public static bool IsWarnEnabled => LogLevel.Warn >= FilterLevel();
+        public static bool IsErrorEnabled => LogLevel.Error >= FilterLevel();
+        public static bool IsFatalEnabled => LogLevel.Fatal >= FilterLevel();
 
         public ILog GetLogger(Type type)
         {
@@ -24,39 +22,34 @@ namespace NServiceBus.Testing
 
         public ILog GetLogger(string name)
         {
-            return new NamedLogger(name, this)
-            {
-                IsDebugEnabled = isDebugEnabled,
-                IsInfoEnabled = isInfoEnabled,
-                IsWarnEnabled = isWarnEnabled,
-                IsErrorEnabled = isErrorEnabled,
-                IsFatalEnabled = isFatalEnabled
-            };
+            return new NamedLogger(name);
         }
 
-        public void Write(string name, LogLevel messageLevel, string message)
+        public static void Write(string name, LogLevel messageLevel, string message)
         {
-            if (messageLevel < filterLevel)
+            if (messageLevel < FilterLevel())
             {
                 return;
             }
+
             var datePart = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
             var paddedLevel = messageLevel.ToString().ToUpper().PadRight(5);
             var fullMessage = $"{datePart} {paddedLevel} {name} {message}";
-            lock (locker)
+            var writer = TextWriter();
+            lock (writer)
             {
-                textWriterLogger.Write(fullMessage);
+                writer.Write(fullMessage);
             }
         }
 
-        LogLevel filterLevel;
-        bool isDebugEnabled;
-        bool isErrorEnabled;
-        bool isFatalEnabled;
-        bool isInfoEnabled;
-        bool isWarnEnabled;
+        static LogLevel FilterLevel()
+        {
+            return TestingLoggerFactory.currentScope.Value?.Item2 ?? TestingLoggerFactory.lazyLevel.Value;
+        }
 
-        object locker = new object();
-        TextWriterLogger textWriterLogger;
+        static TextWriter TextWriter()
+        {
+            return TestingLoggerFactory.currentScope.Value?.Item1 ?? TestingLoggerFactory.lazyWriter.Value;
+        }
     }
 }
