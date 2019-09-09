@@ -45,7 +45,7 @@
         /// <returns>The logging scope. Cannot be nested.</returns>
         public IDisposable BeginScope(TextWriter writer, LogLevel level = LogLevel.Debug)
         {
-            return new Scope(this, writer, level);
+            return new Scope(writer, level);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@
 
         class Scope : IDisposable
         {
-            public Scope(TestingLoggerFactory factory, TextWriter writer, LogLevel logLevel)
+            public Scope(TextWriter writer, LogLevel logLevel)
             {
                 if (currentScope.Value != null)
                 {
