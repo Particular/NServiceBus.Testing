@@ -254,8 +254,7 @@ namespace NServiceBus.Testing
         /// </summary>
         public Saga<T> WhenHandling<TMessage>(Action<TMessage> initializeMessage = null)
         {
-            var message = messageCreator.CreateInstance(initializeMessage);
-            return WhenHandling(message);
+            return WhenHandlingAsync(initializeMessage).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -263,8 +262,7 @@ namespace NServiceBus.Testing
         /// </summary>
         public Saga<T> WhenHandling<TMessage>(TMessage message)
         {
-            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleMessages<>));
-            return When((s, c) => invokers.InvokeSerially(saga, message, c));
+            return WhenHandlingAsync(message).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -273,8 +271,7 @@ namespace NServiceBus.Testing
         /// </summary>
         public Saga<T> WhenHandlingTimeout<TMessage>(Action<TMessage> initializeMessage = null)
         {
-            var message = messageCreator.CreateInstance(initializeMessage);
-            return WhenHandlingTimeout(message);
+            return WhenHandlingTimeoutAsync(initializeMessage).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -282,8 +279,7 @@ namespace NServiceBus.Testing
         /// </summary>
         public Saga<T> WhenHandlingTimeout<TMessage>(TMessage message)
         {
-            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleTimeouts<>));
-            return When((s, c) => invokers.InvokeSerially(saga, message, c));
+            return WhenHandlingTimeoutAsync(message).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -293,7 +289,103 @@ namespace NServiceBus.Testing
         /// </summary>
         public Saga<T> When(Func<T, IMessageHandlerContext, Task> sagaIsInvoked)
         {
-            sagaIsInvoked(saga, testContext).GetAwaiter().GetResult();
+            return WhenAsync(sagaIsInvoked).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Uses the given delegate to select the message handler and invoking it with the given message. Checks all the expectations previously, and then clearing them for continued testing.
+        /// example: <c>When(s => s.Handle, new MyMessage())</c>
+        /// </summary>
+        public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, TMessage message)
+        {
+            return WhenAsync((s, context) => handlerSelector(s)(message, context)).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Uses the given delegate to select the message handler and invoking it with the specified message. Checks all the expectations previously, and then clearing them for continued testing.
+        /// example: <c>When&lt;MyMessage>(s => s.Handle, m => { m.Value = 42 })</c>
+        /// </summary>
+        public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, Action<TMessage> messageInitializer = null)
+        {
+            return WhenAsync(handlerSelector, messageInitializer).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Expires requested timeouts for the saga by simulating that time has passed
+        /// and then clears out all previous expectations.
+        /// This will only invoke timeouts set with a <see cref="TimeSpan"/> argument.
+        /// </summary>
+        /// <param name="after">The amount of time that has passed to simulate.</param>
+        public Saga<T> WhenSagaTimesOut(TimeSpan after)
+        {
+            return WhenSagaTimesOutAsync(after).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Expires requested timeouts for the saga by simulating the passed in date and time
+        /// and then clears out all previous expectations.
+        /// This will only invoke timeouts set with a <see cref="DateTime"/> argument.
+        /// </summary>
+        /// <param name="at">The Date and time to simuluate.</param>
+        public Saga<T> WhenSagaTimesOut(DateTime at)
+        {
+            return WhenSagaTimesOutAsync(at).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Expires all requested timeouts for the saga and then clears out all previous expectations.
+        /// </summary>
+        public Saga<T> WhenSagaTimesOut()
+        {
+            return WhenSagaTimesOutAsync().GetAwaiter().GetResult();
+        }
+        
+        /// <summary>
+        /// Initializes the given message type and checks all the expectations previously set up,
+        /// and then clears them for continued testing.
+        /// </summary>
+        public Task<Saga<T>> WhenHandlingAsync<TMessage>(Action<TMessage> initializeMessage = null)
+        {
+            var message = messageCreator.CreateInstance(initializeMessage);
+            return WhenHandlingAsync(message);
+        }
+
+        /// <summary>
+        /// Checks all the expectations previously set up, and then clears them for continued testing.
+        /// </summary>
+        public Task<Saga<T>> WhenHandlingAsync<TMessage>(TMessage message)
+        {
+            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleMessages<>));
+            return WhenAsync((s, c) => invokers.InvokeSerially(saga, message, c));
+        }
+
+        /// <summary>
+        /// Initializes the given timeout message type and checks all the expectations previously set up,
+        /// and then clears them for continued testing.
+        /// </summary>
+        public Task<Saga<T>> WhenHandlingTimeoutAsync<TMessage>(Action<TMessage> initializeMessage = null)
+        {
+            var message = messageCreator.CreateInstance(initializeMessage);
+            return WhenHandlingTimeoutAsync(message);
+        }
+
+        /// <summary>
+        /// Checks all the expectations previously set up, and then clears them for continued testing.
+        /// </summary>
+        public Task<Saga<T>> WhenHandlingTimeoutAsync<TMessage>(TMessage message)
+        {
+            var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleTimeouts<>));
+            return WhenAsync((s, c) => invokers.InvokeSerially(saga, message, c));
+        }
+
+        /// <summary>
+        /// Uses the given delegate to invoke the saga, checking all the expectations previously set up,
+        /// and then clearing them for continued testing.
+        /// example: <c>When((saga, context) => s.Handle(new MyMessage(), context))</c>
+        /// </summary>
+        public async Task<Saga<T>> WhenAsync(Func<T, IMessageHandlerContext, Task> sagaIsInvoked)
+        {
+            await sagaIsInvoked(saga, testContext).ConfigureAwait(false);
 
             testContext.Validate();
             testContext = new TestingContext(messageCreator, testContext.previousTimeouts.Concat(testContext.TimeoutMessages).ToArray());
@@ -305,20 +397,20 @@ namespace NServiceBus.Testing
         /// Uses the given delegate to select the message handler and invoking it with the given message. Checks all the expectations previously, and then clearing them for continued testing.
         /// example: <c>When(s => s.Handle, new MyMessage())</c>
         /// </summary>
-        public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, TMessage message)
+        public Task<Saga<T>> WhenAsync<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, TMessage message)
         {
-            return When((s, context) => handlerSelector(s)(message, context));
+            return WhenAsync((s, context) => handlerSelector(s)(message, context));
         }
 
         /// <summary>
         /// Uses the given delegate to select the message handler and invoking it with the specified message. Checks all the expectations previously, and then clearing them for continued testing.
         /// example: <c>When&lt;MyMessage>(s => s.Handle, m => { m.Value = 42 })</c>
         /// </summary>
-        public Saga<T> When<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, Action<TMessage> messageInitializer = null)
+        public Task<Saga<T>> WhenAsync<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, Action<TMessage> messageInitializer = null)
         {
             var message = (TMessage)messageCreator.CreateInstance(typeof(TMessage));
             messageInitializer?.Invoke(message);
-            return When((s, context) => handlerSelector(s)(message, context));
+            return WhenAsync((s, context) => handlerSelector(s)(message, context));
         }
 
         /// <summary>
@@ -327,11 +419,11 @@ namespace NServiceBus.Testing
         /// This will only invoke timeouts set with a <see cref="TimeSpan"/> argument.
         /// </summary>
         /// <param name="after">The amount of time that has passed to simulate.</param>
-        public Saga<T> WhenSagaTimesOut(TimeSpan after)
+        public async Task<Saga<T>> WhenSagaTimesOutAsync(TimeSpan after)
         {
-            InvokeTimeouts(testContext.previousTimeouts
+            await InvokeTimeoutsAsync(testContext.previousTimeouts
                 .Where(t => t.Within.HasValue)
-                .Where(t => t.Within <= after));
+                .Where(t => t.Within <= after)).ConfigureAwait(false);
 
             return this;
         }
@@ -342,11 +434,11 @@ namespace NServiceBus.Testing
         /// This will only invoke timeouts set with a <see cref="DateTime"/> argument.
         /// </summary>
         /// <param name="at">The Date and time to simuluate.</param>
-        public Saga<T> WhenSagaTimesOut(DateTime at)
+        public async Task<Saga<T>> WhenSagaTimesOutAsync(DateTime at)
         {
-            InvokeTimeouts(testContext.previousTimeouts
+            await InvokeTimeoutsAsync(testContext.previousTimeouts
                 .Where(t => t.At.HasValue)
-                .Where(t => t.At <= at));
+                .Where(t => t.At <= at)).ConfigureAwait(false);
 
             return this;
         }
@@ -354,9 +446,9 @@ namespace NServiceBus.Testing
         /// <summary>
         /// Expires all requested timeouts for the saga and then clears out all previous expectations.
         /// </summary>
-        public Saga<T> WhenSagaTimesOut()
+        public async Task<Saga<T>> WhenSagaTimesOutAsync()
         {
-            InvokeTimeouts(testContext.previousTimeouts);
+            await InvokeTimeoutsAsync(testContext.previousTimeouts).ConfigureAwait(false);
 
             return this;
         }
@@ -515,17 +607,16 @@ namespace NServiceBus.Testing
             return this;
         }
 
-        void InvokeTimeouts(IEnumerable<TimeoutMessage<object>> messages)
+        async Task InvokeTimeoutsAsync(IEnumerable<TimeoutMessage<object>> messages)
         {
-            messages
-                .OrderBy(t => t.Within)
-                .ToList()
-                .ForEach(t =>
-                {
-                    var messageType = messageCreator.GetMappedTypeFor(t.Message.GetType());
-                    var invokers = saga.GetType().CreateInvokers(messageType, typeof(IHandleTimeouts<>));
-                    invokers.InvokeSerially(saga, t.Message, testContext).GetAwaiter().GetResult();
-                });
+            var timeoutHandlers = messages.OrderBy(t => t.Within).ToList();
+
+            foreach (var timeoutHandler in timeoutHandlers)
+            {
+                var messageType = messageCreator.GetMappedTypeFor(timeoutHandler.Message.GetType());
+                var invokers = saga.GetType().CreateInvokers(messageType, typeof(IHandleTimeouts<>));
+                await invokers.InvokeSerially(saga, timeoutHandler.Message, testContext).ConfigureAwait(false);
+            }
 
             testContext.Validate();
             testContext = new TestingContext(messageCreator);

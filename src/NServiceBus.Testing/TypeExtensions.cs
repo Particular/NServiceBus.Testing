@@ -1,21 +1,21 @@
 ﻿namespace NServiceBus.Testing
- {
-     using System;
-     using System.Collections.Generic;
-     using System.Linq;
-     using System.Linq.Expressions;
-     using System.Threading.Tasks;
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Threading.Tasks;
 
-     static class TypeExtensions
-     {
-         public static IEnumerable<Func<object, object, IMessageHandlerContext, Task>> CreateInvokers(this Type targetType, Type messageType, Type interfaceGenericType)
-         {
-             var interfaceTypes = targetType.GetInterfaces()
-                 .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceGenericType)
-                 .Where(i => i.GenericTypeArguments.First().IsAssignableFrom(messageType));
+    static class TypeExtensions
+    {
+        public static IEnumerable<Func<object, object, IMessageHandlerContext, Task>> CreateInvokers(this Type targetType, Type messageType, Type interfaceGenericType)
+        {
+            var interfaceTypes = targetType.GetInterfaces()
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceGenericType)
+                .Where(i => i.GenericTypeArguments.First().IsAssignableFrom(messageType));
 
-             foreach (var interfaceType in interfaceTypes)
-             {
+            foreach (var interfaceType in interfaceTypes)
+            {
                 var methodInfo = targetType.GetInterfaceMap(interfaceType).TargetMethods.FirstOrDefault();
                 if (methodInfo == null)
                 {
@@ -35,14 +35,14 @@
 
                 yield return Expression.Lambda<Func<object, object, IMessageHandlerContext, Task>>(body, target, messageParam, contextParam).Compile();
             }
-         }
+        }
 
-         public static async Task InvokeSerially(this IEnumerable<Func<object, object, IMessageHandlerContext, Task>> invokers, object instance, object message, IMessageHandlerContext context)
-         {
+        public static async Task InvokeSerially(this IEnumerable<Func<object, object, IMessageHandlerContext, Task>> invokers, object instance, object message, IMessageHandlerContext context)
+        {
             foreach (var invocation in invokers)
             {
                 await invocation(instance, message, context).ConfigureAwait(false);
             }
         }
-     }
- }
+    }
+}

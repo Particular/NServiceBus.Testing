@@ -1,6 +1,7 @@
 namespace NServiceBus.Testing
 {
     using System;
+    using System.Threading.Tasks;
     using MessageInterfaces.MessageMapper.Reflection;
 
     /// <summary>
@@ -266,9 +267,7 @@ namespace NServiceBus.Testing
         /// </summary>
         public void OnMessage<TMessage>(Action<TMessage> initializeMessage = null)
         {
-            var message = messageCreator.CreateInstance<TMessage>();
-            initializeMessage?.Invoke(message);
-            OnMessage(message);
+            OnMessageAsync(initializeMessage).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -277,9 +276,7 @@ namespace NServiceBus.Testing
         /// </summary>
         public void OnMessage<TMessage>(TMessage message, string messageId)
         {
-            testableMessageHandlerContext.MessageId = messageId;
-
-            OnMessage(message);
+            OnMessageAsync(message, messageId).GetAwaiter().GetResult();
         }
 
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
@@ -291,10 +288,53 @@ namespace NServiceBus.Testing
         /// <example><![CDATA[var message = new TestMessage {//...}; Test.Handler<EmptyHandler>().OnMessage<TestMessage>(message);]]></example>
         public void OnMessage<TMessage>(TMessage initializedMessage)
         {
+            OnMessageAsync(initializedMessage).GetAwaiter().GetResult();
+        }
+        
+        /// <summary>
+        /// Activates the test that has been set up passing in the given message,
+        /// setting the incoming headers and the message Id.
+        /// </summary>
+        public Task OnMessageAsync<TMessage>(string messageId, Action<TMessage> initializeMessage = null)
+        {
+            testableMessageHandlerContext.MessageId = messageId;
+            return OnMessageAsync(initializeMessage);
+        }
+
+        /// <summary>
+        /// Activates the test that has been set up passing in the given message.
+        /// </summary>
+        public Task OnMessageAsync<TMessage>(Action<TMessage> initializeMessage = null)
+        {
+            var message = messageCreator.CreateInstance<TMessage>();
+            initializeMessage?.Invoke(message);
+            return OnMessageAsync(message);
+        }
+
+        /// <summary>
+        /// Activates the test that has been set up passing in given message,
+        /// setting the incoming headers and the message Id.
+        /// </summary>
+        public Task OnMessageAsync<TMessage>(TMessage message, string messageId)
+        {
+            testableMessageHandlerContext.MessageId = messageId;
+
+            return OnMessageAsync(message);
+        }
+        
+        /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
+        /// <param name="initializedMessage">A message to be used with message handler.</param>
+        /// <remarks>
+        /// This is different from <see cref="OnMessage{TMessage}(System.Action{TMessage})" /> in a way that
+        /// it uses the message, and not calls to an action.
+        /// </remarks>
+        /// <example><![CDATA[var message = new TestMessage {//...}; Test.Handler<EmptyHandler>().OnMessage<TestMessage>(message);]]></example>
+        public async Task OnMessageAsync<TMessage>(TMessage initializedMessage)
+        {
             var messageType = messageCreator.GetMappedTypeFor(initializedMessage.GetType());
             var handleMethods = handler.GetType().CreateInvokers(messageType, typeof(IHandleMessages<>));
 
-            handleMethods.InvokeSerially(handler, initializedMessage, testableMessageHandlerContext).GetAwaiter().GetResult();
+            await handleMethods.InvokeSerially(handler, initializedMessage, testableMessageHandlerContext).ConfigureAwait(false);
 
             testableMessageHandlerContext.Validate();
         }
