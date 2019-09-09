@@ -57,6 +57,7 @@
             {
                 testingLoggerFactory = new DefaultTestingLoggerFactory();
             }
+
             return testingLoggerFactory;
         }
 

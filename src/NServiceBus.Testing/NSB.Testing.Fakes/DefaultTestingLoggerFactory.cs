@@ -6,14 +6,17 @@ namespace NServiceBus.Testing
 
     class DefaultTestingLoggerFactory : ILoggerFactory
     {
+        public static bool IsDebugEnabled => LogLevel.Debug >= FilterLevel;
 
-        public static bool IsDebugEnabled => LogLevel.Debug >= FilterLevel();
+        public static bool IsInfoEnabled => LogLevel.Info >= FilterLevel;
 
-        public static bool IsInfoEnabled => LogLevel.Info >= FilterLevel();
+        public static bool IsWarnEnabled => LogLevel.Warn >= FilterLevel;
+        public static bool IsErrorEnabled => LogLevel.Error >= FilterLevel;
+        public static bool IsFatalEnabled => LogLevel.Fatal >= FilterLevel;
 
-        public static bool IsWarnEnabled => LogLevel.Warn >= FilterLevel();
-        public static bool IsErrorEnabled => LogLevel.Error >= FilterLevel();
-        public static bool IsFatalEnabled => LogLevel.Fatal >= FilterLevel();
+        static LogLevel FilterLevel => TestingLoggerFactory.currentScope.Value?.Item2 ?? TestingLoggerFactory.lazyLevel.Value;
+
+        static TextWriter TextWriter => TestingLoggerFactory.currentScope.Value?.Item1 ?? TestingLoggerFactory.lazyWriter.Value;
 
         public ILog GetLogger(Type type)
         {
@@ -27,7 +30,7 @@ namespace NServiceBus.Testing
 
         public static void Write(string name, LogLevel messageLevel, string message)
         {
-            if (messageLevel < FilterLevel())
+            if (messageLevel < FilterLevel)
             {
                 return;
             }
@@ -35,21 +38,11 @@ namespace NServiceBus.Testing
             var datePart = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
             var paddedLevel = messageLevel.ToString().ToUpper().PadRight(5);
             var fullMessage = $"{datePart} {paddedLevel} {name} {message}";
-            var writer = TextWriter();
+            var writer = TextWriter;
             lock (writer)
             {
                 writer.Write(fullMessage);
             }
-        }
-
-        static LogLevel FilterLevel()
-        {
-            return TestingLoggerFactory.currentScope.Value?.Item2 ?? TestingLoggerFactory.lazyLevel.Value;
-        }
-
-        static TextWriter TextWriter()
-        {
-            return TestingLoggerFactory.currentScope.Value?.Item1 ?? TestingLoggerFactory.lazyWriter.Value;
         }
     }
 }
