@@ -349,9 +349,9 @@ namespace NServiceBus.Testing
     public class TestingLoggerFactory : NServiceBus.Logging.LoggingFactoryDefinition
     {
         public TestingLoggerFactory() { }
+        public System.IDisposable BeginScope(System.IO.TextWriter writer, NServiceBus.Logging.LogLevel level = 0) { }
         protected override NServiceBus.Logging.ILoggerFactory GetLoggingFactory() { }
         public void Level(NServiceBus.Logging.LogLevel level) { }
-        public System.IDisposable Use(System.IO.TextWriter writer, NServiceBus.Logging.LogLevel level = 0) { }
         public void WriteTo(System.IO.TextWriter writer) { }
     }
     public class TimeoutMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.SendOptions>

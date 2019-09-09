@@ -18,7 +18,7 @@ namespace NServiceBus.Testing.Tests.Logging
             writer = new StringWriter();
             
             this.scope = LogManager.Use<TestingLoggerFactory>()
-                .Use(writer);
+                .BeginScope(writer);
         }
 
         [Test]

@@ -19,14 +19,14 @@ namespace NServiceBus.Testing.Tests.Logging
         {
             var firstStringWriter = new StringWriter();
             var loggerFactory = LogManager.Use<TestingLoggerFactory>();
-            using (loggerFactory.Use(firstStringWriter))
+            using (loggerFactory.BeginScope(firstStringWriter))
             {
                 var firstInstance = new SomeClassThatUsesStaticLogger();
                 firstInstance.DoSomething();
             }
 
             var secondStringWriter = new StringWriter();
-            using (loggerFactory.Use(secondStringWriter))
+            using (loggerFactory.BeginScope(secondStringWriter))
             {
                 var secondInstance = new SomeClassThatUsesStaticLogger();
                 secondInstance.DoSomething();
@@ -47,14 +47,14 @@ namespace NServiceBus.Testing.Tests.Logging
         {
             var firstStringWriter = new StringWriter();
             var loggerFactory = LogManager.Use<TestingLoggerFactory>();
-            using (loggerFactory.Use(firstStringWriter, LogLevel.Warn))
+            using (loggerFactory.BeginScope(firstStringWriter, LogLevel.Warn))
             {
                 var firstInstance = new SomeClassThatUsesStaticLogger();
                 firstInstance.DoSomething();
             }
 
             var secondStringWriter = new StringWriter();
-            using (loggerFactory.Use(secondStringWriter))
+            using (loggerFactory.BeginScope(secondStringWriter))
             {
                 var secondInstance = new SomeClassThatUsesStaticLogger();
                 secondInstance.DoSomething();
@@ -79,7 +79,7 @@ namespace NServiceBus.Testing.Tests.Logging
             firstInstance.DoSomething();
             
             var secondStringWriter = new StringWriter();
-            using (loggerFactory.Use(secondStringWriter))
+            using (loggerFactory.BeginScope(secondStringWriter))
             {
                 var secondInstance = new SomeClassThatUsesStaticLogger();
                 secondInstance.DoSomething();
@@ -101,8 +101,8 @@ namespace NServiceBus.Testing.Tests.Logging
             Assert.Throws<InvalidOperationException>(() =>
             {
                 var loggerFactory = LogManager.Use<TestingLoggerFactory>();
-                using (loggerFactory.Use(new StringWriter()))
-                using (loggerFactory.Use(new StringWriter()))
+                using (loggerFactory.BeginScope(new StringWriter()))
+                using (loggerFactory.BeginScope(new StringWriter()))
                 {
                 }
             });

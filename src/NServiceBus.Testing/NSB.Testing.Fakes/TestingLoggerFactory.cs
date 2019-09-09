@@ -43,7 +43,7 @@
         /// <param name="writer">The text writer to be used.</param>
         /// <param name="level">The log level to be used.</param>
         /// <returns>The logging scope. Cannot be nested.</returns>
-        public IDisposable Use(TextWriter writer, LogLevel level = LogLevel.Debug)
+        public IDisposable BeginScope(TextWriter writer, LogLevel level = LogLevel.Debug)
         {
             return new Scope(this, writer, level);
         }
