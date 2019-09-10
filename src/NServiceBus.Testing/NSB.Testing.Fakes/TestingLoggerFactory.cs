@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Threading;
     using Logging;
 
     /// <summary>
@@ -14,25 +15,37 @@
         /// </summary>
         public TestingLoggerFactory()
         {
-            level = new Lazy<LogLevel>(() => LogLevel.Debug);
-            writer = new Lazy<TextWriter>(() => TextWriter.Null);
+            lazyLevel = new Lazy<LogLevel>(() => LogLevel.Debug);
+            lazyWriter = new Lazy<TextWriter>(() => TextWriter.Null);
         }
 
         /// <summary>
-        /// Controls the <see cref="Logging.LogLevel" />.
+        /// Controls the <see cref="Logging.LogLevel" /> for all default logging.
         /// </summary>
+        /// <param name="level">The log level to be used.</param>
         public void Level(LogLevel level)
         {
-            this.level = new Lazy<LogLevel>(() => level);
+            lazyLevel = new Lazy<LogLevel>(() => level);
         }
 
         /// <summary>
-        /// Instructs the logger to write to the provided text writer.
+        /// Instructs the logger to write to the provided text writer for all default logging.
         /// </summary>
         /// <param name="writer">The text writer to be used.</param>
         public void WriteTo(TextWriter writer)
         {
-            this.writer = new Lazy<TextWriter>(() => writer);
+            lazyWriter = new Lazy<TextWriter>(() => writer);
+        }
+
+        /// <summary>
+        /// Instructs the logger to write to the provided text writer for the given scope.
+        /// </summary>
+        /// <param name="writer">The text writer to be used.</param>
+        /// <param name="level">The log level to be used.</param>
+        /// <returns>The logging scope. Cannot be nested.</returns>
+        public IDisposable BeginScope(TextWriter writer, LogLevel level = LogLevel.Debug)
+        {
+            return new Scope(writer, level);
         }
 
         /// <summary>
@@ -40,13 +53,35 @@
         /// </summary>
         protected override ILoggerFactory GetLoggingFactory()
         {
-            var loggerFactory = new DefaultTestingLoggerFactory(level.Value, writer.Value);
-            var message = $"Logging to testing logger with level {level}";
-            loggerFactory.Write(GetType().Name, LogLevel.Info, message);
-            return loggerFactory;
+            if (testingLoggerFactory == null)
+            {
+                testingLoggerFactory = new DefaultTestingLoggerFactory();
+            }
+
+            return testingLoggerFactory;
         }
 
-        Lazy<LogLevel> level;
-        Lazy<TextWriter> writer;
+        internal static AsyncLocal<Tuple<TextWriter, LogLevel>> currentScope = new AsyncLocal<Tuple<TextWriter, LogLevel>>();
+        internal static Lazy<LogLevel> lazyLevel;
+        internal static Lazy<TextWriter> lazyWriter;
+        static DefaultTestingLoggerFactory testingLoggerFactory;
+
+        class Scope : IDisposable
+        {
+            public Scope(TextWriter writer, LogLevel logLevel)
+            {
+                if (currentScope.Value != null)
+                {
+                    throw new InvalidOperationException("Nesting of logging scopes is not allowed.");
+                }
+
+                currentScope.Value = Tuple.Create(writer, logLevel);
+            }
+
+            public void Dispose()
+            {
+                currentScope.Value = null;
+            }
+        }
     }
 }
