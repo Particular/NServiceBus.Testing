@@ -65,13 +65,6 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Handler<T> SetIncomingHeader(string key, string value) { }
         public NServiceBus.Testing.Handler<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
     }
-    public class OutgoingMessage<TMessage, TOptions>
-        where TOptions : NServiceBus.Extensibility.ExtendableOptions
-    {
-        protected OutgoingMessage(TMessage message, TOptions options) { }
-        public TMessage Message { get; }
-        public TOptions Options { get; }
-    }
     public class static OutgoingMessageExtensions
     {
         public static System.Collections.Generic.IEnumerable<NServiceBus.Testing.RepliedMessage<TMessage>> Containing<TMessage>(this System.Collections.Generic.IEnumerable<NServiceBus.Testing.RepliedMessage<object>> repliedMessages) { }
@@ -83,6 +76,13 @@ namespace NServiceBus.Testing
             where TMessage :  class { }
         public static TMessage Message<TMessage>(this NServiceBus.Testing.SentMessage<object> sentMessage)
             where TMessage :  class { }
+    }
+    public class OutgoingMessage<TMessage, TOptions>
+        where TOptions : NServiceBus.Extensibility.ExtendableOptions
+    {
+        protected OutgoingMessage(TMessage message, TOptions options) { }
+        public TMessage Message { get; }
+        public TOptions Options { get; }
     }
     public class PublishedMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.PublishOptions>
     {
@@ -102,9 +102,9 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Saga<T> ExpectForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
         [System.ObsoleteAttribute("HandleCurrentMessageLater has been deprecated. Will be removed in version 8.0.0.", true)]
         public NServiceBus.Testing.Saga<T> ExpectHandleCurrentMessageLater() { }
-        public NServiceBus.Testing.Saga<T> ExpectNotForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectNoTimeoutToBeSetAt<TMessage>(System.Func<TMessage, System.DateTimeOffset, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectNoTimeoutToBeSetIn<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check = null) { }
+        public NServiceBus.Testing.Saga<T> ExpectNotForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectNotPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
         public NServiceBus.Testing.Saga<T> ExpectNotPublish<TMessage>(System.Func<TMessage, bool> check) { }
         public NServiceBus.Testing.Saga<T> ExpectNotPublish<TMessage>(System.Action<TMessage> check) { }
