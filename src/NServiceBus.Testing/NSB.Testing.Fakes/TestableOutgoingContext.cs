@@ -6,7 +6,6 @@ namespace NServiceBus.Testing
     using DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
     using MicrosoftExtensionsDependencyInjection;
-    using ObjectBuilder;
     using Pipeline;
 
     /// <summary>
