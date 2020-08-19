@@ -21,16 +21,14 @@ namespace NServiceBus.Testing
         }
 
         /// <summary>
-        /// A fake <see cref="IBuilder" /> implementation. If you want to provide your own <see cref="IBuilder" /> implementation
-        /// override <see cref="GetBuilder" />.
+        /// The <see cref="IServiceCollection"/> to build an <see cref="IServiceProvider"/> once the <see cref="IBehaviorContext.Builder"/> is accessed. Override <see cref="GetBuilder" /> to customize the <see cref="IServiceProvider"/> implementation used.
         /// </summary>
         public IServiceCollection ServiceCollection { get; set; } = new ServiceCollection();
 
         IServiceProvider IBehaviorContext.Builder => GetBuilder();
 
         /// <summary>
-        /// Selects the builder returned by <see cref="IBehaviorContext.Builder" />. Override this method to provide your custom
-        /// <see cref="IBuilder" /> implementation.
+        /// Selects the builder returned by <see cref="IBehaviorContext.Builder" />. Override this method to provide your custom <see cref="IServiceProvider" /> implementation.
         /// </summary>
         protected virtual IServiceProvider GetBuilder()
         {
