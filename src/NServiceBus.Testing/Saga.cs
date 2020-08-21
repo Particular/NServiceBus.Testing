@@ -14,7 +14,7 @@ namespace NServiceBus.Testing
     /// <summary>
     /// Saga unit testing framework.
     /// </summary>
-    public partial class Saga<T> where T : Saga
+    public class Saga<T> where T : Saga
     {
         internal Saga(T saga)
         {
@@ -339,7 +339,7 @@ namespace NServiceBus.Testing
         {
             return WhenSagaTimesOutAsync().GetAwaiter().GetResult();
         }
-        
+
         /// <summary>
         /// Initializes the given message type and checks all the expectations previously set up,
         /// and then clears them for continued testing.
@@ -470,7 +470,7 @@ namespace NServiceBus.Testing
         {
             testContext.AddExpectation(new ExpectSagaCompleted<T>(saga, false));
             return this;
-        }      
+        }
 
         /// <summary>
         /// Verifies that the saga is setting the specified timeout

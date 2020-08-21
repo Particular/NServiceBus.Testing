@@ -7,7 +7,7 @@ namespace NServiceBus.Testing
     /// <summary>
     /// Message handler unit testing framework.
     /// </summary>
-    public partial class Handler<T>
+    public class Handler<T>
     {
         /// <summary>
         /// Creates a new instance of the handler tester.
@@ -290,7 +290,7 @@ namespace NServiceBus.Testing
         {
             OnMessageAsync(initializedMessage).GetAwaiter().GetResult();
         }
-        
+
         /// <summary>
         /// Activates the test that has been set up passing in the given message,
         /// setting the incoming headers and the message Id.
@@ -321,7 +321,7 @@ namespace NServiceBus.Testing
 
             return OnMessageAsync(message);
         }
-        
+
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
         /// <param name="initializedMessage">A message to be used with message handler.</param>
         /// <remarks>

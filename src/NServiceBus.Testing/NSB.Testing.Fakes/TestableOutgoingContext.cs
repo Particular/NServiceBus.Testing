@@ -3,7 +3,9 @@ namespace NServiceBus.Testing
 {
     using System;
     using System.Collections.Generic;
-    using ObjectBuilder;
+    using DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection;
+    using MicrosoftExtensionsDependencyInjection;
     using Pipeline;
 
     /// <summary>
@@ -12,12 +14,11 @@ namespace NServiceBus.Testing
     public partial class TestableOutgoingContext : TestablePipelineContext, IOutgoingContext
     {
         /// <summary>
-        /// A fake <see cref="IBuilder" /> implementation. If you want to provide your own <see cref="IBuilder" /> implementation
-        /// override <see cref="GetBuilder" />.
+        /// The <see cref="IServiceCollection"/> to build an <see cref="IServiceProvider"/> once the <see cref="IBehaviorContext.Builder"/> is accessed. Override <see cref="GetBuilder" /> to customize the <see cref="IServiceProvider"/> implementation used.
         /// </summary>
-        public FakeBuilder Builder { get; set; } = new FakeBuilder();
+        public IServiceCollection ServiceCollection { get; set; } = new ServiceCollection();
 
-        IBuilder IBehaviorContext.Builder => GetBuilder();
+        IServiceProvider IBehaviorContext.Builder => GetBuilder();
 
         /// <summary>
         /// The id of the outgoing message.
@@ -30,12 +31,11 @@ namespace NServiceBus.Testing
         public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
-        /// Selects the builder returned by <see cref="IBehaviorContext.Builder" />. Override this method to provide your custom
-        /// <see cref="IBuilder" /> implementation.
+        /// Selects the builder returned by <see cref="IBehaviorContext.Builder" />. Override this method to provide your custom <see cref="IServiceProvider" /> implementation.
         /// </summary>
-        protected virtual IBuilder GetBuilder()
+        protected virtual IServiceProvider GetBuilder()
         {
-            return Builder;
+            return ServiceCollection.BuildDefaultNServiceBusProvider();
         }
     }
 }
