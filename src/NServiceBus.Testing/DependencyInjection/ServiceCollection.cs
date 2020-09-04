@@ -1,6 +1,13 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+/*
+ * This file has been modified from its original form in the following ways:
+ * - The namespace has been changed
+ * - The access modifier has been changed
+ * - The license file name in the copyright notice has been changed to match the license location in this repository
+ */
+
 using System.Collections;
 using System.Collections.Generic;
 
