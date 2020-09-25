@@ -10,8 +10,6 @@ namespace NServiceBus.Testing
         /// <summary>
         /// Creates a new <see cref="Subscription" /> instance for the given event type and it's options.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="options"></param>
         public Subscription(Type message, SubscribeOptions options) : base(message, options)
         {
         }

@@ -6,13 +6,13 @@ namespace NServiceBus.Testing
 
     class DefaultTestingLoggerFactory : ILoggerFactory
     {
-        public static bool IsDebugEnabled => LogLevel.Debug >= FilterLevel;
+        public static bool IsDebugEnabled => FilterLevel <= LogLevel.Debug;
 
-        public static bool IsInfoEnabled => LogLevel.Info >= FilterLevel;
+        public static bool IsInfoEnabled => FilterLevel <= LogLevel.Info;
 
-        public static bool IsWarnEnabled => LogLevel.Warn >= FilterLevel;
-        public static bool IsErrorEnabled => LogLevel.Error >= FilterLevel;
-        public static bool IsFatalEnabled => LogLevel.Fatal >= FilterLevel;
+        public static bool IsWarnEnabled => FilterLevel <= LogLevel.Warn;
+        public static bool IsErrorEnabled => FilterLevel <= LogLevel.Error;
+        public static bool IsFatalEnabled => FilterLevel <= LogLevel.Fatal;
 
         static LogLevel FilterLevel => TestingLoggerFactory.currentScope.Value?.Item2 ?? TestingLoggerFactory.lazyLevel.Value;
 
