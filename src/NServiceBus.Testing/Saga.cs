@@ -465,7 +465,6 @@ namespace NServiceBus.Testing
         /// <summary>
         /// Verifies that the saga has not been completed.
         /// </summary>
-        /// <returns></returns>
         public Saga<T> ExpectSagaNotCompleted()
         {
             testContext.AddExpectation(new ExpectSagaCompleted<T>(saga, false));
