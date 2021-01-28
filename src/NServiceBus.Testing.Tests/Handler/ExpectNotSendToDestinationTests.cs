@@ -10,15 +10,15 @@ namespace NServiceBus.Testing.Tests.Handler
         [Test]
         public void ShouldPassWhenDestinationDoesNotMatch()
         {
-            Test.Handler<SendingHandler<Send1>>()
+            Test.Handler<SendingHandler<ISend1>>()
                 .WithExternalDependencies(h => h.OptionsProvider = () =>
                 {
                     var options = new SendOptions();
                     options.SetDestination("somewhere");
                     return options;
                 })
-                .ExpectNotSendToDestination<Send1>((message, destination) => destination == "anywhere")
-                .OnMessage<TestMessage>();
+                .ExpectNotSendToDestination<ISend1>((message, destination) => destination == "anywhere")
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -26,27 +26,27 @@ namespace NServiceBus.Testing.Tests.Handler
         {
             var expectedDestination = "expected destination";
 
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Send1>>()
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<ISend1>>()
                 .WithExternalDependencies(h => h.OptionsProvider = () =>
                 {
                     var options = new SendOptions();
                     options.SetDestination(expectedDestination);
                     return options;
                 })
-                .ExpectNotSendToDestination<Send1>((message, destination) => destination == expectedDestination)
-                .OnMessage<TestMessage>());
+                .ExpectNotSendToDestination<ISend1>((message, destination) => destination == expectedDestination)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldPassWhenNoMessageIsSent()
         {
-            Test.Handler<SendingHandler<TestMessage>>()
+            Test.Handler<SendingHandler<ITestMessage>>()
                 .WithExternalDependencies(h => h.SendAnything = false)
-                .ExpectNotSendToDestination<Send1>()
-                .OnMessage<TestMessage>();
+                .ExpectNotSendToDestination<ISend1>()
+                .OnMessage<ITestMessage>();
         }
 
-        class SendingHandler<TSend> : IHandleMessages<TestMessage> where TSend : IMessage
+        class SendingHandler<TSend> : IHandleMessages<ITestMessage> where TSend : IMessage
         {
             public Action<TSend> ModifyMessage { get; set; } = m => { };
 
@@ -54,7 +54,7 @@ namespace NServiceBus.Testing.Tests.Handler
 
             public bool SendAnything { get; set; } = true;
 
-            public Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 if (SendAnything)
                 {

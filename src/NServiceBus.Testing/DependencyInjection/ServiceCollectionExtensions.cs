@@ -9,7 +9,7 @@
     {
         public static IServiceProvider BuildDefaultNServiceBusProvider(this IServiceCollection serviceCollection)
         {
-            var defaultOptions = new ContainerOptions {EnableVariance = false}.WithMicrosoftSettings();
+            var defaultOptions = new ContainerOptions { EnableVariance = false }.WithMicrosoftSettings();
             return serviceCollection.CreateLightInjectServiceProvider(defaultOptions);
         }
     }

@@ -3,8 +3,8 @@
 namespace NServiceBus.Testing
 {
     [ObsoleteEx(
-        Message = "Forwarding functionality has been removed from NServiceBus.", 
-        RemoveInVersion = "9", 
+        Message = "Forwarding functionality has been removed from NServiceBus.",
+        RemoveInVersion = "9",
         TreatAsErrorFromVersion = "8")]
     public class TestableForwardingContext
     {

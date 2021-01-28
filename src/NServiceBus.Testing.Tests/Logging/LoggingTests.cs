@@ -13,7 +13,7 @@ namespace NServiceBus.Testing.Tests.Logging
         {
             SomeClassThatUsesStaticLogger.Reset();
         }
-        
+
         [Test]
         public void Scoped_Writer_should_be_honored()
         {
@@ -74,17 +74,17 @@ namespace NServiceBus.Testing.Tests.Logging
             var loggerFactory = LogManager.Use<TestingLoggerFactory>();
             var globalWriter = new StringWriter();
             loggerFactory.WriteTo(globalWriter);
-            
+
             var firstInstance = new SomeClassThatUsesStaticLogger();
             firstInstance.DoSomething();
-            
+
             var secondStringWriter = new StringWriter();
             using (loggerFactory.BeginScope(secondStringWriter))
             {
                 var secondInstance = new SomeClassThatUsesStaticLogger();
                 secondInstance.DoSomething();
             }
-            
+
             var globalLogString = globalWriter.ToString();
             var scopedLogString = secondStringWriter.ToString();
 

@@ -11,7 +11,7 @@
         {
             Test.Handler<DoNotContinueDispatchingCurrentMessageToHandlersHandler>()
                 .ExpectDoNotContinueDispatchingCurrentMessageToHandlers()
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -19,12 +19,12 @@
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<EmptyHandler>()
                 .ExpectDoNotContinueDispatchingCurrentMessageToHandlers()
-                .OnMessage<TestMessage>());
+                .OnMessage<ITestMessage>());
         }
 
-        public class DoNotContinueDispatchingCurrentMessageToHandlersHandler : IHandleMessages<TestMessage>
+        public class DoNotContinueDispatchingCurrentMessageToHandlersHandler : IHandleMessages<ITestMessage>
         {
-            public Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 context.DoNotContinueDispatchingCurrentMessageToHandlers();
 

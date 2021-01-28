@@ -13,10 +13,10 @@
             Test.Saga<MySaga>()
                 .ExpectReplyToOriginator<ResponseToOriginator>()
                 .ExpectTimeoutToBeSetIn<StartsSaga>((state, span) => span == TimeSpan.FromDays(7))
-                .ExpectPublish<Event>()
+                .ExpectPublish<IMyEvent>()
                 .ExpectSend<Command>()
                 .WhenHandling(new StartsSaga())
-                .ExpectPublish<Event>()
+                .ExpectPublish<IMyEvent>()
                 .ExpectSagaCompleted()
                 .WhenHandlingTimeout<StartsSaga>();
         }
@@ -34,7 +34,7 @@
         {
             Test.Saga<MySagaWithInterface>()
                 .ExpectSend<Command>()
-                .WhenHandling<StartsSagaWithInterface>(m => m.Foo = "Hello");
+                .WhenHandling<IStartsSagaWithInterface>(m => m.Foo = "Hello");
         }
 
         [Test]
@@ -151,9 +151,9 @@
     }
 
     public class MySagaWithInterface : NServiceBus.Saga<MySagaWithInterface.MySagaDataWithInterface>,
-        IAmStartedByMessages<StartsSagaWithInterface>
+        IAmStartedByMessages<IStartsSagaWithInterface>
     {
-        public async Task Handle(StartsSagaWithInterface message, IMessageHandlerContext context)
+        public async Task Handle(IStartsSagaWithInterface message, IMessageHandlerContext context)
         {
             if (message.Foo == "Hello")
             {
@@ -177,7 +177,7 @@
         public async Task Handle(StartsSaga message, IMessageHandlerContext context)
         {
             await ReplyToOriginator(context, new ResponseToOriginator());
-            await context.Publish<Event>();
+            await context.Publish<IMyEvent>();
             await context.Send<Command>(s => { });
             await context.ForwardCurrentMessageTo("forwardingDestination");
             await RequestTimeout(context, TimeSpan.FromDays(7), message);
@@ -185,7 +185,7 @@
 
         public async Task Timeout(StartsSaga state, IMessageHandlerContext context)
         {
-            await context.Publish<Event>();
+            await context.Publish<IMyEvent>();
             MarkAsComplete();
         }
 
@@ -201,7 +201,7 @@
         public string OriginalMessageId { get; set; }
     }
 
-    public interface StartsSagaWithInterface : IEvent
+    public interface IStartsSagaWithInterface : IEvent
     {
         string Foo { get; set; }
     }
@@ -214,7 +214,7 @@
     {
     }
 
-    public interface Event : IEvent
+    public interface IMyEvent : IEvent
     {
     }
 

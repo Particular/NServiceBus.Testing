@@ -12,7 +12,7 @@
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<NotForwardingMessageHandler>()
                 .ExpectForwardCurrentMessageTo()
-                .OnMessage<TestMessage>());
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
@@ -20,7 +20,7 @@
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<NotForwardingMessageHandler>()
                 .ExpectForwardCurrentMessageTo(dest => true)
-                .OnMessage<TestMessage>());
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
@@ -30,7 +30,7 @@
 
             Assert.Throws<ExpectationException>(() => Test.Handler(handler)
                 .ExpectForwardCurrentMessageTo(dest => dest == "expectedDestination")
-                .OnMessage<TestMessage>());
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
@@ -40,7 +40,7 @@
 
             Test.Handler(handler)
                 .ExpectForwardCurrentMessageTo()
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -51,7 +51,7 @@
 
             Test.Handler(handler)
                 .ExpectForwardCurrentMessageTo(dest => dest == forwardingDestination)
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -59,7 +59,7 @@
         {
             Test.Handler<NotForwardingMessageHandler>()
                 .ExpectNotForwardCurrentMessageTo()
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -67,7 +67,7 @@
         {
             Test.Handler<NotForwardingMessageHandler>()
                 .ExpectNotForwardCurrentMessageTo(dest => true)
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -77,7 +77,7 @@
 
             Assert.Throws<ExpectationException>(() => Test.Handler(handler)
                 .ExpectNotForwardCurrentMessageTo()
-                .OnMessage<TestMessage>());
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
@@ -88,7 +88,7 @@
 
             Assert.Throws<ExpectationException>(() => Test.Handler(handler)
                 .ExpectNotForwardCurrentMessageTo(dest => dest == forwardingDestination)
-                .OnMessage<TestMessage>());
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
@@ -98,7 +98,7 @@
 
             Test.Handler(handler)
                 .ExpectNotForwardCurrentMessageTo(dest => dest == "expectedDestination")
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -108,7 +108,7 @@
                 .ExpectForwardCurrentMessageTo(dest => dest == "dest1")
                 .ExpectForwardCurrentMessageTo(dest => dest == "dest2")
                 .ExpectNotForwardCurrentMessageTo(dest => dest == "dest3")
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -132,22 +132,22 @@
             Assert.AreEqual(100, counter);
         }
 
-        public class NotForwardingMessageHandler : IHandleMessages<TestMessage>
+        public class NotForwardingMessageHandler : IHandleMessages<ITestMessage>
         {
-            public Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 return Task.FromResult(0);
             }
         }
 
-        public class ForwardingMessageHandler : IHandleMessages<TestMessage>
+        public class ForwardingMessageHandler : IHandleMessages<ITestMessage>
         {
             public ForwardingMessageHandler(string destination)
             {
                 this.destination = destination;
             }
 
-            public Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 return context.ForwardCurrentMessageTo(destination);
             }
@@ -155,9 +155,9 @@
             readonly string destination;
         }
 
-        public class MultipleForwardingsMessageHandler : IHandleMessages<TestMessage>
+        public class MultipleForwardingsMessageHandler : IHandleMessages<ITestMessage>
         {
-            public async Task Handle(TestMessage message, IMessageHandlerContext context)
+            public async Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 await context.ForwardCurrentMessageTo("dest1");
                 await context.ForwardCurrentMessageTo("dest2");

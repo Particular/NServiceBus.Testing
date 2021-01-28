@@ -6,7 +6,7 @@ namespace NServiceBus.Testing
     using System.Threading.Tasks;
     using MessageInterfaces.MessageMapper.Reflection;
 
-    internal static class SagaConsts
+    static class SagaConsts
     {
         public const string Originator = "NServiceBus.Testing.SagaOriginator";
     }
