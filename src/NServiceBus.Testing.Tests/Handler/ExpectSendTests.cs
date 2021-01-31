@@ -11,41 +11,41 @@
         [Test]
         public void ShouldPassExpectSendIfSending()
         {
-            Test.Handler<SendingHandler<Send1>>()
-                .ExpectSend<Send1>()
-                .OnMessage<TestMessage>();
+            Test.Handler<SendingHandler<ISend1>>()
+                .ExpectSend<ISend1>()
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldPassExpectSendWithCheckIfSending()
         {
-            Test.Handler<SendingHandler<Send1>>()
-                .ExpectSend<Send1>(m => true)
-                .OnMessage<TestMessage>();
+            Test.Handler<SendingHandler<ISend1>>()
+                .ExpectSend<ISend1>(m => true)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectSendIfNotSending()
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<EmptyHandler>()
-                .ExpectSend<Send1>()
-                .OnMessage<TestMessage>());
+                .ExpectSend<ISend1>()
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldFailExpectSendWithCheckIfNotSending()
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<EmptyHandler>()
-                .ExpectSend<Send1>(m => true)
-                .OnMessage<TestMessage>());
+                .ExpectSend<ISend1>(m => true)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldFailExpectSendIfSendingWithoutMatch()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Publish1>>()
-                .ExpectSend<Send1>(m => true)
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<IPublish1>>()
+                .ExpectSend<ISend1>(m => true)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
@@ -54,14 +54,14 @@
             var options = new SendOptions();
             SendOptions capturedOptions = null;
 
-            Test.Handler<SendingHandler<Send1>>()
+            Test.Handler<SendingHandler<ISend1>>()
                 .WithExternalDependencies(handler => handler.OptionsProvider = () => options)
-                .ExpectSend<Send1>((message, sendOptions) =>
+                .ExpectSend<ISend1>((message, sendOptions) =>
                 {
                     capturedOptions = sendOptions;
                     return true;
                 })
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
 
             Assert.AreSame(options, capturedOptions);
         }
@@ -70,32 +70,32 @@
         public void ShouldPassExpectNotSendIfNotSending()
         {
             Test.Handler<EmptyHandler>()
-                .ExpectNotSend<Send1>()
-                .OnMessage<TestMessage>();
+                .ExpectNotSend<ISend1>()
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldPassExpectNotSendWithCheckIfNotSending()
         {
             Test.Handler<EmptyHandler>()
-                .ExpectNotSend<Send1>(m => true)
-                .OnMessage<TestMessage>();
+                .ExpectNotSend<ISend1>(m => true)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectNotSendIfSending()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Send1>>()
-                .ExpectNotSend<Send1>()
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<ISend1>>()
+                .ExpectNotSend<ISend1>()
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldFailExpectNotSendWithCheckIfSending()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Send1>>()
-                .ExpectNotSend<Send1>(m => true)
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<ISend1>>()
+                .ExpectNotSend<ISend1>(m => true)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
@@ -104,14 +104,14 @@
             var options = new SendOptions();
             SendOptions capturedOptions = null;
 
-            Test.Handler<SendingHandler<Send1>>()
+            Test.Handler<SendingHandler<ISend1>>()
                 .WithExternalDependencies(handler => handler.OptionsProvider = () => options)
-                .ExpectNotSend<Send1>((message, sendOptions) =>
+                .ExpectNotSend<ISend1>((message, sendOptions) =>
                 {
                     capturedOptions = sendOptions;
                     return false;
                 })
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
 
             Assert.AreSame(options, capturedOptions);
         }
@@ -119,81 +119,81 @@
         [Test]
         public void ShouldFailExpectSendLocalIfNotSendingLocal()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Send1>>()
-                .ExpectSendLocal<Send1>()
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<ISend1>>()
+                .ExpectSendLocal<ISend1>()
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldFailExpectSendLocalWithCheckIfNotSendingLocal()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<Send1>>()
-                .ExpectSendLocal<Send1>(m => true)
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<ISend1>>()
+                .ExpectSendLocal<ISend1>(m => true)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldPassExpectSendLocalIfSendingLocal()
         {
-            Test.Handler<SendingLocalHandler<Send1>>()
-                .ExpectSendLocal<Send1>()
-                .OnMessage<TestMessage>();
+            Test.Handler<SendingLocalHandler<ISend1>>()
+                .ExpectSendLocal<ISend1>()
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldPassExpectSendLocalWithCheckIfSendingLocal()
         {
-            Test.Handler<SendingLocalHandler<Send1>>()
-                .ExpectSendLocal<Send1>(m => true)
-                .OnMessage<TestMessage>();
+            Test.Handler<SendingLocalHandler<ISend1>>()
+                .ExpectSendLocal<ISend1>(m => true)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectSendLocalIfSendingLocalWithoutMatch()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingLocalHandler<Publish1>>()
-                .ExpectSendLocal<Send1>(m => true)
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingLocalHandler<IPublish1>>()
+                .ExpectSendLocal<ISend1>(m => true)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldFailExpectSendLocalIfSendingLocalWithFailingCheck()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingLocalHandler<Send1>>()
-                .ExpectSendLocal<Send1>(m => false)
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingLocalHandler<ISend1>>()
+                .ExpectSendLocal<ISend1>(m => false)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldPassExpectNotSendLocalIfNotSendingLocal()
         {
             Test.Handler<EmptyHandler>()
-                .ExpectNotSendLocal<Send1>(m => true)
-                .OnMessage<TestMessage>();
+                .ExpectNotSendLocal<ISend1>(m => true)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectNotSendLocalIfSendingLocal()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingLocalHandler<Send1>>()
-                .ExpectNotSendLocal<Send1>(m => true)
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingLocalHandler<ISend1>>()
+                .ExpectNotSendLocal<ISend1>(m => true)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldPassExpectNotSendLocalIfSendingLocalWithoutMatch()
         {
-            Test.Handler<SendingLocalHandler<Publish1>>()
-                .ExpectNotSendLocal<Send1>(m => true)
-                .OnMessage<TestMessage>();
+            Test.Handler<SendingLocalHandler<IPublish1>>()
+                .ExpectNotSendLocal<ISend1>(m => true)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldPassExpectNotSendLocalIfSendingLocalWithFailingCheck()
         {
-            Test.Handler<SendingLocalHandler<Send1>>()
-                .ExpectNotSendLocal<Send1>(m => false)
-                .OnMessage<TestMessage>();
+            Test.Handler<SendingLocalHandler<ISend1>>()
+                .ExpectNotSendLocal<ISend1>(m => false)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -238,9 +238,9 @@
                 .WithExternalDependencies(h =>
                 {
                     h.NumberOfThreads = 100;
-                    h.HandlerAction = context => context.Send<Send1>(m => { });
+                    h.HandlerAction = context => context.Send<ISend1>(m => { });
                 })
-                .ExpectSend<Send1>(m =>
+                .ExpectSend<ISend1>(m =>
                 {
                     Interlocked.Increment(ref counter);
                     return false;
@@ -249,25 +249,25 @@
             Assert.AreEqual(100, counter);
         }
 
-        public class SendingHandler<TSend> : IHandleMessages<TestMessage>
+        public class SendingHandler<TSend> : IHandleMessages<ITestMessage>
         where TSend : IMessage
         {
             public Action<TSend> ModifyMessage { get; set; } = m => { };
 
             public Func<SendOptions> OptionsProvider { get; set; } = () => new SendOptions();
 
-            public Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 return context.Send(ModifyMessage, OptionsProvider());
             }
         }
 
-        public class SendingLocalHandler<TSend> : IHandleMessages<TestMessage>
+        public class SendingLocalHandler<TSend> : IHandleMessages<ITestMessage>
         where TSend : IMessage
         {
             public Action<TSend> ModifyMessage { get; set; } = m => { };
 
-            public Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 return context.SendLocal(ModifyMessage);
             }

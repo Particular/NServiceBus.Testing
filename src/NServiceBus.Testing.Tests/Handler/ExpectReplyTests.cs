@@ -74,9 +74,9 @@
                 .WithExternalDependencies(h =>
                 {
                     h.NumberOfThreads = 100;
-                    h.HandlerAction = context => context.Reply<Send1>(m => { });
+                    h.HandlerAction = context => context.Reply<ISend1>(m => { });
                 })
-                .ExpectReply<Send1>(m =>
+                .ExpectReply<ISend1>(m =>
                 {
                     Interlocked.Increment(ref counter);
                     return false;

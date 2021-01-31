@@ -3,8 +3,8 @@ namespace NServiceBus.Testing.Tests.Handler
     using System;
     using System.Collections.Concurrent;
     using System.Threading.Tasks;
-    using Saga;
     using NUnit.Framework;
+    using Saga;
 
     [TestFixture]
     public class HandlerTests
@@ -26,7 +26,7 @@ namespace NServiceBus.Testing.Tests.Handler
         {
             var handler = new ExplicitInterfaceImplementation();
             Assert.IsFalse(handler.IsHandled);
-            Test.Handler(handler).OnMessage<TestMessage>();
+            Test.Handler(handler).OnMessage<ITestMessage>();
             Assert.IsTrue(handler.IsHandled);
         }
 
@@ -75,7 +75,7 @@ namespace NServiceBus.Testing.Tests.Handler
                     c.ReplyToAddress = replyToAddress;
                     contextInstance = c;
                 })
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
 
             Assert.AreEqual(messageId, handler.Context.MessageId);
             Assert.AreEqual(replyToAddress, handler.Context.ReplyToAddress);
@@ -86,7 +86,7 @@ namespace NServiceBus.Testing.Tests.Handler
         public void OnMessageShouldAwaitAsyncTasks()
         {
             Test.Handler<AsyncHandler>()
-                .ExpectSend<Send1>(m => true)
+                .ExpectSend<ISend1>(m => true)
                 .OnMessage<MyCommand>();
         }
 
@@ -138,20 +138,20 @@ namespace NServiceBus.Testing.Tests.Handler
         public string Header2 { get; set; }
     }
 
-    public class ContextAccessingHandler : IHandleMessages<TestMessage>
+    public class ContextAccessingHandler : IHandleMessages<ITestMessage>
     {
         public IMessageHandlerContext Context { get; private set; }
 
-        public Task Handle(TestMessage message, IMessageHandlerContext context)
+        public Task Handle(ITestMessage message, IMessageHandlerContext context)
         {
             Context = context;
             return Task.FromResult(0);
         }
     }
 
-    public class EmptyHandler : IHandleMessages<TestMessage>
+    public class EmptyHandler : IHandleMessages<ITestMessage>
     {
-        public Task Handle(TestMessage message, IMessageHandlerContext context)
+        public Task Handle(ITestMessage message, IMessageHandlerContext context)
         {
             return Task.FromResult(0);
         }
@@ -173,21 +173,21 @@ namespace NServiceBus.Testing.Tests.Handler
         public Func<IMessageHandlerContext, Task> HandlerAction = x => Task.FromResult(0);
     }
 
-    public interface TestMessage : IMessage
+    public interface ITestMessage : IMessage
     {
     }
 
-    public interface Publish1 : IMessage
-    {
-        string Data { get; set; }
-    }
-
-    public interface Send1 : IMessage
+    public interface IPublish1 : IMessage
     {
         string Data { get; set; }
     }
 
-    public interface Publish2 : IMessage
+    public interface ISend1 : IMessage
+    {
+        string Data { get; set; }
+    }
+
+    public interface IPublish2 : IMessage
     {
         string Data { get; set; }
     }
@@ -253,15 +253,15 @@ namespace NServiceBus.Testing.Tests.Handler
         public async Task Handle(MyCommand message, IMessageHandlerContext context)
         {
             await Task.Yield();
-            await context.Send<Send1>(m => { }, new SendOptions());
+            await context.Send<ISend1>(m => { }, new SendOptions());
         }
     }
 
-    public class ExplicitInterfaceImplementation : IHandleMessages<TestMessage>
+    public class ExplicitInterfaceImplementation : IHandleMessages<ITestMessage>
     {
         public bool IsHandled { get; set; }
 
-        Task IHandleMessages<TestMessage>.Handle(TestMessage message, IMessageHandlerContext context)
+        Task IHandleMessages<ITestMessage>.Handle(ITestMessage message, IMessageHandlerContext context)
         {
             IsHandled = true;
 

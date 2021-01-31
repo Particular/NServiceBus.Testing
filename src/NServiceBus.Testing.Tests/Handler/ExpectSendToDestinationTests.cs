@@ -12,38 +12,38 @@
         {
             var expectedDestination = "expected destination";
 
-            Test.Handler<SendingHandler<Send1>>()
+            Test.Handler<SendingHandler<ISend1>>()
                 .WithExternalDependencies(h => h.OptionsProvider = () =>
                 {
                     var options = new SendOptions();
                     options.SetDestination(expectedDestination);
                     return options;
                 })
-                .ExpectSendToDestination<Send1>((message, destination) => destination == expectedDestination)
-                .OnMessage<TestMessage>();
+                .ExpectSendToDestination<ISend1>((message, destination) => destination == expectedDestination)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldNotPassWhenDestinationDoesNotMatch()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<TestMessage>>()
+            Assert.Throws<ExpectationException>(() => Test.Handler<SendingHandler<ITestMessage>>()
                 .WithExternalDependencies(h => h.OptionsProvider = () =>
                 {
                     var options = new SendOptions();
                     options.SetDestination("somewhere");
                     return options;
                 })
-                .ExpectSendToDestination<Send1>((message, destination) => destination == "anywhere")
-                .OnMessage<TestMessage>());
+                .ExpectSendToDestination<ISend1>((message, destination) => destination == "anywhere")
+                .OnMessage<ITestMessage>());
         }
 
-        class SendingHandler<TSend> : IHandleMessages<TestMessage> where TSend : IMessage
+        class SendingHandler<TSend> : IHandleMessages<ITestMessage> where TSend : IMessage
         {
             public Action<TSend> ModifyMessage { get; set; } = m => { };
 
             public Func<SendOptions> OptionsProvider { get; set; } = () => new SendOptions();
 
-            public Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 return context.Send(ModifyMessage, OptionsProvider());
             }

@@ -11,93 +11,93 @@
         [Test]
         public void ShouldPassExpectPublishWhenPublishing()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
-                .ExpectPublish<Publish1>()
-                .OnMessage<TestMessage>();
+            Test.Handler<PublishingHandler<IPublish1>>()
+                .ExpectPublish<IPublish1>()
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldPassExpectPublishWhenPublishingWithCustomCheck()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
-                .ExpectPublish<Publish1>(m => true)
-                .OnMessage<TestMessage>();
+            Test.Handler<PublishingHandler<IPublish1>>()
+                .ExpectPublish<IPublish1>(m => true)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectNotPublishWhenPublishing()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<Publish1>>()
-                .ExpectNotPublish<Publish1>()
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<IPublish1>>()
+                .ExpectNotPublish<IPublish1>()
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldFailExpectNotPublishWithCheckWhenPublishing()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<Publish1>>()
-                .ExpectNotPublish<Publish1>(m => true)
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<IPublish1>>()
+                .ExpectNotPublish<IPublish1>(m => true)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldPassExpectPublishWhenPublishingMultipleEvents()
         {
-            Test.Handler<PublishingHandler<Publish1, Publish2>>()
-                .ExpectPublish<Publish1>(m => true)
-                .OnMessage<TestMessage>();
+            Test.Handler<PublishingHandler<IPublish1, IPublish2>>()
+                .ExpectPublish<IPublish1>(m => true)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldPassExpectPublishWhenMessageIsSend()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
-                .ExpectPublish<Publish1>(m => true)
+            Test.Handler<PublishingHandler<IPublish1>>()
+                .ExpectPublish<IPublish1>(m => true)
                 .OnMessage(new TestMessageImpl(), Guid.NewGuid().ToString());
         }
 
         [Test]
         public void ShouldPassExpectPublishWhenPublishingAndCheckingPredicate()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
+            Test.Handler<PublishingHandler<IPublish1>>()
                 .WithExternalDependencies(h => h.ModifyMessage = m => m.Data = "Data")
-                .ExpectPublish<Publish1>(m => m.Data == "Data")
-                .OnMessage<TestMessage>();
+                .ExpectPublish<IPublish1>(m => m.Data == "Data")
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectNotPublishWhenPublishingAndCheckingPredicate()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<Publish1>>()
+            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<IPublish1>>()
                 .WithExternalDependencies(h => h.ModifyMessage = m => m.Data = "Data")
-                .ExpectNotPublish<Publish1>(m => m.Data == "Data")
-                .OnMessage<TestMessage>());
+                .ExpectNotPublish<IPublish1>(m => m.Data == "Data")
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldFailExpectPublishWhenPublishingAndCheckingPredicateThatFails()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<Publish1>>()
+            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<IPublish1>>()
                 .WithExternalDependencies(h => h.ModifyMessage = m => m.Data = "NotData")
-                .ExpectPublish<Publish1>(m => m.Data == "Data")
-                .OnMessage<TestMessage>());
+                .ExpectPublish<IPublish1>(m => m.Data == "Data")
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldPassExpectNotPublishWhenPublishingAndCheckingPredicateThatFails()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
+            Test.Handler<PublishingHandler<IPublish1>>()
                 .WithExternalDependencies(h => h.ModifyMessage = m => m.Data = "NotData")
-                .ExpectNotPublish<Publish1>(m => m.Data == "Data")
-                .OnMessage<TestMessage>();
+                .ExpectNotPublish<IPublish1>(m => m.Data == "Data")
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldFailExpectPublishIfNotPublishing()
         {
             Assert.Throws<ExpectationException>(() => Test.Handler<EmptyHandler>()
-                .ExpectPublish<Publish1>(m => true)
-                .OnMessage<TestMessage>());
+                .ExpectPublish<IPublish1>(m => true)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
@@ -106,14 +106,14 @@
             var options = new PublishOptions();
             PublishOptions capturedOptions = null;
 
-            Test.Handler<PublishingHandler<Publish1>>()
+            Test.Handler<PublishingHandler<IPublish1>>()
                 .WithExternalDependencies(h => h.OptionsProvider = () => options)
-                .ExpectPublish<Publish1>((message, publishOptions) =>
+                .ExpectPublish<IPublish1>((message, publishOptions) =>
                 {
                     capturedOptions = publishOptions;
                     return true;
                 })
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
 
             Assert.AreSame(options, capturedOptions);
         }
@@ -122,16 +122,16 @@
         public void ShouldPassExpectNotPublishIfNotPublishing()
         {
             Test.Handler<EmptyHandler>()
-                .ExpectNotPublish<Publish1>()
-                .OnMessage<TestMessage>();
+                .ExpectNotPublish<IPublish1>()
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldPassExpectNotPublishWithCheckIfNotPublishing()
         {
             Test.Handler<EmptyHandler>()
-                .ExpectNotPublish<Publish1>(m => true)
-                .OnMessage<TestMessage>();
+                .ExpectNotPublish<IPublish1>(m => true)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
@@ -140,14 +140,14 @@
             var options = new PublishOptions();
             PublishOptions capturedOptions = null;
 
-            Test.Handler<PublishingHandler<Publish1>>()
+            Test.Handler<PublishingHandler<IPublish1>>()
                 .WithExternalDependencies(h => h.OptionsProvider = () => options)
-                .ExpectNotPublish<Publish1>((message, publishOptions) =>
+                .ExpectNotPublish<IPublish1>((message, publishOptions) =>
                 {
                     capturedOptions = publishOptions;
                     return false;
                 })
-                .OnMessage<TestMessage>();
+                .OnMessage<ITestMessage>();
 
             Assert.AreSame(options, capturedOptions);
         }
@@ -155,24 +155,24 @@
         [Test]
         public void ShouldFailExpectPublishIfPublishWrongMessageType()
         {
-            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<Publish1>>()
-                .ExpectPublish<Publish2>(m => true)
-                .OnMessage<TestMessage>());
+            Assert.Throws<ExpectationException>(() => Test.Handler<PublishingHandler<IPublish1>>()
+                .ExpectPublish<IPublish2>(m => true)
+                .OnMessage<ITestMessage>());
         }
 
         [Test]
         public void ShouldPassExpectNotPublishIfPublishWrongMessageType()
         {
-            Test.Handler<PublishingHandler<Publish1>>()
-                .ExpectNotPublish<Publish2>(m => true)
-                .OnMessage<TestMessage>();
+            Test.Handler<PublishingHandler<IPublish1>>()
+                .ExpectNotPublish<IPublish2>(m => true)
+                .OnMessage<ITestMessage>();
         }
 
         [Test]
         public void ShouldSupportDataBusProperties()
         {
             Test.Handler<DataBusMessageHandler>()
-                .ExpectNotPublish<Publish2>(m => true)
+                .ExpectNotPublish<IPublish2>(m => true)
                 .OnMessage<MessageWithDataBusProperty>();
         }
 
@@ -194,9 +194,9 @@
                 .WithExternalDependencies(h =>
                 {
                     h.NumberOfThreads = 100;
-                    h.HandlerAction = context => context.Publish<Publish1>(m => { });
+                    h.HandlerAction = context => context.Publish<IPublish1>(m => { });
                 })
-                .ExpectPublish<Publish1>(m =>
+                .ExpectPublish<IPublish1>(m =>
                 {
                     Interlocked.Increment(ref counter);
                     return false;
@@ -206,34 +206,34 @@
             Assert.AreEqual(100, counter);
         }
 
-        public class PublishingHandler<TPublish> : IHandleMessages<TestMessage>
+        public class PublishingHandler<TPublish> : IHandleMessages<ITestMessage>
         where TPublish : IMessage
         {
             public Action<TPublish> ModifyMessage { get; set; } = m => { };
 
             public Func<PublishOptions> OptionsProvider { get; set; } = () => new PublishOptions();
 
-            public Task Handle(TestMessage message, IMessageHandlerContext context)
+            public Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 return context.Publish(ModifyMessage, OptionsProvider());
             }
         }
 
-        public class PublishingHandler<TPublish1, TPublish2> : IHandleMessages<TestMessage>
+        public class PublishingHandler<TPublish1, TPublish2> : IHandleMessages<ITestMessage>
         where TPublish1 : IMessage
         where TPublish2 : IMessage
         {
             public Action<TPublish1> ModifyPublish1 { get; set; } = m => { };
             public Action<TPublish2> ModifyPublish2 { get; set; } = m => { };
 
-            public async Task Handle(TestMessage message, IMessageHandlerContext context)
+            public async Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
                 await context.Publish(ModifyPublish1);
                 await context.Publish(ModifyPublish2);
             }
         }
 
-        class TestMessageImpl : TestMessage
+        class TestMessageImpl : ITestMessage
         {
         }
 
