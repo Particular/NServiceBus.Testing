@@ -162,7 +162,7 @@ namespace NServiceBus.Testing
         public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>(TSaga saga)
             where TSaga : NServiceBus.Saga { }
     }
-    public class TestableAuditContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IAuditContext, NServiceBus.Pipeline.IBehaviorContext
+    public class TestableAuditContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IAuditContext, NServiceBus.Pipeline.IBehaviorContext
     {
         public TestableAuditContext() { }
         public System.Collections.Generic.IDictionary<string, string> AddedAuditData { get; }
@@ -170,19 +170,20 @@ namespace NServiceBus.Testing
         public NServiceBus.Transport.OutgoingMessage Message { get; set; }
         public void AddAuditData(string key, string value) { }
     }
-    public class TestableBatchDispatchContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBatchDispatchContext, NServiceBus.Pipeline.IBehaviorContext
+    public class TestableBatchDispatchContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBatchDispatchContext, NServiceBus.Pipeline.IBehaviorContext
     {
         public TestableBatchDispatchContext() { }
         public System.Collections.Generic.IList<NServiceBus.Transport.TransportOperation> Operations { get; set; }
     }
-    public abstract class TestableBehaviorContext : NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext
+    public abstract class TestableBehaviorContext : NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext
     {
         protected TestableBehaviorContext() { }
+        public System.Threading.CancellationToken CancellationToken { get; set; }
         public NServiceBus.Extensibility.ContextBag Extensions { get; set; }
         public Microsoft.Extensions.DependencyInjection.IServiceCollection ServiceCollection { get; set; }
         protected virtual System.IServiceProvider GetBuilder() { }
     }
-    public class TestableDispatchContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IDispatchContext
+    public class TestableDispatchContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IDispatchContext
     {
         public TestableDispatchContext() { }
         public System.Collections.Generic.IList<NServiceBus.Transport.TransportOperation> Operations { get; set; }
@@ -191,7 +192,7 @@ namespace NServiceBus.Testing
     {
         public TestableEndpointInstance() { }
         public bool EndpointStopped { get; }
-        public virtual System.Threading.Tasks.Task Stop() { }
+        public virtual System.Threading.Tasks.Task Stop(System.Threading.CancellationToken cancellationToken = default) { }
     }
     [System.Obsolete("Forwarding functionality has been removed from NServiceBus. Will be removed in ve" +
         "rsion 9.0.0.", true)]
@@ -199,13 +200,13 @@ namespace NServiceBus.Testing
     {
         public TestableForwardingContext() { }
     }
-    public abstract class TestableIncomingContext : NServiceBus.Testing.TestableMessageProcessingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext
+    public abstract class TestableIncomingContext : NServiceBus.Testing.TestableMessageProcessingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext
     {
         protected TestableIncomingContext(NServiceBus.IMessageCreator messageCreator = null) { }
         public Microsoft.Extensions.DependencyInjection.IServiceCollection ServiceCollection { get; set; }
         protected virtual System.IServiceProvider GetBuilder() { }
     }
-    public class TestableIncomingLogicalMessageContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IIncomingLogicalMessageContext
+    public class TestableIncomingLogicalMessageContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IIncomingLogicalMessageContext
     {
         public TestableIncomingLogicalMessageContext(NServiceBus.IMessageCreator messageCreator = null) { }
         public System.Collections.Generic.Dictionary<string, string> Headers { get; set; }
@@ -213,13 +214,13 @@ namespace NServiceBus.Testing
         public bool MessageHandled { get; set; }
         public virtual void UpdateMessageInstance(object newInstance) { }
     }
-    public class TestableIncomingPhysicalMessageContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IIncomingPhysicalMessageContext
+    public class TestableIncomingPhysicalMessageContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IIncomingPhysicalMessageContext
     {
         public TestableIncomingPhysicalMessageContext() { }
         public NServiceBus.Transport.IncomingMessage Message { get; set; }
         public virtual void UpdateMessage(byte[] body) { }
     }
-    public class TestableInvokeHandlerContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageHandlerContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IInvokeHandlerContext
+    public class TestableInvokeHandlerContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IMessageHandlerContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IInvokeHandlerContext
     {
         public TestableInvokeHandlerContext(NServiceBus.IMessageCreator messageCreator = null) { }
         public bool DoNotContinueDispatchingCurrentMessageToHandlersWasCalled { get; set; }
@@ -235,7 +236,7 @@ namespace NServiceBus.Testing
     {
         public TestableMessageHandlerContext(NServiceBus.IMessageCreator messageCreator = null) { }
     }
-    public class TestableMessageProcessingContext : NServiceBus.Testing.TestablePipelineContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext
+    public class TestableMessageProcessingContext : NServiceBus.Testing.TestablePipelineContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext
     {
         public TestableMessageProcessingContext(NServiceBus.IMessageCreator messageCreator = null) { }
         public virtual string[] ForwardedMessages { get; }
@@ -252,10 +253,14 @@ namespace NServiceBus.Testing
         public TestableMessageSession() { }
         public virtual NServiceBus.Testing.Subscription[] Subscriptions { get; }
         public virtual NServiceBus.Testing.Unsubscription[] Unsubscription { get; }
-        public virtual System.Threading.Tasks.Task Subscribe(System.Type eventType, NServiceBus.SubscribeOptions options) { }
-        public virtual System.Threading.Tasks.Task Unsubscribe(System.Type eventType, NServiceBus.UnsubscribeOptions options) { }
+        public System.Threading.Tasks.Task Publish(object message, NServiceBus.PublishOptions publishOptions, System.Threading.CancellationToken cancellationToken) { }
+        public System.Threading.Tasks.Task Publish<T>(System.Action<T> messageConstructor, NServiceBus.PublishOptions publishOptions, System.Threading.CancellationToken cancellationToken) { }
+        public System.Threading.Tasks.Task Send(object message, NServiceBus.SendOptions sendOptions, System.Threading.CancellationToken cancellationToken) { }
+        public System.Threading.Tasks.Task Send<T>(System.Action<T> messageConstructor, NServiceBus.SendOptions sendOptions, System.Threading.CancellationToken cancellationToken) { }
+        public virtual System.Threading.Tasks.Task Subscribe(System.Type eventType, NServiceBus.SubscribeOptions options, System.Threading.CancellationToken cancellationToken) { }
+        public virtual System.Threading.Tasks.Task Unsubscribe(System.Type eventType, NServiceBus.UnsubscribeOptions options, System.Threading.CancellationToken cancellationToken) { }
     }
-    public class TestableOutgoingContext : NServiceBus.Testing.TestablePipelineContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext
+    public class TestableOutgoingContext : NServiceBus.Testing.TestablePipelineContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext
     {
         public TestableOutgoingContext() { }
         public System.Collections.Generic.Dictionary<string, string> Headers { get; set; }
@@ -263,39 +268,40 @@ namespace NServiceBus.Testing
         public Microsoft.Extensions.DependencyInjection.IServiceCollection ServiceCollection { get; set; }
         protected virtual System.IServiceProvider GetBuilder() { }
     }
-    public class TestableOutgoingLogicalMessageContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingLogicalMessageContext
+    public class TestableOutgoingLogicalMessageContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingLogicalMessageContext
     {
         public TestableOutgoingLogicalMessageContext() { }
         public NServiceBus.Pipeline.OutgoingLogicalMessage Message { get; set; }
         public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
         public virtual void UpdateMessage(object newInstance) { }
     }
-    public class TestableOutgoingPhysicalMessageContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingPhysicalMessageContext
+    public class TestableOutgoingPhysicalMessageContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingPhysicalMessageContext
     {
         public TestableOutgoingPhysicalMessageContext() { }
         public byte[] Body { get; set; }
         public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
         public virtual void UpdateMessage(byte[] body) { }
     }
-    public class TestableOutgoingPublishContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingPublishContext
+    public class TestableOutgoingPublishContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingPublishContext
     {
         public TestableOutgoingPublishContext() { }
         public NServiceBus.Pipeline.OutgoingLogicalMessage Message { get; set; }
     }
-    public class TestableOutgoingReplyContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingReplyContext
+    public class TestableOutgoingReplyContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingReplyContext
     {
         public TestableOutgoingReplyContext() { }
         public NServiceBus.Pipeline.OutgoingLogicalMessage Message { get; set; }
     }
-    public class TestableOutgoingSendContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingSendContext
+    public class TestableOutgoingSendContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingSendContext
     {
         public TestableOutgoingSendContext() { }
         public NServiceBus.Pipeline.OutgoingLogicalMessage Message { get; set; }
     }
-    public class TestablePipelineContext : NServiceBus.Extensibility.IExtendable, NServiceBus.IPipelineContext
+    public class TestablePipelineContext : NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IPipelineContext
     {
         protected NServiceBus.IMessageCreator messageCreator;
         public TestablePipelineContext(NServiceBus.IMessageCreator messageCreator = null) { }
+        public System.Threading.CancellationToken CancellationToken { get; set; }
         public NServiceBus.Extensibility.ContextBag Extensions { get; set; }
         public virtual NServiceBus.Testing.PublishedMessage<>[] PublishedMessages { get; }
         public virtual NServiceBus.Testing.SentMessage<>[] SentMessages { get; }
@@ -305,26 +311,26 @@ namespace NServiceBus.Testing
         public virtual System.Threading.Tasks.Task Send(object message, NServiceBus.SendOptions options) { }
         public virtual System.Threading.Tasks.Task Send<T>(System.Action<T> messageConstructor, NServiceBus.SendOptions options) { }
     }
-    public class TestableRoutingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IRoutingContext
+    public class TestableRoutingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IRoutingContext
     {
         public TestableRoutingContext() { }
         public NServiceBus.Transport.OutgoingMessage Message { get; set; }
         public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
     }
-    public class TestableSubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISubscribeContext
+    public class TestableSubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISubscribeContext
     {
         public TestableSubscribeContext() { }
         public System.Type EventType { get; set; }
         public System.Type[] EventTypes { get; set; }
     }
-    public class TestableTransportReceiveContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ITransportReceiveContext
+    public class TestableTransportReceiveContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ITransportReceiveContext
     {
         public TestableTransportReceiveContext() { }
         public NServiceBus.Transport.IncomingMessage Message { get; set; }
         public bool ReceiveOperationAborted { get; set; }
         public virtual void AbortReceiveOperation() { }
     }
-    public class TestableUnsubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IUnsubscribeContext
+    public class TestableUnsubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IUnsubscribeContext
     {
         public TestableUnsubscribeContext() { }
         public System.Type EventType { get; set; }
