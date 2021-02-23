@@ -43,7 +43,7 @@
         /// <summary>
         /// A <see cref="CancellationToken"/> to observe during message processing. Use this to verify behavior when message processing is cancelled.
         /// </summary>
-        public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
+        public CancellationToken CancellationToken { get; set; }
 
         /// <summary>
         /// Sends the provided message.
