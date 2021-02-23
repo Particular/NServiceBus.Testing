@@ -69,18 +69,6 @@ namespace NServiceBus.Testing.Tests.Handler
             Assert.AreEqual($"Expected no message of type {nameof(ITestMessage)} to be deferred, but a message matching your constraints was deferred.", exception.Message);
         }
 
-        [Test]
-        public void ShouldFailAssertingDeferWasNotCalledWithDateTime()
-        {
-            var datetime = DateTimeOffset.UtcNow;
-            var exception = Assert.Throws<ExpectationException>(() => Test.Handler<DeferringDateTimeHandler>()
-                .WithExternalDependencies(h => h.Defer = datetime)
-                .ExpectNotDefer<ITestMessage>((m, t) => t == datetime)
-                .OnMessage<ITestMessage>());
-
-            Assert.AreEqual($"Expected no message of type {nameof(ITestMessage)} to be deferred, but a message matching your constraints was deferred.", exception.Message);
-        }
-
         public class DeferringDateTimeHandler : IHandleMessages<ITestMessage>
         {
             public DateTimeOffset Defer { get; set; }

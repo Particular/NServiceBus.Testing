@@ -51,20 +51,6 @@ namespace NServiceBus.Testing.Tests.Saga
         }
 
         [Test]
-        public void TimeoutInLocalTimeInTheFuture()
-        {
-            var expected = DateTimeOffset.Now.AddDays(3);
-            var message = new TheMessage
-            {
-                TimeoutAt = expected
-            };
-
-            Test.Saga<TimeoutSaga>()
-                .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => at == expected)
-                .When((s, c) => s.Handle(message, c));
-        }
-
-        [Test]
         public void Should_assert_30_style_timeouts_being_set()
         {
             Test.Saga<MultipleTimeoutsSaga>()
