@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Threading;
     using System.Threading.Tasks;
     using Extensibility;
     using MessageInterfaces.MessageMapper.Reflection;
@@ -38,6 +39,11 @@
         /// A <see cref="T:NServiceBus.Extensibility.ContextBag" /> which can be used to extend the current object.
         /// </summary>
         public ContextBag Extensions { get; set; } = new ContextBag();
+
+        /// <summary>
+        /// A <see cref="CancellationToken"/> to observe during message processing. Use this to verify behavior when message processing is cancelled.
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
         /// <summary>
         /// Sends the provided message.
@@ -108,7 +114,6 @@
         protected IMessageCreator messageCreator;
 
         ConcurrentQueue<PublishedMessage<object>> publishedMessages = new ConcurrentQueue<PublishedMessage<object>>();
-
         ConcurrentQueue<SentMessage<object>> sentMessages = new ConcurrentQueue<SentMessage<object>>();
         ConcurrentQueue<TimeoutMessage<object>> timeoutMessages = new ConcurrentQueue<TimeoutMessage<object>>();
     }
