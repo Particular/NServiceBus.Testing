@@ -11,6 +11,9 @@ namespace NServiceBus.Testing.Tests.Saga
         public void TimeoutInThePast()
         {
             var expected = DateTimeOffset.UtcNow.AddDays(-3);
+
+            expected = new DateTimeOffset(expected.Ticks - (expected.Ticks % TimeSpan.TicksPerMillisecond), TimeSpan.Zero); // Drop microseconds
+
             var message = new TheMessage
             {
                 TimeoutAt = expected
@@ -40,6 +43,9 @@ namespace NServiceBus.Testing.Tests.Saga
         public void TimeoutInTheFuture()
         {
             var expected = DateTimeOffset.UtcNow.AddDays(3);
+
+            expected = new DateTimeOffset(expected.Ticks - (expected.Ticks % TimeSpan.TicksPerMillisecond), TimeSpan.Zero); // Drop microseconds
+
             var message = new TheMessage
             {
                 TimeoutAt = expected
