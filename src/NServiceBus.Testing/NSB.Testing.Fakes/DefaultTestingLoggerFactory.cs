@@ -35,7 +35,7 @@ namespace NServiceBus.Testing
                 return;
             }
 
-            var datePart = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            var datePart = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
             var paddedLevel = messageLevel.ToString().ToUpper().PadRight(5);
             var fullMessage = $"{datePart} {paddedLevel} {name} {message}";
             var writer = TextWriter;

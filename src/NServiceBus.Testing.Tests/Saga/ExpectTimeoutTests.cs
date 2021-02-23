@@ -10,7 +10,10 @@ namespace NServiceBus.Testing.Tests.Saga
         [Test]
         public void TimeoutInThePast()
         {
-            var expected = DateTime.UtcNow.AddDays(-3);
+            var expected = DateTimeOffset.UtcNow.AddDays(-3);
+
+            expected = new DateTimeOffset(expected.Ticks - (expected.Ticks % TimeSpan.TicksPerMillisecond), TimeSpan.Zero); // Drop microseconds
+
             var message = new TheMessage
             {
                 TimeoutAt = expected
@@ -26,7 +29,7 @@ namespace NServiceBus.Testing.Tests.Saga
         {
             var message = new TheMessage
             {
-                TimeoutAt = DateTime.UtcNow.AddDays(-3)
+                TimeoutAt = DateTimeOffset.UtcNow.AddDays(-3)
             };
 
             Test.Saga<TimeoutSaga>()
@@ -39,21 +42,10 @@ namespace NServiceBus.Testing.Tests.Saga
         [Test]
         public void TimeoutInTheFuture()
         {
-            var expected = DateTime.UtcNow.AddDays(3);
-            var message = new TheMessage
-            {
-                TimeoutAt = expected
-            };
+            var expected = DateTimeOffset.UtcNow.AddDays(3);
 
-            Test.Saga<TimeoutSaga>()
-                .ExpectTimeoutToBeSetAt<TheTimeout>((m, at) => at == expected)
-                .When((s, c) => s.Handle(message, c));
-        }
+            expected = new DateTimeOffset(expected.Ticks - (expected.Ticks % TimeSpan.TicksPerMillisecond), TimeSpan.Zero); // Drop microseconds
 
-        [Test]
-        public void TimeoutInLocalTimeInTheFuture()
-        {
-            var expected = DateTime.Now.AddDays(3);
             var message = new TheMessage
             {
                 TimeoutAt = expected
@@ -179,7 +171,7 @@ namespace NServiceBus.Testing.Tests.Saga
 
         public class TheMessage : IMessage
         {
-            public DateTime TimeoutAt { get; set; }
+            public DateTimeOffset TimeoutAt { get; set; }
         }
 
         public class TheTimeout : IMessage

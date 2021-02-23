@@ -130,10 +130,10 @@ namespace NServiceBus.Testing
         public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingTimeoutAsync<TMessage>(TMessage message) { }
         public NServiceBus.Testing.Saga<T> WhenReceivesMessageFrom(string client) { }
         public NServiceBus.Testing.Saga<T> WhenSagaTimesOut() { }
-        public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.DateTime at) { }
+        public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.DateTimeOffset at) { }
         public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.TimeSpan after) { }
         public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync() { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.DateTime at) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.DateTimeOffset at) { }
         public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.TimeSpan after) { }
         public NServiceBus.Testing.Saga<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
     }
@@ -315,6 +315,7 @@ namespace NServiceBus.Testing
     {
         public TestableSubscribeContext() { }
         public System.Type EventType { get; set; }
+        public System.Type[] EventTypes { get; set; }
     }
     public class TestableTransportReceiveContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ITransportReceiveContext
     {

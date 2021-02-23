@@ -18,26 +18,6 @@ namespace NServiceBus.Testing.Tests.Handler
         }
 
         [Test]
-        public void ShouldAssertDeferWasCalledWithDateTime()
-        {
-            var datetime = DateTime.UtcNow;
-            Test.Handler<DeferringDateTimeHandler>()
-                .WithExternalDependencies(h => h.Defer = datetime)
-                .ExpectDefer<ITestMessage>((m, t) => t == datetime)
-                .OnMessage<ITestMessage>();
-        }
-
-        [Test]
-        public void ShouldAssertDeferWasCalledWithLocalDateTime()
-        {
-            var datetime = DateTime.Now;
-            Test.Handler<DeferringDateTimeHandler>()
-                .WithExternalDependencies(h => h.Defer = datetime)
-                .ExpectDefer<ITestMessage>((m, t) => t == datetime)
-                .OnMessage<ITestMessage>();
-        }
-
-        [Test]
         public void ShouldFailAssertingDeferWasCalledWithTimeSpan()
         {
             var timespan = TimeSpan.FromMinutes(10);
@@ -51,7 +31,7 @@ namespace NServiceBus.Testing.Tests.Handler
         [Test]
         public void ShouldFailAssertingDeferWasCalledWithDateTime()
         {
-            var datetime = DateTime.UtcNow;
+            var datetime = DateTimeOffset.UtcNow;
             var exception = Assert.Throws<ExpectationException>(() => Test.Handler<EmptyHandler>()
                 .ExpectDefer<ITestMessage>((m, t) => t == datetime)
                 .OnMessage<ITestMessage>());
@@ -71,7 +51,7 @@ namespace NServiceBus.Testing.Tests.Handler
         [Test]
         public void ShouldAssertDeferWasNotCalledWithDateTime()
         {
-            var datetime = DateTime.UtcNow;
+            var datetime = DateTimeOffset.UtcNow;
             Test.Handler<EmptyHandler>()
                 .ExpectNotDefer<ITestMessage>((m, t) => t == datetime)
                 .OnMessage<ITestMessage>();
@@ -89,21 +69,9 @@ namespace NServiceBus.Testing.Tests.Handler
             Assert.AreEqual($"Expected no message of type {nameof(ITestMessage)} to be deferred, but a message matching your constraints was deferred.", exception.Message);
         }
 
-        [Test]
-        public void ShouldFailAssertingDeferWasNotCalledWithDateTime()
-        {
-            var datetime = DateTime.UtcNow;
-            var exception = Assert.Throws<ExpectationException>(() => Test.Handler<DeferringDateTimeHandler>()
-                .WithExternalDependencies(h => h.Defer = datetime)
-                .ExpectNotDefer<ITestMessage>((m, t) => t == datetime)
-                .OnMessage<ITestMessage>());
-
-            Assert.AreEqual($"Expected no message of type {nameof(ITestMessage)} to be deferred, but a message matching your constraints was deferred.", exception.Message);
-        }
-
         public class DeferringDateTimeHandler : IHandleMessages<ITestMessage>
         {
-            public DateTime Defer { get; set; }
+            public DateTimeOffset Defer { get; set; }
 
             public Task Handle(ITestMessage message, IMessageHandlerContext context)
             {
