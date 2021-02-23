@@ -327,7 +327,7 @@ namespace NServiceBus.Testing
         /// This will only invoke timeouts set with a <see cref="DateTime"/> argument.
         /// </summary>
         /// <param name="at">The Date and time to simuluate.</param>
-        public Saga<T> WhenSagaTimesOut(DateTime at)
+        public Saga<T> WhenSagaTimesOut(DateTimeOffset at)
         {
             return WhenSagaTimesOutAsync(at).GetAwaiter().GetResult();
         }
@@ -434,7 +434,7 @@ namespace NServiceBus.Testing
         /// This will only invoke timeouts set with a <see cref="DateTime"/> argument.
         /// </summary>
         /// <param name="at">The Date and time to simuluate.</param>
-        public async Task<Saga<T>> WhenSagaTimesOutAsync(DateTime at)
+        public async Task<Saga<T>> WhenSagaTimesOutAsync(DateTimeOffset at)
         {
             await InvokeTimeoutsAsync(testContext.previousTimeouts
                 .Where(t => t.At.HasValue)
