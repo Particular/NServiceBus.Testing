@@ -12,5 +12,10 @@
         /// The type of the event.
         /// </summary>
         public Type EventType { get; set; } = typeof(object);
+
+        /// <summary>
+        /// Events being subscribed to.
+        /// </summary>
+        public Type[] EventTypes { get; set; } = Array.Empty<Type>();
     }
 }
