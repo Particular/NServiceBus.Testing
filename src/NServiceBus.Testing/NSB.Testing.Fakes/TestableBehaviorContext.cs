@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Testing
 {
     using System;
+    using System.Threading;
     using DependencyInjection;
     using Extensibility;
     using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,11 @@
         /// A <see cref="T:NServiceBus.Extensibility.ContextBag" /> which can be used to extend the current object.
         /// </summary>
         public ContextBag Extensions { get; set; } = new ContextBag();
+
+        /// <summary>
+        /// A <see cref="CancellationToken"/> to observe during message processing. Use this to verify behavior when message processing is cancelled.
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; }
 
         IServiceProvider IBehaviorContext.Builder => GetBuilder();
 
