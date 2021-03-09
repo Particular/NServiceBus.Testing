@@ -1,9 +1,7 @@
 ﻿namespace NServiceBus.Testing
 {
     using System;
-    using DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
-    using MicrosoftExtensionsDependencyInjection;
     using Pipeline;
 
     /// <summary>
@@ -30,7 +28,7 @@
         /// </summary>
         protected virtual IServiceProvider GetBuilder()
         {
-            return ServiceCollection.BuildDefaultNServiceBusProvider();
+            return ServiceCollection.BuildServiceProvider();
         }
     }
 }
