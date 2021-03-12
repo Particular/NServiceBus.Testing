@@ -27,7 +27,7 @@
         /// <param name="eventType">The type of event to subscribe to.</param>
         /// <param name="options">Options for the subscribe.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public virtual Task Subscribe(Type eventType, SubscribeOptions options, CancellationToken cancellationToken)
+        public virtual Task Subscribe(Type eventType, SubscribeOptions options, CancellationToken cancellationToken = default)
         {
             subscriptions.Enqueue(new Subscription(eventType, options));
             return Task.FromResult(0);
@@ -39,7 +39,7 @@
         /// <param name="eventType">The type of event to unsubscribe to.</param>
         /// <param name="options">Options for the subscribe.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public virtual Task Unsubscribe(Type eventType, UnsubscribeOptions options, CancellationToken cancellationToken)
+        public virtual Task Unsubscribe(Type eventType, UnsubscribeOptions options, CancellationToken cancellationToken = default)
         {
             unsubscriptions.Enqueue(new Unsubscription(eventType, options));
             return Task.FromResult(0);
@@ -51,10 +51,8 @@
         /// <param name="message">The message to send.</param>
         /// <param name="sendOptions">The options for the send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public Task Send(object message, SendOptions sendOptions, CancellationToken cancellationToken)
-        {
-            return Send(message, sendOptions);
-        }
+        public Task Send(object message, SendOptions sendOptions, CancellationToken cancellationToken = default) =>
+            Send(message, sendOptions, cancellationToken);
 
         /// <summary>
         /// Instantiates a message of type T and sends it.
@@ -63,10 +61,8 @@
         /// <param name="messageConstructor">An action which initializes properties of the message.</param>
         /// <param name="sendOptions">The options for the send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public Task Send<T>(Action<T> messageConstructor, SendOptions sendOptions, CancellationToken cancellationToken)
-        {
-            return Send(messageConstructor, sendOptions);
-        }
+        public Task Send<T>(Action<T> messageConstructor, SendOptions sendOptions, CancellationToken cancellationToken = default) =>
+            Send(messageConstructor, sendOptions, cancellationToken);
 
         /// <summary>
         /// Publish the message to subscribers.
@@ -74,10 +70,8 @@
         /// <param name="message">The message to publish.</param>
         /// <param name="publishOptions">The options for the publish.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public Task Publish(object message, PublishOptions publishOptions, CancellationToken cancellationToken)
-        {
-            return Publish(message, publishOptions);
-        }
+        public Task Publish(object message, PublishOptions publishOptions, CancellationToken cancellationToken = default) =>
+            Publish(message, publishOptions, cancellationToken);
 
         /// <summary>
         /// Instantiates a message of type T and publishes it.
@@ -86,10 +80,8 @@
         /// <param name="messageConstructor">An action which initializes properties of the message.</param>
         /// <param name="publishOptions">Specific options for this event.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public Task Publish<T>(Action<T> messageConstructor, PublishOptions publishOptions, CancellationToken cancellationToken)
-        {
-            return Publish(messageConstructor, publishOptions);
-        }
+        public Task Publish<T>(Action<T> messageConstructor, PublishOptions publishOptions, CancellationToken cancellationToken = default) =>
+            Publish(messageConstructor, publishOptions, cancellationToken);
 
         ConcurrentQueue<Subscription> subscriptions = new ConcurrentQueue<Subscription>();
 
