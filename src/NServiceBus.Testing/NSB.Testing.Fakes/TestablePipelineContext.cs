@@ -54,12 +54,19 @@
         {
             var headers = options.GetHeaders();
 
-            if (headers.ContainsKey(Headers.IsSagaTimeoutMessage))
+            var isTimeout = options.GetDeliveryDate().HasValue
+                            || options.GetDeliveryDelay().HasValue
+                            || headers.ContainsKey(Headers.IsSagaTimeoutMessage);
+
+            if (isTimeout)
             {
                 timeoutMessages.Enqueue(GetTimeoutMessage(message, options));
             }
+            else
+            {
+                sentMessages.Enqueue(new SentMessage<object>(message, options));
+            }
 
-            sentMessages.Enqueue(new SentMessage<object>(message, options));
             return Task.FromResult(0);
         }
 

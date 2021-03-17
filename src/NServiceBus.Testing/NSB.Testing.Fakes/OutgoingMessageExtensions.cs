@@ -1,5 +1,6 @@
 namespace NServiceBus.Testing
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -38,6 +39,19 @@ namespace NServiceBus.Testing
             return sentMessages
                 .Where(x => x.Message is TMessage)
                 .Select(x => new SentMessage<TMessage>((TMessage)x.Message, x.Options));
+        }
+
+        /// <summary>
+        /// Returns all <see cref="TimeoutMessage{TMessage}"/> of the specified type contained in <paramref name="timeoutMessages"/>.
+        /// </summary>
+        public static IEnumerable<TimeoutMessage<TMessage>> Containing<TMessage>(
+            this IEnumerable<TimeoutMessage<object>> timeoutMessages)
+        {
+            return timeoutMessages
+                .Where(x => x.Message is TMessage)
+                .Select(x => x.At.HasValue ? new TimeoutMessage<TMessage>((TMessage)x.Message, x.Options, x.At.Value)
+                    : x.Within.HasValue ? new TimeoutMessage<TMessage>((TMessage)x.Message, x.Options, x.Within.Value)
+                        : throw new Exception("Timeout message does not have .At or .Within set."));
         }
 
         /// <summary>

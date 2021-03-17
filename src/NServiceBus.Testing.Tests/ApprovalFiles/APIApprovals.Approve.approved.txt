@@ -49,6 +49,7 @@ namespace NServiceBus.Testing
         public static System.Collections.Generic.IEnumerable<NServiceBus.Testing.PublishedMessage<TMessage>> Containing<TMessage>(this System.Collections.Generic.IEnumerable<NServiceBus.Testing.PublishedMessage<object>> publishedMessages) { }
         public static System.Collections.Generic.IEnumerable<NServiceBus.Testing.RepliedMessage<TMessage>> Containing<TMessage>(this System.Collections.Generic.IEnumerable<NServiceBus.Testing.RepliedMessage<object>> repliedMessages) { }
         public static System.Collections.Generic.IEnumerable<NServiceBus.Testing.SentMessage<TMessage>> Containing<TMessage>(this System.Collections.Generic.IEnumerable<NServiceBus.Testing.SentMessage<object>> sentMessages) { }
+        public static System.Collections.Generic.IEnumerable<NServiceBus.Testing.TimeoutMessage<TMessage>> Containing<TMessage>(this System.Collections.Generic.IEnumerable<NServiceBus.Testing.TimeoutMessage<object>> timeoutMessages) { }
         public static TMessage Message<TMessage>(this NServiceBus.Testing.PublishedMessage<object> sentMessage)
             where TMessage :  class { }
         public static TMessage Message<TMessage>(this NServiceBus.Testing.RepliedMessage<object> sentMessage)

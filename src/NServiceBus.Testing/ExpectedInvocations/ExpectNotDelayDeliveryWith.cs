@@ -12,7 +12,7 @@
 
         public override void Validate(TestableMessageHandlerContext context)
         {
-            var sentMessages = context.SentMessages
+            var sentMessages = context.TimeoutMessages
                 .Containing<TMessage>()
                 .Where(s => s.Options.GetDeliveryDelay().HasValue)
                 .ToList();
