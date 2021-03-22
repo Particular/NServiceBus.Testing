@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Fody" Version="6.4.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <!-- When the reference to NServiceBus is changed to 8.0.0-rc.1, the reference to Microsoft.Extensions.DependencyInjection should be removed -->
     <PackageReference Include="NServiceBus" Version="8.0.0-alpha.881" />
     <PackageReference Include="Obsolete.Fody" Version="5.2.1" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="1.1.0" PrivateAssets="All" />
