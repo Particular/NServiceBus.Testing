@@ -2,9 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
-    using MicrosoftExtensionsDependencyInjection;
     using Pipeline;
 
     /// <summary>
@@ -34,7 +32,7 @@
         /// </summary>
         protected virtual IServiceProvider GetBuilder()
         {
-            return ServiceCollection.BuildDefaultNServiceBusProvider();
+            return ServiceCollection.BuildServiceProvider();
         }
     }
 }
