@@ -37,10 +37,10 @@ namespace NServiceBus.Testing
         public void OnMessage<TMessage>(TMessage initializedMessage) { }
         public void OnMessage<TMessage>(string messageId, System.Action<TMessage> initializeMessage = null) { }
         public void OnMessage<TMessage>(TMessage message, string messageId) { }
-        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(System.Action<TMessage> initializeMessage = null) { }
-        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(TMessage initializedMessage) { }
-        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(string messageId, System.Action<TMessage> initializeMessage = null) { }
-        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(TMessage message, string messageId) { }
+        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(System.Action<TMessage> initializeMessage = null, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(TMessage initializedMessage, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(string messageId, System.Action<TMessage> initializeMessage = null, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(TMessage message, string messageId, System.Threading.CancellationToken cancellationToken = default) { }
         public NServiceBus.Testing.Handler<T> SetIncomingHeader(string key, string value) { }
         public NServiceBus.Testing.Handler<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
     }
@@ -117,24 +117,24 @@ namespace NServiceBus.Testing
         public NServiceBus.Testing.Saga<T> When(System.Func<T, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task> sagaIsInvoked) { }
         public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, System.Action<TMessage> messageInitializer = null) { }
         public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, TMessage message) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenAsync(System.Func<T, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task> sagaIsInvoked) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenAsync<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, System.Action<TMessage> messageInitializer = null) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenAsync<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, TMessage message) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenAsync(System.Func<T, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task> sagaIsInvoked, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenAsync<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, System.Action<TMessage> messageInitializer = null, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenAsync<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, TMessage message, System.Threading.CancellationToken cancellationToken = default) { }
         public NServiceBus.Testing.Saga<T> WhenHandling<TMessage>(System.Action<TMessage> initializeMessage = null) { }
         public NServiceBus.Testing.Saga<T> WhenHandling<TMessage>(TMessage message) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingAsync<TMessage>(System.Action<TMessage> initializeMessage = null) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingAsync<TMessage>(TMessage message) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingAsync<TMessage>(System.Action<TMessage> initializeMessage = null, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingAsync<TMessage>(TMessage message, System.Threading.CancellationToken cancellationToken = default) { }
         public NServiceBus.Testing.Saga<T> WhenHandlingTimeout<TMessage>(System.Action<TMessage> initializeMessage = null) { }
         public NServiceBus.Testing.Saga<T> WhenHandlingTimeout<TMessage>(TMessage message) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingTimeoutAsync<TMessage>(System.Action<TMessage> initializeMessage = null) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingTimeoutAsync<TMessage>(TMessage message) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingTimeoutAsync<TMessage>(System.Action<TMessage> initializeMessage = null, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingTimeoutAsync<TMessage>(TMessage message, System.Threading.CancellationToken cancellationToken = default) { }
         public NServiceBus.Testing.Saga<T> WhenReceivesMessageFrom(string client) { }
         public NServiceBus.Testing.Saga<T> WhenSagaTimesOut() { }
         public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.DateTimeOffset at) { }
         public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.TimeSpan after) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync() { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.DateTimeOffset at) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.TimeSpan after) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.DateTimeOffset at, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.TimeSpan after, System.Threading.CancellationToken cancellationToken = default) { }
         public NServiceBus.Testing.Saga<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
     }
     public class SentMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.SendOptions>

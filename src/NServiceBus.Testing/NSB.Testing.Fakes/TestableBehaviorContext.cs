@@ -24,7 +24,9 @@
         /// <summary>
         /// A <see cref="CancellationToken"/> to observe during message processing. Use this to verify behavior when message processing is cancelled.
         /// </summary>
+#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public CancellationToken CancellationToken { get; set; }
+#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
 
         IServiceProvider IBehaviorContext.Builder => GetBuilder();
 

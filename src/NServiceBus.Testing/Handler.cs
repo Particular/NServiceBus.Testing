@@ -1,6 +1,7 @@
 namespace NServiceBus.Testing
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using MessageInterfaces.MessageMapper.Reflection;
 
@@ -295,41 +296,42 @@ namespace NServiceBus.Testing
         /// Activates the test that has been set up passing in the given message,
         /// setting the incoming headers and the message Id.
         /// </summary>
-        public Task OnMessageAsync<TMessage>(string messageId, Action<TMessage> initializeMessage = null)
+        public Task OnMessageAsync<TMessage>(string messageId, Action<TMessage> initializeMessage = null, CancellationToken cancellationToken = default)
         {
             testableMessageHandlerContext.MessageId = messageId;
-            return OnMessageAsync(initializeMessage);
+            return OnMessageAsync(initializeMessage, cancellationToken);
         }
 
         /// <summary>
         /// Activates the test that has been set up passing in the given message.
         /// </summary>
-        public Task OnMessageAsync<TMessage>(Action<TMessage> initializeMessage = null)
+        public Task OnMessageAsync<TMessage>(Action<TMessage> initializeMessage = null, CancellationToken cancellationToken = default)
         {
             var message = messageCreator.CreateInstance<TMessage>();
             initializeMessage?.Invoke(message);
-            return OnMessageAsync(message);
+            return OnMessageAsync(message, cancellationToken);
         }
 
         /// <summary>
         /// Activates the test that has been set up passing in given message,
         /// setting the incoming headers and the message Id.
         /// </summary>
-        public Task OnMessageAsync<TMessage>(TMessage message, string messageId)
+        public Task OnMessageAsync<TMessage>(TMessage message, string messageId, CancellationToken cancellationToken = default)
         {
             testableMessageHandlerContext.MessageId = messageId;
 
-            return OnMessageAsync(message);
+            return OnMessageAsync(message, cancellationToken);
         }
 
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
         /// <param name="initializedMessage">A message to be used with message handler.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
         /// <remarks>
         /// This is different from <see cref="OnMessage{TMessage}(Action{TMessage})" /> in a way that
         /// it uses the message, and not calls to an action.
         /// </remarks>
         /// <example><![CDATA[var message = new TestMessage {//...}; Test.Handler<EmptyHandler>().OnMessage<TestMessage>(message);]]></example>
-        public async Task OnMessageAsync<TMessage>(TMessage initializedMessage)
+        public async Task OnMessageAsync<TMessage>(TMessage initializedMessage, CancellationToken cancellationToken = default)
         {
             var messageType = messageCreator.GetMappedTypeFor(initializedMessage.GetType());
             var handleMethods = handler.GetType().CreateInvokers(messageType, typeof(IHandleMessages<>));

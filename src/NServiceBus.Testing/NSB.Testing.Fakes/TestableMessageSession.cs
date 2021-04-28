@@ -27,7 +27,9 @@
         /// <param name="eventType">The type of event to subscribe to.</param>
         /// <param name="options">Options for the subscribe.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public virtual Task Subscribe(Type eventType, SubscribeOptions options, CancellationToken cancellationToken = default)
+#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         {
             subscriptions.Enqueue(new Subscription(eventType, options));
             return Task.FromResult(0);
@@ -39,7 +41,9 @@
         /// <param name="eventType">The type of event to unsubscribe to.</param>
         /// <param name="options">Options for the subscribe.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public virtual Task Unsubscribe(Type eventType, UnsubscribeOptions options, CancellationToken cancellationToken = default)
+#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         {
             unsubscriptions.Enqueue(new Unsubscription(eventType, options));
             return Task.FromResult(0);
@@ -51,7 +55,9 @@
         /// <param name="message">The message to send.</param>
         /// <param name="sendOptions">The options for the send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public Task Send(object message, SendOptions sendOptions, CancellationToken cancellationToken = default) =>
+#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
             Send(message, sendOptions, cancellationToken);
 
         /// <summary>
@@ -61,7 +67,9 @@
         /// <param name="messageConstructor">An action which initializes properties of the message.</param>
         /// <param name="sendOptions">The options for the send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public Task Send<T>(Action<T> messageConstructor, SendOptions sendOptions, CancellationToken cancellationToken = default) =>
+#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
             Send(messageConstructor, sendOptions, cancellationToken);
 
         /// <summary>
@@ -70,7 +78,9 @@
         /// <param name="message">The message to publish.</param>
         /// <param name="publishOptions">The options for the publish.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public Task Publish(object message, PublishOptions publishOptions, CancellationToken cancellationToken = default) =>
+#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
             Publish(message, publishOptions, cancellationToken);
 
         /// <summary>
@@ -80,7 +90,9 @@
         /// <param name="messageConstructor">An action which initializes properties of the message.</param>
         /// <param name="publishOptions">Specific options for this event.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public Task Publish<T>(Action<T> messageConstructor, PublishOptions publishOptions, CancellationToken cancellationToken = default) =>
+#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
             Publish(messageConstructor, publishOptions, cancellationToken);
 
         ConcurrentQueue<Subscription> subscriptions = new ConcurrentQueue<Subscription>();
