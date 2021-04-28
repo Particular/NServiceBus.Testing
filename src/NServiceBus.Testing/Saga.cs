@@ -3,6 +3,7 @@ namespace NServiceBus.Testing
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using MessageInterfaces.MessageMapper.Reflection;
 
@@ -344,38 +345,38 @@ namespace NServiceBus.Testing
         /// Initializes the given message type and checks all the expectations previously set up,
         /// and then clears them for continued testing.
         /// </summary>
-        public Task<Saga<T>> WhenHandlingAsync<TMessage>(Action<TMessage> initializeMessage = null)
+        public Task<Saga<T>> WhenHandlingAsync<TMessage>(Action<TMessage> initializeMessage = null, CancellationToken cancellationToken = default)
         {
             var message = messageCreator.CreateInstance(initializeMessage);
-            return WhenHandlingAsync(message);
+            return WhenHandlingAsync(message, cancellationToken);
         }
 
         /// <summary>
         /// Checks all the expectations previously set up, and then clears them for continued testing.
         /// </summary>
-        public Task<Saga<T>> WhenHandlingAsync<TMessage>(TMessage message)
+        public Task<Saga<T>> WhenHandlingAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
         {
             var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleMessages<>));
-            return WhenAsync((s, c) => invokers.InvokeSerially(saga, message, c));
+            return WhenAsync((s, c) => invokers.InvokeSerially(saga, message, c), cancellationToken);
         }
 
         /// <summary>
         /// Initializes the given timeout message type and checks all the expectations previously set up,
         /// and then clears them for continued testing.
         /// </summary>
-        public Task<Saga<T>> WhenHandlingTimeoutAsync<TMessage>(Action<TMessage> initializeMessage = null)
+        public Task<Saga<T>> WhenHandlingTimeoutAsync<TMessage>(Action<TMessage> initializeMessage = null, CancellationToken cancellationToken = default)
         {
             var message = messageCreator.CreateInstance(initializeMessage);
-            return WhenHandlingTimeoutAsync(message);
+            return WhenHandlingTimeoutAsync(message, cancellationToken);
         }
 
         /// <summary>
         /// Checks all the expectations previously set up, and then clears them for continued testing.
         /// </summary>
-        public Task<Saga<T>> WhenHandlingTimeoutAsync<TMessage>(TMessage message)
+        public Task<Saga<T>> WhenHandlingTimeoutAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
         {
             var invokers = saga.GetType().CreateInvokers(typeof(TMessage), typeof(IHandleTimeouts<>));
-            return WhenAsync((s, c) => invokers.InvokeSerially(saga, message, c));
+            return WhenAsync((s, c) => invokers.InvokeSerially(saga, message, c), cancellationToken);
         }
 
         /// <summary>
@@ -383,7 +384,7 @@ namespace NServiceBus.Testing
         /// and then clearing them for continued testing.
         /// example: <c>When((saga, context) => s.Handle(new MyMessage(), context))</c>
         /// </summary>
-        public async Task<Saga<T>> WhenAsync(Func<T, IMessageHandlerContext, Task> sagaIsInvoked)
+        public async Task<Saga<T>> WhenAsync(Func<T, IMessageHandlerContext, Task> sagaIsInvoked, CancellationToken cancellationToken = default)
         {
             await sagaIsInvoked(saga, testContext).ConfigureAwait(false);
 
@@ -397,20 +398,20 @@ namespace NServiceBus.Testing
         /// Uses the given delegate to select the message handler and invoking it with the given message. Checks all the expectations previously, and then clearing them for continued testing.
         /// example: <c>When(s => s.Handle, new MyMessage())</c>
         /// </summary>
-        public Task<Saga<T>> WhenAsync<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, TMessage message)
+        public Task<Saga<T>> WhenAsync<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, TMessage message, CancellationToken cancellationToken = default)
         {
-            return WhenAsync((s, context) => handlerSelector(s)(message, context));
+            return WhenAsync((s, context) => handlerSelector(s)(message, context), cancellationToken);
         }
 
         /// <summary>
         /// Uses the given delegate to select the message handler and invoking it with the specified message. Checks all the expectations previously, and then clearing them for continued testing.
         /// example: <c>When&lt;MyMessage>(s => s.Handle, m => { m.Value = 42 })</c>
         /// </summary>
-        public Task<Saga<T>> WhenAsync<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, Action<TMessage> messageInitializer = null)
+        public Task<Saga<T>> WhenAsync<TMessage>(Func<T, Func<TMessage, IMessageHandlerContext, Task>> handlerSelector, Action<TMessage> messageInitializer = null, CancellationToken cancellationToken = default)
         {
             var message = (TMessage)messageCreator.CreateInstance(typeof(TMessage));
             messageInitializer?.Invoke(message);
-            return WhenAsync((s, context) => handlerSelector(s)(message, context));
+            return WhenAsync((s, context) => handlerSelector(s)(message, context), cancellationToken);
         }
 
         /// <summary>
@@ -419,11 +420,14 @@ namespace NServiceBus.Testing
         /// This will only invoke timeouts set with a <see cref="TimeSpan"/> argument.
         /// </summary>
         /// <param name="after">The amount of time that has passed to simulate.</param>
-        public async Task<Saga<T>> WhenSagaTimesOutAsync(TimeSpan after)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+        public async Task<Saga<T>> WhenSagaTimesOutAsync(TimeSpan after, CancellationToken cancellationToken = default)
         {
-            await InvokeTimeoutsAsync(testContext.previousTimeouts
-                .Where(t => t.Within.HasValue)
-                .Where(t => t.Within <= after)).ConfigureAwait(false);
+            await InvokeTimeoutsAsync(
+                testContext.previousTimeouts
+                    .Where(t => t.Within.HasValue)
+                    .Where(t => t.Within <= after),
+                cancellationToken).ConfigureAwait(false);
 
             return this;
         }
@@ -434,11 +438,14 @@ namespace NServiceBus.Testing
         /// This will only invoke timeouts set with a <see cref="DateTime"/> argument.
         /// </summary>
         /// <param name="at">The Date and time to simuluate.</param>
-        public async Task<Saga<T>> WhenSagaTimesOutAsync(DateTimeOffset at)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+        public async Task<Saga<T>> WhenSagaTimesOutAsync(DateTimeOffset at, CancellationToken cancellationToken = default)
         {
-            await InvokeTimeoutsAsync(testContext.previousTimeouts
-                .Where(t => t.At.HasValue)
-                .Where(t => t.At <= at)).ConfigureAwait(false);
+            await InvokeTimeoutsAsync(
+                testContext.previousTimeouts
+                    .Where(t => t.At.HasValue)
+                    .Where(t => t.At <= at),
+                cancellationToken).ConfigureAwait(false);
 
             return this;
         }
@@ -446,9 +453,9 @@ namespace NServiceBus.Testing
         /// <summary>
         /// Expires all requested timeouts for the saga and then clears out all previous expectations.
         /// </summary>
-        public async Task<Saga<T>> WhenSagaTimesOutAsync()
+        public async Task<Saga<T>> WhenSagaTimesOutAsync(CancellationToken cancellationToken = default)
         {
-            await InvokeTimeoutsAsync(testContext.previousTimeouts).ConfigureAwait(false);
+            await InvokeTimeoutsAsync(testContext.previousTimeouts, cancellationToken).ConfigureAwait(false);
 
             return this;
         }
@@ -606,7 +613,7 @@ namespace NServiceBus.Testing
             return this;
         }
 
-        async Task InvokeTimeoutsAsync(IEnumerable<TimeoutMessage<object>> messages)
+        async Task InvokeTimeoutsAsync(IEnumerable<TimeoutMessage<object>> messages, CancellationToken cancellationToken)
         {
             var timeoutHandlers = messages.OrderBy(t => t.Within).ToList();
 
