@@ -4,12 +4,38 @@
     using System.Collections.Concurrent;
     using System.Threading;
     using System.Threading.Tasks;
+    using NServiceBus.MessageInterfaces.MessageMapper.Reflection;
 
     /// <summary>
     /// A testable <see cref="IMessageSession"/> implementation.
     /// </summary>
-    public partial class TestableMessageSession : TestablePipelineContext, IMessageSession
+    public partial class TestableMessageSession : IMessageSession
     {
+        /// <summary>
+        /// Creates a new <see cref="TestableMessageSession" /> instance.
+        /// </summary>
+        /// <param name="messageCreator"></param>
+        public TestableMessageSession(IMessageCreator messageCreator = null)
+        {
+            this.messageCreator = messageCreator ?? new MessageMapper();
+        }
+
+        /// <summary>
+        /// A list of all messages sent with a saga timeout header.
+        /// </summary>
+        public TimeoutMessage<object>[] TimeoutMessages => timeoutMessages.ToArray();
+
+        /// <summary>
+        /// A list of all messages sent by <see cref="IPipelineContext.Send" />.
+        /// </summary>
+        public virtual SentMessage<object>[] SentMessages => sentMessages.ToArray();
+
+        /// <summary>
+        /// A list of all messages published by <see cref="IPipelineContext.Publish" />,
+        /// </summary>
+        public virtual PublishedMessage<object>[] PublishedMessages => publishedMessages.ToArray();
+
+
         /// <summary>
         /// A list of all event subscriptions made from this session.
         /// </summary>
@@ -27,12 +53,10 @@
         /// <param name="eventType">The type of event to subscribe to.</param>
         /// <param name="options">Options for the subscribe.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public virtual Task Subscribe(Type eventType, SubscribeOptions options, CancellationToken cancellationToken = default)
-#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         {
             subscriptions.Enqueue(new Subscription(eventType, options));
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -41,12 +65,10 @@
         /// <param name="eventType">The type of event to unsubscribe to.</param>
         /// <param name="options">Options for the subscribe.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public virtual Task Unsubscribe(Type eventType, UnsubscribeOptions options, CancellationToken cancellationToken = default)
-#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         {
             unsubscriptions.Enqueue(new Unsubscription(eventType, options));
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -55,10 +77,18 @@
         /// <param name="message">The message to send.</param>
         /// <param name="sendOptions">The options for the send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
-        public Task Send(object message, SendOptions sendOptions, CancellationToken cancellationToken = default) =>
-#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
-            Send(message, sendOptions, cancellationToken);
+        public Task Send(object message, SendOptions sendOptions, CancellationToken cancellationToken = default)
+        {
+            var headers = sendOptions.GetHeaders();
+
+            if (headers.ContainsKey(Headers.IsSagaTimeoutMessage))
+            {
+                timeoutMessages.Enqueue(GetTimeoutMessage(message, sendOptions));
+            }
+
+            sentMessages.Enqueue(new SentMessage<object>(message, sendOptions));
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Instantiates a message of type T and sends it.
@@ -67,10 +97,8 @@
         /// <param name="messageConstructor">An action which initializes properties of the message.</param>
         /// <param name="sendOptions">The options for the send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public Task Send<T>(Action<T> messageConstructor, SendOptions sendOptions, CancellationToken cancellationToken = default) =>
-#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
-            Send(messageConstructor, sendOptions, cancellationToken);
+            Send(messageCreator.CreateInstance(messageConstructor), sendOptions, cancellationToken);
 
         /// <summary>
         /// Publish the message to subscribers.
@@ -78,10 +106,11 @@
         /// <param name="message">The message to publish.</param>
         /// <param name="publishOptions">The options for the publish.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
-        public Task Publish(object message, PublishOptions publishOptions, CancellationToken cancellationToken = default) =>
-#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
-            Publish(message, publishOptions, cancellationToken);
+        public Task Publish(object message, PublishOptions publishOptions, CancellationToken cancellationToken = default)
+        {
+            publishedMessages.Enqueue(new PublishedMessage<object>(message, publishOptions));
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Instantiates a message of type T and publishes it.
@@ -90,13 +119,31 @@
         /// <param name="messageConstructor">An action which initializes properties of the message.</param>
         /// <param name="publishOptions">Specific options for this event.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public Task Publish<T>(Action<T> messageConstructor, PublishOptions publishOptions, CancellationToken cancellationToken = default) =>
-#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
-            Publish(messageConstructor, publishOptions, cancellationToken);
+            Publish(messageCreator.CreateInstance(messageConstructor), publishOptions, cancellationToken);
 
-        ConcurrentQueue<Subscription> subscriptions = new ConcurrentQueue<Subscription>();
 
-        ConcurrentQueue<Unsubscription> unsubscriptions = new ConcurrentQueue<Unsubscription>();
+        static TimeoutMessage<object> GetTimeoutMessage(object message, SendOptions options)
+        {
+            var within = options.GetDeliveryDelay();
+            if (within.HasValue)
+            {
+                return new TimeoutMessage<object>(message, options, within.Value);
+            }
+
+            var dateTimeOffset = options.GetDeliveryDate();
+            return new TimeoutMessage<object>(message, options, dateTimeOffset.Value);
+        }
+
+        /// <summary>
+        /// the <see cref="IMessageCreator" /> instance used to create proxy implementation for message interfaces.
+        /// </summary>
+        protected IMessageCreator messageCreator;
+        readonly ConcurrentQueue<Subscription> subscriptions = new ConcurrentQueue<Subscription>();
+        readonly ConcurrentQueue<Unsubscription> unsubscriptions = new ConcurrentQueue<Unsubscription>();
+        readonly ConcurrentQueue<PublishedMessage<object>> publishedMessages = new ConcurrentQueue<PublishedMessage<object>>();
+        readonly ConcurrentQueue<SentMessage<object>> sentMessages = new ConcurrentQueue<SentMessage<object>>();
+        readonly ConcurrentQueue<TimeoutMessage<object>> timeoutMessages = new ConcurrentQueue<TimeoutMessage<object>>();
+
     }
 }
