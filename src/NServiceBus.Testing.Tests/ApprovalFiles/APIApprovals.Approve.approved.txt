@@ -248,10 +248,14 @@ namespace NServiceBus.Testing
         public virtual System.Threading.Tasks.Task Reply(object message, NServiceBus.ReplyOptions options) { }
         public virtual System.Threading.Tasks.Task Reply<T>(System.Action<T> messageConstructor, NServiceBus.ReplyOptions options) { }
     }
-    public class TestableMessageSession : NServiceBus.Testing.TestablePipelineContext, NServiceBus.IMessageSession
+    public class TestableMessageSession : NServiceBus.IMessageSession
     {
-        public TestableMessageSession() { }
+        protected NServiceBus.IMessageCreator messageCreator;
+        public TestableMessageSession(NServiceBus.IMessageCreator messageCreator = null) { }
+        public virtual NServiceBus.Testing.PublishedMessage<>[] PublishedMessages { get; }
+        public virtual NServiceBus.Testing.SentMessage<>[] SentMessages { get; }
         public virtual NServiceBus.Testing.Subscription[] Subscriptions { get; }
+        public NServiceBus.Testing.TimeoutMessage<>[] TimeoutMessages { get; }
         public virtual NServiceBus.Testing.Unsubscription[] Unsubscription { get; }
         public System.Threading.Tasks.Task Publish(object message, NServiceBus.PublishOptions publishOptions, System.Threading.CancellationToken cancellationToken = default) { }
         public System.Threading.Tasks.Task Publish<T>(System.Action<T> messageConstructor, NServiceBus.PublishOptions publishOptions, System.Threading.CancellationToken cancellationToken = default) { }

@@ -62,7 +62,7 @@
             }
 
             sentMessages.Enqueue(new SentMessage<object>(message, options));
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -84,7 +84,7 @@
         public virtual Task Publish(object message, PublishOptions options)
         {
             publishedMessages.Enqueue(new PublishedMessage<object>(message, options));
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -115,8 +115,8 @@
         /// </summary>
         protected IMessageCreator messageCreator;
 
-        ConcurrentQueue<PublishedMessage<object>> publishedMessages = new ConcurrentQueue<PublishedMessage<object>>();
-        ConcurrentQueue<SentMessage<object>> sentMessages = new ConcurrentQueue<SentMessage<object>>();
-        ConcurrentQueue<TimeoutMessage<object>> timeoutMessages = new ConcurrentQueue<TimeoutMessage<object>>();
+        readonly ConcurrentQueue<PublishedMessage<object>> publishedMessages = new ConcurrentQueue<PublishedMessage<object>>();
+        readonly ConcurrentQueue<SentMessage<object>> sentMessages = new ConcurrentQueue<SentMessage<object>>();
+        readonly ConcurrentQueue<TimeoutMessage<object>> timeoutMessages = new ConcurrentQueue<TimeoutMessage<object>>();
     }
 }

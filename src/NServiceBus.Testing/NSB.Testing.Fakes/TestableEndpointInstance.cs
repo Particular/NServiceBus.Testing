@@ -21,7 +21,7 @@
 #pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         {
             EndpointStopped = true;
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }
