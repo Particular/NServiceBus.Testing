@@ -35,7 +35,6 @@
         /// </summary>
         public virtual PublishedMessage<object>[] PublishedMessages => publishedMessages.ToArray();
 
-
         /// <summary>
         /// A list of all event subscriptions made from this session.
         /// </summary>
@@ -77,7 +76,7 @@
         /// <param name="message">The message to send.</param>
         /// <param name="sendOptions">The options for the send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public Task Send(object message, SendOptions sendOptions, CancellationToken cancellationToken = default)
+        public virtual Task Send(object message, SendOptions sendOptions, CancellationToken cancellationToken = default)
         {
             var headers = sendOptions.GetHeaders();
 
@@ -97,7 +96,7 @@
         /// <param name="messageConstructor">An action which initializes properties of the message.</param>
         /// <param name="sendOptions">The options for the send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public Task Send<T>(Action<T> messageConstructor, SendOptions sendOptions, CancellationToken cancellationToken = default) =>
+        public virtual Task Send<T>(Action<T> messageConstructor, SendOptions sendOptions, CancellationToken cancellationToken = default) =>
             Send(messageCreator.CreateInstance(messageConstructor), sendOptions, cancellationToken);
 
         /// <summary>
@@ -106,7 +105,7 @@
         /// <param name="message">The message to publish.</param>
         /// <param name="publishOptions">The options for the publish.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public Task Publish(object message, PublishOptions publishOptions, CancellationToken cancellationToken = default)
+        public virtual Task Publish(object message, PublishOptions publishOptions, CancellationToken cancellationToken = default)
         {
             publishedMessages.Enqueue(new PublishedMessage<object>(message, publishOptions));
             return Task.CompletedTask;
@@ -119,9 +118,8 @@
         /// <param name="messageConstructor">An action which initializes properties of the message.</param>
         /// <param name="publishOptions">Specific options for this event.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
-        public Task Publish<T>(Action<T> messageConstructor, PublishOptions publishOptions, CancellationToken cancellationToken = default) =>
+        public virtual Task Publish<T>(Action<T> messageConstructor, PublishOptions publishOptions, CancellationToken cancellationToken = default) =>
             Publish(messageCreator.CreateInstance(messageConstructor), publishOptions, cancellationToken);
-
 
         static TimeoutMessage<object> GetTimeoutMessage(object message, SendOptions options)
         {
@@ -139,11 +137,11 @@
         /// the <see cref="IMessageCreator" /> instance used to create proxy implementation for message interfaces.
         /// </summary>
         protected IMessageCreator messageCreator;
+
         readonly ConcurrentQueue<Subscription> subscriptions = new ConcurrentQueue<Subscription>();
         readonly ConcurrentQueue<Unsubscription> unsubscriptions = new ConcurrentQueue<Unsubscription>();
         readonly ConcurrentQueue<PublishedMessage<object>> publishedMessages = new ConcurrentQueue<PublishedMessage<object>>();
         readonly ConcurrentQueue<SentMessage<object>> sentMessages = new ConcurrentQueue<SentMessage<object>>();
         readonly ConcurrentQueue<TimeoutMessage<object>> timeoutMessages = new ConcurrentQueue<TimeoutMessage<object>>();
-
     }
 }
