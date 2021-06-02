@@ -41,7 +41,7 @@
         public ContextBag Extensions { get; set; } = new ContextBag();
 
         /// <summary>
-        /// A <see cref="CancellationToken"/> to observe during message processing. Use this to verify behavior when message processing is cancelled.
+        /// A <see cref="CancellationToken"/> to observe during message processing. Use this to verify behavior when message processing is canceled.
         /// </summary>
 #pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public CancellationToken CancellationToken { get; set; }
