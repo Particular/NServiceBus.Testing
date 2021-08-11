@@ -229,7 +229,7 @@ namespace NServiceBus.Testing
         public object MessageBeingHandled { get; set; }
         public NServiceBus.Pipeline.MessageHandler MessageHandler { get; set; }
         public NServiceBus.Unicast.Messages.MessageMetadata MessageMetadata { get; set; }
-        public NServiceBus.Persistence.SynchronizedStorageSession SynchronizedStorageSession { get; set; }
+        public NServiceBus.Persistence.ISynchronizedStorageSession SynchronizedStorageSession { get; set; }
         public void DoNotContinueDispatchingCurrentMessageToHandlers() { }
     }
     public class TestableMessageHandlerContext : NServiceBus.Testing.TestableInvokeHandlerContext

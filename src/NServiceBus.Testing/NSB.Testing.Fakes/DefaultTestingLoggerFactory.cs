@@ -35,7 +35,9 @@ namespace NServiceBus.Testing
                 return;
             }
 
+#pragma warning disable PS0023 // DateTime.UtcNow or DateTimeOffset.UtcNow should be used instead of DateTime.Now and DateTimeOffset.Now, unless the value is being used for displaying the current date-time in a user's local time zone
             var datePart = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+#pragma warning restore PS0023 // DateTime.UtcNow or DateTimeOffset.UtcNow should be used instead of DateTime.Now and DateTimeOffset.Now, unless the value is being used for displaying the current date-time in a user's local time zone
             var paddedLevel = messageLevel.ToString().ToUpper().PadRight(5);
             var fullMessage = $"{datePart} {paddedLevel} {name} {message}";
             var writer = TextWriter;

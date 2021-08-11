@@ -47,7 +47,7 @@
         {
             var context = new TestableEndpointInstance();
 
-            await RunTestableMessageSessionInternal(context);
+            await RunTestableMessageSessionInternal(context, CancellationToken.None);
 
             await context.Stop();
             Assert.AreEqual(true, context.EndpointStopped);
