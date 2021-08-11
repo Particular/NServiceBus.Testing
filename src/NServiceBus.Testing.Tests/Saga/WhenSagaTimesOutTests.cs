@@ -50,7 +50,7 @@
                 .ExpectNotSend<TimeoutSaga.SendMessageDateTime2>()
                 .ExpectNotSend<TimeoutSaga.SendMessage1>()
                 .ExpectNotSend<TimeoutSaga.SendMessage2>()
-                .WhenSagaTimesOut(new DateTime(2010, 1, 10));
+                .WhenSagaTimesOut(new DateTimeOffset(2010, 1, 10, 0, 0, 0, TimeSpan.Zero));
         }
 
         [Test]
@@ -60,7 +60,7 @@
                 .WhenHandling<TimeoutSaga.StartMessage>()
                 .ExpectSend<TimeoutSaga.SendMessageDateTime1>()
                 .ExpectSend<TimeoutSaga.SendMessageDateTime2>()
-                .WhenSagaTimesOut(new DateTime(2010, 1, 10)));
+                .WhenSagaTimesOut(new DateTimeOffset(2010, 1, 10, 0, 0, 0, TimeSpan.Zero)));
         }
 
         [Test]
@@ -97,8 +97,8 @@
         {
             await RequestTimeout(context, TimeSpan.FromDays(7), new TimeoutMessage1());
             await RequestTimeout(context, TimeSpan.FromDays(14), new TimeoutMessage2());
-            await RequestTimeout(context, new DateTime(2010, 1, 7, 0, 0, 0, DateTimeKind.Utc), new DateTimeTimeOutMessage1());
-            await RequestTimeout(context, new DateTime(2010, 1, 14, 0, 0, 0, DateTimeKind.Utc), new DateTimeTimeOutMessage2());
+            await RequestTimeout(context, new DateTimeOffset(2010, 1, 7, 0, 0, 0, TimeSpan.Zero), new DateTimeTimeOutMessage1());
+            await RequestTimeout(context, new DateTimeOffset(2010, 1, 14, 0, 0, 0, TimeSpan.Zero), new DateTimeTimeOutMessage2());
         }
 
         public Task Timeout(TimeoutMessage1 state, IMessageHandlerContext context)
