@@ -218,7 +218,7 @@ namespace NServiceBus.Testing
     {
         public TestableIncomingPhysicalMessageContext() { }
         public NServiceBus.Transport.IncomingMessage Message { get; set; }
-        public virtual void UpdateMessage(byte[] body) { }
+        public virtual void UpdateMessage(System.ReadOnlyMemory<byte> body) { }
     }
     public class TestableInvokeHandlerContext : NServiceBus.Testing.TestableIncomingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IMessageHandlerContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext, NServiceBus.Pipeline.IInvokeHandlerContext
     {
@@ -282,9 +282,9 @@ namespace NServiceBus.Testing
     public class TestableOutgoingPhysicalMessageContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingPhysicalMessageContext
     {
         public TestableOutgoingPhysicalMessageContext() { }
-        public byte[] Body { get; set; }
+        public System.ReadOnlyMemory<byte> Body { get; set; }
         public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
-        public virtual void UpdateMessage(byte[] body) { }
+        public virtual void UpdateMessage(System.ReadOnlyMemory<byte> body) { }
     }
     public class TestableOutgoingPublishContext : NServiceBus.Testing.TestableOutgoingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IOutgoingContext, NServiceBus.Pipeline.IOutgoingPublishContext
     {
