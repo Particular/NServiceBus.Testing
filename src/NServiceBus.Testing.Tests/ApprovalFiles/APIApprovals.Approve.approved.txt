@@ -2,47 +2,17 @@
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 namespace NServiceBus.Testing
 {
+    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Will be removed in version 9.0.0" +
+        ".", true)]
     public class ExpectationException : System.Exception
     {
         public ExpectationException() { }
-        public ExpectationException(string message) { }
     }
+    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Will be removed in version 9.0.0" +
+        ".", true)]
     public class Handler<T>
     {
-        public NServiceBus.Testing.Handler<T> ConfigureHandlerContext(System.Action<NServiceBus.Testing.TestableMessageHandlerContext> contextInitializer) { }
-        public NServiceBus.Testing.Handler<T> ExpectDefer<TMessage>(System.Func<TMessage, System.DateTimeOffset, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectDefer<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectDoNotContinueDispatchingCurrentMessageToHandlers() { }
-        public NServiceBus.Testing.Handler<T> ExpectForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotDefer<TMessage>(System.Func<TMessage, System.DateTimeOffset, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotDefer<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotPublish<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotReply<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectNotSendToDestination<TMessage>(System.Func<TMessage, string, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectPublish<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectReply<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectSend<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Handler<T> ExpectSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
-        public NServiceBus.Testing.Handler<T> ExpectSendToDestination<TMessage>(System.Func<TMessage, string, bool> check) { }
-        public void OnMessage<TMessage>(System.Action<TMessage> initializeMessage = null) { }
-        public void OnMessage<TMessage>(TMessage initializedMessage) { }
-        public void OnMessage<TMessage>(string messageId, System.Action<TMessage> initializeMessage = null) { }
-        public void OnMessage<TMessage>(TMessage message, string messageId) { }
-        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(System.Action<TMessage> initializeMessage = null, System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(TMessage initializedMessage, System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(string messageId, System.Action<TMessage> initializeMessage = null, System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task OnMessageAsync<TMessage>(TMessage message, string messageId, System.Threading.CancellationToken cancellationToken = default) { }
-        public NServiceBus.Testing.Handler<T> SetIncomingHeader(string key, string value) { }
-        public NServiceBus.Testing.Handler<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
+        public Handler() { }
     }
     public static class OutgoingMessageExtensions
     {
@@ -71,71 +41,11 @@ namespace NServiceBus.Testing
     {
         public RepliedMessage(TMessage message, NServiceBus.ReplyOptions options) { }
     }
+    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Will be removed in version 9.0.0" +
+        ".", true)]
     public class Saga<T>
-        where T : NServiceBus.Saga
     {
-        public NServiceBus.Testing.Saga<T> ConfigureHandlerContext(System.Action<NServiceBus.Testing.TestableMessageHandlerContext> contextInitializer) { }
-        public NServiceBus.Testing.Saga<T> ExpectForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectNoTimeoutToBeSetAt<TMessage>(System.Func<TMessage, System.DateTimeOffset, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectNoTimeoutToBeSetIn<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotForwardCurrentMessageTo(System.Func<string, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotPublish<TMessage>(System.Action<TMessage> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotPublish<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotReply<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotSend<TMessage>(System.Action<TMessage> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotSend<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotSendLocal<TMessage>(System.Action<TMessage> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotSendToDestination<TMessage>(System.Action<TMessage, string> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectNotSendToDestination<TMessage>(System.Func<TMessage, string, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectPublish<TMessage>(System.Action<TMessage> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectPublish<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectPublish<TMessage>(System.Func<TMessage, NServiceBus.PublishOptions, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectReply<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectReply<TMessage>(System.Func<TMessage, NServiceBus.ReplyOptions, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectReplyToOriginator<TMessage>(System.Action<TMessage> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectReplyToOriginator<TMessage>(System.Func<TMessage, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectSagaCompleted() { }
-        public NServiceBus.Testing.Saga<T> ExpectSagaData<TSagaData>(System.Func<TSagaData, bool> check)
-            where TSagaData : NServiceBus.IContainSagaData { }
-        public NServiceBus.Testing.Saga<T> ExpectSagaNotCompleted() { }
-        public NServiceBus.Testing.Saga<T> ExpectSend<TMessage>(System.Action<TMessage> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectSend<TMessage>(System.Func<TMessage, bool> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectSend<TMessage>(System.Func<TMessage, NServiceBus.SendOptions, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectSendLocal<TMessage>(System.Action<TMessage> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectSendLocal<TMessage>(System.Func<TMessage, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectSendToDestination<TMessage>(System.Action<TMessage, string> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectSendToDestination<TMessage>(System.Func<TMessage, string, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetAt<TMessage>(System.Action<TMessage, System.DateTimeOffset> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetAt<TMessage>(System.Func<TMessage, System.DateTimeOffset, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetIn<TMessage>(System.Action<TMessage, System.TimeSpan> check) { }
-        public NServiceBus.Testing.Saga<T> ExpectTimeoutToBeSetIn<TMessage>(System.Func<TMessage, System.TimeSpan, bool> check = null) { }
-        public NServiceBus.Testing.Saga<T> SetIncomingHeader(string key, string value) { }
-        public NServiceBus.Testing.Saga<T> When(System.Func<T, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task> sagaIsInvoked) { }
-        public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, System.Action<TMessage> messageInitializer = null) { }
-        public NServiceBus.Testing.Saga<T> When<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, TMessage message) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenAsync(System.Func<T, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task> sagaIsInvoked, System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenAsync<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, System.Action<TMessage> messageInitializer = null, System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenAsync<TMessage>(System.Func<T, System.Func<TMessage, NServiceBus.IMessageHandlerContext, System.Threading.Tasks.Task>> handlerSelector, TMessage message, System.Threading.CancellationToken cancellationToken = default) { }
-        public NServiceBus.Testing.Saga<T> WhenHandling<TMessage>(System.Action<TMessage> initializeMessage = null) { }
-        public NServiceBus.Testing.Saga<T> WhenHandling<TMessage>(TMessage message) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingAsync<TMessage>(System.Action<TMessage> initializeMessage = null, System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingAsync<TMessage>(TMessage message, System.Threading.CancellationToken cancellationToken = default) { }
-        public NServiceBus.Testing.Saga<T> WhenHandlingTimeout<TMessage>(System.Action<TMessage> initializeMessage = null) { }
-        public NServiceBus.Testing.Saga<T> WhenHandlingTimeout<TMessage>(TMessage message) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingTimeoutAsync<TMessage>(System.Action<TMessage> initializeMessage = null, System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenHandlingTimeoutAsync<TMessage>(TMessage message, System.Threading.CancellationToken cancellationToken = default) { }
-        public NServiceBus.Testing.Saga<T> WhenReceivesMessageFrom(string client) { }
-        public NServiceBus.Testing.Saga<T> WhenSagaTimesOut() { }
-        public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.DateTimeOffset at) { }
-        public NServiceBus.Testing.Saga<T> WhenSagaTimesOut(System.TimeSpan after) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.DateTimeOffset at, System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.Saga<T>> WhenSagaTimesOutAsync(System.TimeSpan after, System.Threading.CancellationToken cancellationToken = default) { }
-        public NServiceBus.Testing.Saga<T> WithExternalDependencies(System.Action<T> actionToSetUpExternalDependencies) { }
+        public Saga() { }
     }
     public class SentMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.SendOptions>
     {
@@ -145,22 +55,11 @@ namespace NServiceBus.Testing
     {
         public Subscription(System.Type message, NServiceBus.SubscribeOptions options) { }
     }
+    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Will be removed in version 9.0.0" +
+        ".", true)]
     public class Test
     {
         public Test() { }
-        public static TMessage CreateInstance<TMessage>() { }
-        public static TMessage CreateInstance<TMessage>(System.Action<TMessage> action) { }
-        public static NServiceBus.Testing.Handler<THandler> Handler<THandler>()
-            where THandler : new() { }
-        public static NServiceBus.Testing.Handler<THandler> Handler<THandler>(THandler handler) { }
-        public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>()
-            where TSaga : NServiceBus.Saga, new () { }
-        public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>(NServiceBus.IContainSagaData sagaData)
-            where TSaga : NServiceBus.Saga, new () { }
-        public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>(System.Guid sagaId)
-            where TSaga : NServiceBus.Saga, new () { }
-        public static NServiceBus.Testing.Saga<TSaga> Saga<TSaga>(TSaga saga)
-            where TSaga : NServiceBus.Saga { }
     }
     public class TestableAuditContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IAuditContext, NServiceBus.Pipeline.IBehaviorContext
     {
