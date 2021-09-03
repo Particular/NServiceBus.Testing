@@ -2,6 +2,9 @@
 [assembly: System.Runtime.InteropServices.ComVisibleAttribute(false)]
 namespace NServiceBus.Testing
 {
+    [System.ObsoleteAttribute("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
+        " more details. Will be treated as an error from version 8.0.0. Will be removed i" +
+        "n version 9.0.0.", false)]
     public class ExpectationException : System.Exception
     {
         public ExpectationException() { }
@@ -26,6 +29,9 @@ namespace NServiceBus.Testing
         public void Register(System.Type type, System.Func<object[]> factory) { }
         public virtual void Release(object instance) { }
     }
+    [System.ObsoleteAttribute("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
+        " more details. Will be treated as an error from version 8.0.0. Will be removed i" +
+        "n version 9.0.0.", false)]
     public class Handler<T>
     {
         public NServiceBus.Testing.Handler<T> ConfigureHandlerContext(System.Action<NServiceBus.Testing.TestableMessageHandlerContext> contextInitializer) { }
@@ -92,6 +98,9 @@ namespace NServiceBus.Testing
     {
         public RepliedMessage(TMessage message, NServiceBus.ReplyOptions options) { }
     }
+    [System.ObsoleteAttribute("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
+        " more details. Will be treated as an error from version 8.0.0. Will be removed i" +
+        "n version 9.0.0.", false)]
     public class Saga<T>
         where T : NServiceBus.Saga
     {
@@ -171,6 +180,9 @@ namespace NServiceBus.Testing
     {
         public Subscription(System.Type message, NServiceBus.SubscribeOptions options) { }
     }
+    [System.ObsoleteAttribute("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
+        " more details. Will be treated as an error from version 8.0.0. Will be removed i" +
+        "n version 9.0.0.", false)]
     public class Test
     {
         public Test() { }
