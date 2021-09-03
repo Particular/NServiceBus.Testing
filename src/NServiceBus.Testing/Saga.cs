@@ -14,6 +14,10 @@ namespace NServiceBus.Testing
     /// <summary>
     /// Saga unit testing framework.
     /// </summary>
+    [ObsoleteEx(
+     Message = "Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for more details.",
+     RemoveInVersion = "9",
+     TreatAsErrorFromVersion = "8")]
     public partial class Saga<T> where T : Saga
     {
         internal Saga(T saga)

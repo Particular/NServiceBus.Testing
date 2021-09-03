@@ -6,6 +6,10 @@
     /// <summary>
     /// Entry class used for unit testing
     /// </summary>
+    [ObsoleteEx(
+     Message = "Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for more details.",
+     RemoveInVersion = "9",
+     TreatAsErrorFromVersion = "8")]
     public class Test
     {
         /// <summary>
