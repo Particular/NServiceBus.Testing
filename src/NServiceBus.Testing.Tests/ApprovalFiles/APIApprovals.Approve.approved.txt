@@ -2,14 +2,14 @@
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 namespace NServiceBus.Testing
 {
-    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Will be removed in version 9.0.0" +
-        ".", true)]
+    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
+        " more details. Will be removed in version 9.0.0.", true)]
     public class ExpectationException : System.Exception
     {
         public ExpectationException() { }
     }
-    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Will be removed in version 9.0.0" +
-        ".", true)]
+    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
+        " more details. Will be removed in version 9.0.0.", true)]
     public class Handler<T>
     {
         public Handler() { }
@@ -41,8 +41,8 @@ namespace NServiceBus.Testing
     {
         public RepliedMessage(TMessage message, NServiceBus.ReplyOptions options) { }
     }
-    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Will be removed in version 9.0.0" +
-        ".", true)]
+    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
+        " more details. Will be removed in version 9.0.0.", true)]
     public class Saga<T>
     {
         public Saga() { }
@@ -55,8 +55,8 @@ namespace NServiceBus.Testing
     {
         public Subscription(System.Type message, NServiceBus.SubscribeOptions options) { }
     }
-    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Will be removed in version 9.0.0" +
-        ".", true)]
+    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
+        " more details. Will be removed in version 9.0.0.", true)]
     public class Test
     {
         public Test() { }
