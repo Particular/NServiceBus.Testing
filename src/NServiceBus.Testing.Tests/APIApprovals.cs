@@ -9,7 +9,7 @@ public class APIApprovals
     [Test]
     public void Approve()
     {
-        var publicApi = typeof(Test).Assembly.GeneratePublicApi(new ApiGeneratorOptions
+        var publicApi = typeof(TestableMessageSession).Assembly.GeneratePublicApi(new ApiGeneratorOptions
         {
             ExcludeAttributes = new[] { "System.Runtime.Versioning.TargetFrameworkAttribute", "System.Reflection.AssemblyMetadataAttribute" }
         });
