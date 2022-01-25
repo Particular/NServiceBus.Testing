@@ -151,6 +151,9 @@ namespace NServiceBus.Testing
     {
         protected NServiceBus.IMessageCreator messageCreator;
         public TestableMessageSession(NServiceBus.IMessageCreator messageCreator = null) { }
+        [System.Obsolete("The member currently throws a NotImplementedException. Will be removed in version" +
+            " 9.0.0.", true)]
+        public NServiceBus.Extensibility.ContextBag Extensions { get; set; }
         public virtual NServiceBus.Testing.PublishedMessage<>[] PublishedMessages { get; }
         public virtual NServiceBus.Testing.SentMessage<>[] SentMessages { get; }
         public virtual NServiceBus.Testing.Subscription[] Subscriptions { get; }

@@ -57,4 +57,21 @@ namespace NServiceBus.Testing
     }
 }
 
+namespace NServiceBus.Testing
+{
+    using System;
+
+    public partial class TestableMessageSession
+    {
+        [ObsoleteEx(
+            RemoveInVersion = "9",
+            TreatAsErrorFromVersion = "8")]
+        public Extensibility.ContextBag Extensions
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+    }
+}
+
 #pragma warning restore 1591
