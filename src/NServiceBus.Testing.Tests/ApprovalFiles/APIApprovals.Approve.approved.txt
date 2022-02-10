@@ -64,6 +64,8 @@ namespace NServiceBus.Testing
     public class TestableAuditContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IAuditActionContext, NServiceBus.Pipeline.IAuditContext, NServiceBus.Pipeline.IBehaviorContext
     {
         public TestableAuditContext() { }
+        [System.Obsolete("Use `AuditMetadata` instead. Will be removed in version 9.0.0.", true)]
+        public System.Collections.Generic.Dictionary<string, string> AddedAuditData { get; }
         public NServiceBus.Audit.AuditAction AuditAction { get; set; }
         public string AuditAddress { get; set; }
         public System.Collections.Generic.Dictionary<string, string> AuditMetadata { get; set; }

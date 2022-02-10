@@ -39,20 +39,6 @@
         IReadOnlyDictionary<string, string> IAuditActionContext.AuditMetadata => AuditMetadata;
 
         /// <summary>
-        /// Adds information about the current message that should be audited.
-        /// </summary>
-        /// <param name="key">The audit key.</param>
-        /// <param name="value">The value.</param>
-        [ObsoleteEx(
-            ReplacementTypeOrMember = nameof(AuditMetadata),
-            RemoveInVersion = "9",
-            TreatAsErrorFromVersion = "8")]
-        public void AddAuditData(string key, string value)
-        {
-            AuditMetadata.Add(key, value);
-        }
-
-        /// <summary>
         /// Locks the audit action for further changes.
         /// </summary>
         public IAuditActionContext PreventChanges()

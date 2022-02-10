@@ -74,4 +74,29 @@ namespace NServiceBus.Testing
     }
 }
 
+
+namespace NServiceBus.Testing
+{
+    using System.Collections.Generic;
+
+
+    public partial class TestableAuditContext
+    {
+        [ObsoleteEx(
+            ReplacementTypeOrMember = nameof(AuditMetadata),
+            RemoveInVersion = "9",
+            TreatAsErrorFromVersion = "8")]
+        public void AddAuditData(string key, string value)
+        {
+            AuditMetadata.Add(key, value);
+        }
+
+        [ObsoleteEx(
+            ReplacementTypeOrMember = nameof(AuditMetadata),
+            RemoveInVersion = "9",
+            TreatAsErrorFromVersion = "8")]
+        public Dictionary<string, string> AddedAuditData { get; }
+    }
+}
+
 #pragma warning restore 1591
