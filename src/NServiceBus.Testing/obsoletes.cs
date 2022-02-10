@@ -74,11 +74,9 @@ namespace NServiceBus.Testing
     }
 }
 
-
 namespace NServiceBus.Testing
 {
     using System.Collections.Generic;
-
 
     public partial class TestableAuditContext
     {
