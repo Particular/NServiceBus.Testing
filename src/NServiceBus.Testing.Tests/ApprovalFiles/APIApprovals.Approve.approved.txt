@@ -61,13 +61,20 @@ namespace NServiceBus.Testing
     {
         public Test() { }
     }
-    public class TestableAuditContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IAuditContext, NServiceBus.Pipeline.IBehaviorContext
+    public class TestableAuditContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IAuditActionContext, NServiceBus.Pipeline.IAuditContext, NServiceBus.Pipeline.IBehaviorContext
     {
         public TestableAuditContext() { }
-        public System.Collections.Generic.IDictionary<string, string> AddedAuditData { get; }
+        [System.Obsolete("Use `AuditMetadata` instead. Will be removed in version 9.0.0.", true)]
+        public System.Collections.Generic.Dictionary<string, string> AddedAuditData { get; }
+        public NServiceBus.Audit.AuditAction AuditAction { get; set; }
         public string AuditAddress { get; set; }
+        public System.Collections.Generic.Dictionary<string, string> AuditMetadata { get; set; }
+        public bool IsLocked { get; }
         public NServiceBus.Transport.OutgoingMessage Message { get; set; }
+        public System.TimeSpan? TimeToBeReceived { get; }
+        [System.Obsolete("Use `AuditMetadata` instead. Will be removed in version 9.0.0.", true)]
         public void AddAuditData(string key, string value) { }
+        public NServiceBus.Pipeline.IAuditActionContext PreventChanges() { }
     }
     public class TestableBatchDispatchContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBatchDispatchContext, NServiceBus.Pipeline.IBehaviorContext
     {
@@ -216,6 +223,16 @@ namespace NServiceBus.Testing
         public virtual System.Threading.Tasks.Task Publish<T>(System.Action<T> messageConstructor, NServiceBus.PublishOptions publishOptions) { }
         public virtual System.Threading.Tasks.Task Send(object message, NServiceBus.SendOptions options) { }
         public virtual System.Threading.Tasks.Task Send<T>(System.Action<T> messageConstructor, NServiceBus.SendOptions options) { }
+    }
+    public class TestableRecoverabilityContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IRecoverabilityActionContext, NServiceBus.Pipeline.IRecoverabilityContext
+    {
+        public TestableRecoverabilityContext() { }
+        public NServiceBus.Transport.ErrorContext ErrorContext { get; set; }
+        public bool IsLocked { get; }
+        public System.Collections.Generic.Dictionary<string, string> Metadata { get; set; }
+        public NServiceBus.RecoverabilityAction RecoverabilityAction { get; set; }
+        public NServiceBus.RecoverabilityConfig RecoverabilityConfiguration { get; set; }
+        public NServiceBus.Pipeline.IRecoverabilityActionContext PreventChanges() { }
     }
     public class TestableRoutingContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IRoutingContext
     {
