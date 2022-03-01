@@ -148,7 +148,7 @@ namespace NServiceBus.Testing
         public virtual string[] ForwardedMessages { get; }
         public System.Collections.Generic.IDictionary<string, string> MessageHeaders { get; set; }
         public string MessageId { get; set; }
-        public virtual NServiceBus.Testing.RepliedMessage<>[] RepliedMessages { get; }
+        public virtual NServiceBus.Testing.RepliedMessage<object>[] RepliedMessages { get; }
         public string ReplyToAddress { get; set; }
         public virtual System.Threading.Tasks.Task ForwardCurrentMessageTo(string destination) { }
         public virtual System.Threading.Tasks.Task Reply(object message, NServiceBus.ReplyOptions options) { }
@@ -161,10 +161,10 @@ namespace NServiceBus.Testing
         [System.Obsolete("The member currently throws a NotImplementedException. Will be removed in version" +
             " 9.0.0.", true)]
         public NServiceBus.Extensibility.ContextBag Extensions { get; set; }
-        public virtual NServiceBus.Testing.PublishedMessage<>[] PublishedMessages { get; }
-        public virtual NServiceBus.Testing.SentMessage<>[] SentMessages { get; }
+        public virtual NServiceBus.Testing.PublishedMessage<object>[] PublishedMessages { get; }
+        public virtual NServiceBus.Testing.SentMessage<object>[] SentMessages { get; }
         public virtual NServiceBus.Testing.Subscription[] Subscriptions { get; }
-        public NServiceBus.Testing.TimeoutMessage<>[] TimeoutMessages { get; }
+        public NServiceBus.Testing.TimeoutMessage<object>[] TimeoutMessages { get; }
         public virtual NServiceBus.Testing.Unsubscription[] Unsubscription { get; }
         public virtual System.Threading.Tasks.Task Publish(object message, NServiceBus.PublishOptions publishOptions, System.Threading.CancellationToken cancellationToken = default) { }
         public virtual System.Threading.Tasks.Task Publish<T>(System.Action<T> messageConstructor, NServiceBus.PublishOptions publishOptions, System.Threading.CancellationToken cancellationToken = default) { }
@@ -216,9 +216,9 @@ namespace NServiceBus.Testing
         public TestablePipelineContext(NServiceBus.IMessageCreator messageCreator = null) { }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public NServiceBus.Extensibility.ContextBag Extensions { get; set; }
-        public virtual NServiceBus.Testing.PublishedMessage<>[] PublishedMessages { get; }
-        public virtual NServiceBus.Testing.SentMessage<>[] SentMessages { get; }
-        public NServiceBus.Testing.TimeoutMessage<>[] TimeoutMessages { get; }
+        public virtual NServiceBus.Testing.PublishedMessage<object>[] PublishedMessages { get; }
+        public virtual NServiceBus.Testing.SentMessage<object>[] SentMessages { get; }
+        public NServiceBus.Testing.TimeoutMessage<object>[] TimeoutMessages { get; }
         public virtual System.Threading.Tasks.Task Publish(object message, NServiceBus.PublishOptions options) { }
         public virtual System.Threading.Tasks.Task Publish<T>(System.Action<T> messageConstructor, NServiceBus.PublishOptions publishOptions) { }
         public virtual System.Threading.Tasks.Task Send(object message, NServiceBus.SendOptions options) { }
