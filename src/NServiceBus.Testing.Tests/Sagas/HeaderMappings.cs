@@ -34,7 +34,7 @@
             public Task Handle(HeaderMessage message, IMessageHandlerContext context)
             {
                 Data.HeaderMessageReceived = true;
-                return Task.CompletedTask;
+                return Task.FromResult(false);
             }
         }
 

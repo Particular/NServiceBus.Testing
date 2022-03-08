@@ -10,13 +10,13 @@
 
     class SagaMapper : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders
     {
-        static Dictionary<Type, SagaMapper> sagaMappers = new Dictionary<Type, SagaMapper>();
+        static readonly Dictionary<Type, SagaMapper> sagaMappers = new Dictionary<Type, SagaMapper>();
 
-        SagaMetadata metadata;
-        Dictionary<Type, Func<QueuedSagaMessage, object>> mappings;
-        SagaMetadata.CorrelationPropertyMetadata correlationProperty;
-        PropertyInfo correlationPropertyInfo;
-        Dictionary<(Type messageType, string methodName), MethodInfo> handlerMethods;
+        readonly SagaMetadata metadata;
+        readonly Dictionary<Type, Func<QueuedSagaMessage, object>> mappings;
+        readonly SagaMetadata.CorrelationPropertyMetadata correlationProperty;
+        readonly PropertyInfo correlationPropertyInfo;
+        readonly Dictionary<Tuple<Type, string>, MethodInfo> handlerMethods;
 
         public string CorrelationPropertyName => correlationProperty.Name;
 
@@ -24,7 +24,7 @@
         {
             metadata = SagaMetadata.Create(sagaType);
             mappings = new Dictionary<Type, Func<QueuedSagaMessage, object>>();
-            handlerMethods = new Dictionary<(Type messageType, string methodName), MethodInfo>();
+            handlerMethods = new Dictionary<Tuple<Type, string>, MethodInfo>();
 
             if (!metadata.TryGetCorrelationProperty(out correlationProperty))
             {
@@ -85,11 +85,12 @@
 
         public Task InvokeHandlerMethod<TSaga>(TSaga saga, string methodName, QueuedSagaMessage message, TestableMessageHandlerContext context)
         {
-            if (!handlerMethods.TryGetValue((message.Type, methodName), out var handlerMethodInfo))
+            var key = new Tuple<Type, string>(message.Type, methodName);
+            if (!handlerMethods.TryGetValue(key, out var handlerMethodInfo))
             {
                 var handlerTypes = new Type[] { message.Type, typeof(IMessageHandlerContext) };
                 handlerMethodInfo = typeof(TSaga).GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, handlerTypes, null);
-                handlerMethods[(message.Type, methodName)] = handlerMethodInfo;
+                handlerMethods[key] = handlerMethodInfo;
             }
             var invokeTask = handlerMethodInfo.Invoke(saga, new object[] { message.Message, context }) as Task;
             return invokeTask;

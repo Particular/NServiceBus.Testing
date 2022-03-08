@@ -42,7 +42,7 @@
             public Task Handle(Step1Reply message, IMessageHandlerContext context)
             {
                 Data.ReplyReceived = true;
-                return Task.CompletedTask;
+                return Task.FromResult(false);
             }
         }
 

@@ -65,14 +65,14 @@
             public Task Handle(DelayedCmd message, IMessageHandlerContext context)
             {
                 Data.DelayedCommandReceived = true;
-                return Task.CompletedTask;
+                return Task.FromResult(false);
             }
 
 
             public Task Timeout(RegularTimeout state, IMessageHandlerContext context)
             {
                 Data.RegularTimeoutReceived = true;
-                return Task.CompletedTask;
+                return Task.FromResult(false);
             }
         }
 

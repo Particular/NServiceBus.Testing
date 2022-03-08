@@ -21,7 +21,7 @@
             byCorrelationIdCollection = byCorrelationId;
         }
 
-        public Task Complete(IContainSagaData sagaData, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Task Complete(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
         {
             ((NonDurableSynchronizedStorageSession)session).Enlist(() =>
             {
@@ -40,10 +40,10 @@
                 }
             });
 
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
-        public Task<TSagaData> Get<TSagaData>(Guid sagaId, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Task<TSagaData> Get<TSagaData>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
             where TSagaData : class, IContainSagaData
         {
             if (sagas.TryGetValue(sagaId, out var value))
@@ -57,7 +57,7 @@
             return CachedSagaDataTask<TSagaData>.Default;
         }
 
-        public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, SynchronizedStorageSession session, ContextBag context)
             where TSagaData : class, IContainSagaData
         {
             var key = new CorrelationId(typeof(TSagaData), propertyName, propertyValue);
@@ -65,13 +65,13 @@
             if (byCorrelationId.TryGetValue(key, out var id))
             {
                 // this isn't updated atomically and may return null for an entry that has been indexed but not inserted yet
-                return Get<TSagaData>(id, session, context, cancellationToken);
+                return Get<TSagaData>(id, session, context);
             }
 
             return CachedSagaDataTask<TSagaData>.Default;
         }
 
-        public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
         {
             ((NonDurableSynchronizedStorageSession)session).Enlist(() =>
             {
@@ -92,10 +92,10 @@
                 }
             });
 
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
-        public Task Update(IContainSagaData sagaData, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Task Update(IContainSagaData sagaData, SynchronizedStorageSession session, ContextBag context)
         {
             ((NonDurableSynchronizedStorageSession)session).Enlist(() =>
             {
@@ -107,7 +107,7 @@
                 }
             });
 
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
         static void SetEntry(ContextBag context, Guid sagaId, Entry value)
@@ -120,7 +120,7 @@
             entries[sagaId] = value;
         }
 
-        static Entry GetEntry(IReadOnlyContextBag context, Guid sagaDataId)
+        static Entry GetEntry(ReadOnlyContextBag context, Guid sagaDataId)
         {
             if (context.TryGet(ContextKey, out Dictionary<Guid, Entry> entries))
             {
@@ -205,8 +205,8 @@
             }
 
             readonly IContainSagaData data;
-            static ConcurrentDictionary<Type, bool> canBeShallowCopiedCache = new ConcurrentDictionary<Type, bool>();
-            static Func<IContainSagaData, IContainSagaData> shallowCopy;
+            static readonly ConcurrentDictionary<Type, bool> canBeShallowCopiedCache = new ConcurrentDictionary<Type, bool>();
+            static readonly Func<IContainSagaData, IContainSagaData> shallowCopy;
         }
 
         /// <summary>

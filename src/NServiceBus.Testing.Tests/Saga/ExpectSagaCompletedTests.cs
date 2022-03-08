@@ -43,7 +43,7 @@
         }
     }
 
-    class TestSaga : NServiceBus.Saga<TestSaga.TestSagaData>, 
+    class TestSaga : NServiceBus.Saga<TestSaga.TestSagaData>,
         IAmStartedByMessages<TestSaga.CompleteSagaMessage>,
         IAmStartedByMessages<TestSaga.DoNotCompleteSagaMessage>
     {
@@ -80,5 +80,5 @@
         }
     }
 
-    
+
 }

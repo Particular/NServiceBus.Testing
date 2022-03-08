@@ -5,7 +5,7 @@
     using System.Threading.Tasks;
     using Persistence;
 
-    class NonDurableSynchronizedStorageSession : ICompletableSynchronizedStorageSession
+    class NonDurableSynchronizedStorageSession : CompletableSynchronizedStorageSession
     {
         public NonDurableSynchronizedStorageSession(NonDurableTransaction transaction)
         {
@@ -25,13 +25,13 @@
             Transaction = null;
         }
 
-        public Task CompleteAsync(CancellationToken cancellationToken = default)
+        public Task CompleteAsync()
         {
             if (ownsTransaction)
             {
                 Transaction.Commit();
             }
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
         public void Enlist(Action action)
@@ -39,6 +39,6 @@
             Transaction.Enlist(action);
         }
 
-        bool ownsTransaction;
+        readonly bool ownsTransaction;
     }
 }

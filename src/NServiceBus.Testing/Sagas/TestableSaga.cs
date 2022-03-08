@@ -24,8 +24,8 @@
         readonly Queue<QueuedSagaMessage> queue;
         readonly ISagaPersister persister;
         readonly SagaMapper sagaMapper;
-        readonly List<(DateTime At, OutgoingMessage<object, SendOptions> Timeout)> storedTimeouts;
-        readonly Dictionary<Type, List<(Type, Func<object, object>)>> handlerSimulations;
+        readonly List<Tuple<DateTime, OutgoingMessage<object, SendOptions>>> storedTimeouts;
+        readonly Dictionary<Type, List<Tuple<Type, Func<object, object>>>> handlerSimulations;
 
         /// <summary>
         /// Create a tester for a saga.
@@ -45,8 +45,8 @@
 
             queue = new Queue<QueuedSagaMessage>();
             persister = new NonDurableSagaPersister();
-            storedTimeouts = new List<(DateTime, OutgoingMessage<object, SendOptions>)>();
-            handlerSimulations = new Dictionary<Type, List<(Type, Func<object, object>)>>();
+            storedTimeouts = new List<Tuple<DateTime, OutgoingMessage<object, SendOptions>>>();
+            handlerSimulations = new Dictionary<Type, List<Tuple<Type, Func<object, object>>>>();
 
             sagaMapper = SagaMapper.Get<TSaga, TSagaEntity>(this.sagaFactory);
         }
@@ -191,11 +191,11 @@
 
             if (!handlerSimulations.TryGetValue(typeof(TMessageFromSaga), out var list))
             {
-                list = new List<(Type, Func<object, object>)>();
+                list = new List<Tuple<Type, Func<object, object>>>();
                 handlerSimulations.Add(typeof(TMessageFromSaga), list);
             }
 
-            list.Add((typeof(TResponseMessage), wrapperFunc));
+            list.Add(new Tuple<Type, Func<object, object>>(typeof(TResponseMessage), wrapperFunc));
         }
 
         async Task<MessageProcessingResult> InnerProcess(QueuedSagaMessage message, string handleMethodName, TestableMessageHandlerContext context)
@@ -206,12 +206,12 @@
             {
                 var contextBag = new ContextBag();
 
-                var loadResult = await LoadSagaData(message, session, contextBag, context.CancellationToken).ConfigureAwait(false);
-                saga.Entity = loadResult.Data;
+                var loadResult = await LoadSagaData(message, session, contextBag).ConfigureAwait(false);
+                saga.Entity = loadResult.Item1;
 
-                await InvokeSagaHandler(saga, handleMethodName, message, context).ConfigureAwait(false);
-                await SaveSagaData(saga, loadResult.IsNew, loadResult.MappedValue, session, contextBag, context.CancellationToken).ConfigureAwait(false);
-                await session.CompleteAsync(context.CancellationToken).ConfigureAwait(false);
+                await sagaMapper.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
+                await SaveSagaData(saga, loadResult.Item2, loadResult.Item3, session, contextBag).ConfigureAwait(false);
+                await session.CompleteAsync().ConfigureAwait(false);
             }
 
             EnqueueMessagesAndTimeouts(context, saga.Entity.Id);
@@ -219,33 +219,27 @@
             return new MessageProcessingResult(saga, message, context);
         }
 
-        Task InvokeSagaHandler(TSaga saga, string methodName, QueuedSagaMessage message, TestableMessageHandlerContext context)
-        {
-            return sagaMapper.InvokeHandlerMethod(saga, methodName, message, context);
-        }
-
         /// <summary>
         /// Advance the <see cref="CurrentTime"/> for the test, dispatching any stored timeouts along the way.
         /// </summary>
         /// <param name="timeToAdvance">Amount of time to advance the <see cref="CurrentTime"/>.</param>
-        /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>
         /// Returns an array of <see cref="MessageProcessingResult"/>, one for each timeout that was dispatched and processed
         /// during the time that was advanced. If no timeouts were fired, the array will be empty.
         /// </returns>
-        public async Task<MessageProcessingResult[]> AdvanceTime(TimeSpan timeToAdvance, CancellationToken cancellationToken = default)
+        public async Task<MessageProcessingResult[]> AdvanceTime(TimeSpan timeToAdvance)
         {
             var advanceToTime = CurrentTime + timeToAdvance;
 
-            var due = storedTimeouts.Where(t => t.At <= advanceToTime).OrderBy(t => t.At).ToArray();
-            storedTimeouts.RemoveAll(t => t.At <= advanceToTime);
+            var due = storedTimeouts.Where(t => t.Item1 <= advanceToTime).OrderBy(t => t.Item2).ToArray();
+            storedTimeouts.RemoveAll(t => t.Item1 <= advanceToTime);
 
             var results = new List<MessageProcessingResult>();
 
             foreach (var storedTimeout in due)
             {
-                CurrentTime = storedTimeout.At;
-                var result = await ProcessTimeout(storedTimeout.Timeout, cancellationToken).ConfigureAwait(false);
+                CurrentTime = storedTimeout.Item1;
+                var result = await ProcessTimeout(storedTimeout.Item2).ConfigureAwait(false);
                 results.Add(result);
             }
 
@@ -254,10 +248,10 @@
             return results.ToArray();
         }
 
-        async Task<MessageProcessingResult> ProcessTimeout(OutgoingMessage<object, SendOptions> timeoutMessage, CancellationToken cancellationToken)
+        async Task<MessageProcessingResult> ProcessTimeout(OutgoingMessage<object, SendOptions> timeoutMessage)
         {
             var messageType = timeoutMessage.Message.GetType();
-            var context = new TestableMessageHandlerContext { CancellationToken = cancellationToken };
+            var context = new TestableMessageHandlerContext();
 
             var queueMessage = new QueuedSagaMessage(messageType, timeoutMessage.Message, timeoutMessage.Options.GetHeaders());
 
@@ -268,53 +262,53 @@
             return processingResult;
         }
 
-        async Task<(TSagaEntity Data, bool IsNew, object MappedValue)> LoadSagaData(QueuedSagaMessage message, ISynchronizedStorageSession session, ContextBag contextBag, CancellationToken cancellationToken)
+        async Task<Tuple<TSagaEntity, bool, object>> LoadSagaData(QueuedSagaMessage message, SynchronizedStorageSession session, ContextBag contextBag)
         {
             var messageMetadata = sagaMapper.GetMessageMetadata(message.Type);
             TSagaEntity sagaData;
 
             if (message.Headers != null && message.Headers.TryGetValue(Headers.SagaId, out var sagaIdString) && Guid.TryParse(sagaIdString, out Guid sagaId))
             {
-                sagaData = await persister.Get<TSagaEntity>(sagaId, session, contextBag, cancellationToken).ConfigureAwait(false);
+                sagaData = await persister.Get<TSagaEntity>(sagaId, session, contextBag).ConfigureAwait(false);
                 if (sagaData != null)
                 {
-                    return (sagaData, false, null);
+                    return new Tuple<TSagaEntity, bool, object>(sagaData, false, null);
                 }
             }
 
             var messageMappedValue = sagaMapper.GetMessageMappedValue(message);
 
-            sagaData = await persister.Get<TSagaEntity>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, contextBag, cancellationToken).ConfigureAwait(false);
+            sagaData = await persister.Get<TSagaEntity>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, contextBag).ConfigureAwait(false);
 
             if (sagaData != null)
             {
-                return (sagaData, false, messageMappedValue);
+                return new Tuple<TSagaEntity, bool, object>(sagaData, false, messageMappedValue);
             }
 
             if (messageMetadata.IsAllowedToStartSaga)
             {
                 sagaData = new TSagaEntity { Id = Guid.NewGuid() };
                 sagaMapper.SetCorrelationPropertyValue(sagaData, messageMappedValue);
-                return (sagaData, true, messageMappedValue);
+                return new Tuple<TSagaEntity, bool, object>(sagaData, true, messageMappedValue);
             }
 
             throw new Exception($"Saga not found and message type {message.Type.FullName} is not allowed to start the saga.");
         }
 
-        async Task SaveSagaData(TSaga saga, bool isNew, object mappedValue, ISynchronizedStorageSession session, ContextBag contextBag, CancellationToken cancellationToken)
+        async Task SaveSagaData(TSaga saga, bool isNew, object mappedValue, SynchronizedStorageSession session, ContextBag contextBag)
         {
             if (saga.Completed)
             {
-                await persister.Complete(saga.Entity, session, contextBag, cancellationToken).ConfigureAwait(false);
+                await persister.Complete(saga.Entity, session, contextBag).ConfigureAwait(false);
             }
             else if (isNew)
             {
                 var saveCorrelationProperty = new SagaCorrelationProperty(sagaMapper.CorrelationPropertyName, mappedValue);
-                await persister.Save(saga.Entity, saveCorrelationProperty, session, contextBag, cancellationToken).ConfigureAwait(false);
+                await persister.Save(saga.Entity, saveCorrelationProperty, session, contextBag).ConfigureAwait(false);
             }
             else
             {
-                await persister.Update(saga.Entity, session, contextBag, cancellationToken).ConfigureAwait(false);
+                await persister.Update(saga.Entity, session, contextBag).ConfigureAwait(false);
             }
         }
 
@@ -325,11 +319,11 @@
                 if (timeout.Within.HasValue)
                 {
                     var targetTime = CurrentTime + timeout.Within.Value;
-                    storedTimeouts.Add((targetTime, timeout));
+                    storedTimeouts.Add(new Tuple<DateTime, OutgoingMessage<object, SendOptions>>(targetTime, timeout));
                 }
                 else if (timeout.At.HasValue)
                 {
-                    storedTimeouts.Add((timeout.At.Value.UtcDateTime, timeout));
+                    storedTimeouts.Add(new Tuple<DateTime, OutgoingMessage<object, SendOptions>>(timeout.At.Value.UtcDateTime, timeout));
                 }
                 else
                 {
@@ -354,11 +348,11 @@
                     if (deliveryDelay.HasValue)
                     {
                         var targetTime = CurrentTime + deliveryDelay.Value;
-                        storedTimeouts.Add((targetTime, message));
+                        storedTimeouts.Add(new Tuple<DateTime, OutgoingMessage<object, SendOptions>>(targetTime, message));
                     }
                     else if (deliverAt.HasValue)
                     {
-                        storedTimeouts.Add((deliverAt.Value.UtcDateTime, message));
+                        storedTimeouts.Add(new Tuple<DateTime, OutgoingMessage<object, SendOptions>>(deliverAt.Value.UtcDateTime, message));
                     }
                     else
                     {
