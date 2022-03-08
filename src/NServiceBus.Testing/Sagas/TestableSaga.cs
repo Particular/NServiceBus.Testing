@@ -66,7 +66,7 @@
         /// <summary>
         /// The length of the message queue.
         /// </summary>
-        public int QueueLength => queue.Count();
+        public int QueueLength => queue.Count;
 
         /// <summary>
         /// Peeks at the first message in the queue.
@@ -187,7 +187,7 @@
                 throw new Exception($"Messages of type {typeof(TResponseMessage).FullName} are not handled by the saga.");
             }
 
-            Func<object, object> wrapperFunc = messageObject => responseGenerator((TMessageFromSaga)messageObject);
+            object wrapperFunc(object messageObject) => responseGenerator((TMessageFromSaga)messageObject);
 
             if (!handlerSimulations.TryGetValue(typeof(TMessageFromSaga), out var list))
             {
@@ -206,22 +206,17 @@
             {
                 var contextBag = new ContextBag();
 
-                var loadResult = await LoadSagaData(message, session, contextBag, context.CancellationToken).ConfigureAwait(false);
-                saga.Entity = loadResult.Data;
+                var (data, isNew, mappedValue) = await LoadSagaData(message, session, contextBag, context.CancellationToken).ConfigureAwait(false);
+                saga.Entity = data;
 
-                await InvokeSagaHandler(saga, handleMethodName, message, context).ConfigureAwait(false);
-                await SaveSagaData(saga, loadResult.IsNew, loadResult.MappedValue, session, contextBag, context.CancellationToken).ConfigureAwait(false);
+                await sagaMapper.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
+                await SaveSagaData(saga, isNew, mappedValue, session, contextBag, context.CancellationToken).ConfigureAwait(false);
                 await session.CompleteAsync(context.CancellationToken).ConfigureAwait(false);
             }
 
             EnqueueMessagesAndTimeouts(context, saga.Entity.Id);
 
             return new MessageProcessingResult(saga, message, context);
-        }
-
-        Task InvokeSagaHandler(TSaga saga, string methodName, QueuedSagaMessage message, TestableMessageHandlerContext context)
-        {
-            return sagaMapper.InvokeHandlerMethod(saga, methodName, message, context);
         }
 
         /// <summary>
@@ -238,7 +233,7 @@
             var advanceToTime = CurrentTime + timeToAdvance;
 
             var due = storedTimeouts.Where(t => t.At <= advanceToTime).OrderBy(t => t.At).ToArray();
-            storedTimeouts.RemoveAll(t => t.At <= advanceToTime);
+            _ = storedTimeouts.RemoveAll(t => t.At <= advanceToTime);
 
             var results = new List<MessageProcessingResult>();
 
