@@ -274,10 +274,10 @@ namespace NServiceBus.Testing
             public NServiceBus.Testing.QueuedSagaMessage HandledMessage { get; }
             public TSagaData SagaDataSnapshot { get; }
             public System.Guid SagaId { get; }
-            public TMessageType FindPublishedMessage<TMessageType>() { }
-            public TMessageType FindRepliedMessage<TMessageType>() { }
-            public TMessageType FindSentMessage<TMessageType>() { }
-            public TMessageType FindTimeoutMessage<TMessageType>() { }
+            public TMessage FindPublishedMessage<TMessage>() { }
+            public TMessage FindReplyMessage<TMessage>() { }
+            public TMessage FindSentMessage<TMessage>() { }
+            public TMessage FindTimeoutMessage<TMessage>() { }
         }
     }
     public class TestableSubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISubscribeContext
@@ -301,7 +301,7 @@ namespace NServiceBus.Testing
     public static class TestingExtensions
     {
         public static TMessage FindPublishedMessage<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
-        public static TMessage FindRepliedMessage<TMessage>(this NServiceBus.Testing.TestableMessageProcessingContext context) { }
+        public static TMessage FindReplyMessage<TMessage>(this NServiceBus.Testing.TestableMessageProcessingContext context) { }
         public static TMessage FindSentMessage<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
         public static TMessage FindTimeoutMessage<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
     }

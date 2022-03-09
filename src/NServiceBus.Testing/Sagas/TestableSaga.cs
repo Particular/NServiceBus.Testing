@@ -452,25 +452,25 @@
             /// Returns the first published message of a given type,
             /// or a default value if there is no published message of the given type.
             /// </summary>
-            public TMessageType FindPublishedMessage<TMessageType>() => Context.FindPublishedMessage<TMessageType>();
+            public TMessage FindPublishedMessage<TMessage>() => Context.FindPublishedMessage<TMessage>();
 
             /// <summary>
             /// Returns the first sent message of a given type,
             /// or a default value if there is no sent message of the given type.
             /// </summary>
-            public TMessageType FindSentMessage<TMessageType>() => Context.FindSentMessage<TMessageType>();
+            public TMessage FindSentMessage<TMessage>() => Context.FindSentMessage<TMessage>();
 
             /// <summary>
             /// Returns the first timeout message of a given type,
             /// or a default value if there is no timeout message of the given type.
             /// </summary>
-            public TMessageType FindTimeoutMessage<TMessageType>() => Context.FindTimeoutMessage<TMessageType>();
+            public TMessage FindTimeoutMessage<TMessage>() => Context.FindTimeoutMessage<TMessage>();
 
             /// <summary>
             /// Returns the first replied message of a given type,
             /// or a default value if there is no replied message of the given type.
             /// </summary>
-            public TMessageType FindRepliedMessage<TMessageType>() => Context.FindRepliedMessage<TMessageType>();
+            public TMessage FindReplyMessage<TMessage>() => Context.FindReplyMessage<TMessage>();
         }
     }
 }

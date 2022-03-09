@@ -32,7 +32,7 @@
         /// Returns the first replied message of a given type,
         /// or a default value if there is no replied message of the given type.
         /// </summary>
-        public static TMessage FindRepliedMessage<TMessage>(this TestableMessageProcessingContext context) =>
+        public static TMessage FindReplyMessage<TMessage>(this TestableMessageProcessingContext context) =>
             (TMessage)context.RepliedMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
     }
 }
