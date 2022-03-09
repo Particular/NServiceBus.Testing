@@ -12,16 +12,16 @@
         {
             var testableSaga = new TestableSaga<MySaga, MyData>();
 
-            testableSaga.SimulateHandlerResponse<RunStep1Command, Step1Response>(cmd => new Step1Response());
+            testableSaga.SimulateReply<RunStep1Command, Step1Response>(cmd => new Step1Response());
 
-            var startResult = await testableSaga.Process(new StartMsg { CorrId = "abc" });
+            var startResult = await testableSaga.Handle(new StartMsg { CorrId = "abc" });
 
             Assert.That(startResult.Context.SentMessages.Count, Is.EqualTo(1));
             Assert.That(testableSaga.QueueLength, Is.EqualTo(1));
             Assert.That(testableSaga.QueuePeek().Type, Is.EqualTo(typeof(Step1Response)));
 
-            var continueResult = await testableSaga.ProcessQueuedMessage();
-            var doneEvt = continueResult.FindPublishedMessage<DoneEvent>();
+            var continueResult = await testableSaga.HandleQueuedMessage();
+            var doneEvt = continueResult.FirstPublishedMessageOrDefault<DoneEvent>();
 
             Assert.That(doneEvt.CorrId, Is.EqualTo("abc"));
         }

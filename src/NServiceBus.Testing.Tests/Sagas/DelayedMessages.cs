@@ -15,15 +15,15 @@
 
             var corrId = Guid.NewGuid().ToString().Substring(0, 8);
 
-            var startResult = await testableSaga.Process(new Start { CorrId = corrId });
+            var startResult = await testableSaga.Handle(new Start { CorrId = corrId });
 
             Assert.That(startResult.Context.TimeoutMessages.Count, Is.EqualTo(1)); // Just timeout
             Assert.That(startResult.Context.SentMessages.Count, Is.EqualTo(2));    // Both
             Assert.That(startResult.SagaDataSnapshot.RegularTimeoutReceived, Is.False);
             Assert.That(startResult.SagaDataSnapshot.DelayedCommandReceived, Is.False);
 
-            var timeout = startResult.FindTimeoutMessage<RegularTimeout>();
-            var delayed = startResult.FindSentMessage<DelayedCmd>();
+            var timeout = startResult.FirstTimeoutMessageOrDefault<RegularTimeout>();
+            var delayed = startResult.FirstSentMessageOrDefault<DelayedCmd>();
 
             Assert.That(timeout, Is.Not.Null);
             Assert.That(delayed, Is.Not.Null);

@@ -13,15 +13,15 @@
             var testableSaga = new TestableSaga<MySaga, MyData>();
             var processId = Guid.NewGuid().ToString().Substring(0, 8);
 
-            var startResult = await testableSaga.Process(new StartMsg { ProcessId = processId });
+            var startResult = await testableSaga.Handle(new StartMsg { ProcessId = processId });
 
-            var step1Cmd = startResult.FindSentMessage<Step1Cmd>();
+            var step1Cmd = startResult.FirstSentMessageOrDefault<Step1Cmd>();
             Assert.That(step1Cmd, Is.Not.Null);
             Assert.That(startResult.SagaDataSnapshot.ReplyReceived, Is.False);
 
             var sagaId = startResult.SagaId;
 
-            var endResult = await testableSaga.ProcessAutoCorrelatedReply(sagaId, new Step1Reply());
+            var endResult = await testableSaga.HandleReply(sagaId, new Step1Reply());
             Assert.That(endResult.SagaDataSnapshot.ReplyReceived, Is.True);
         }
 

@@ -252,32 +252,32 @@ namespace NServiceBus.Testing
         public System.Collections.Generic.IReadOnlyCollection<NServiceBus.Routing.RoutingStrategy> RoutingStrategies { get; set; }
     }
     [System.Diagnostics.DebuggerDisplay("TestableSaga for {typeof(TSaga).FullName}")]
-    public class TestableSaga<TSaga, TSagaEntity>
-        where TSaga : NServiceBus.Saga<TSagaEntity>
-        where TSagaEntity :  class, NServiceBus.IContainSagaData, new ()
+    public class TestableSaga<TSaga, TSagaData>
+        where TSaga : NServiceBus.Saga<TSagaData>
+        where TSagaData :  class, NServiceBus.IContainSagaData, new ()
     {
-        public TestableSaga(System.Func<TSaga> sagaFactory = null, System.DateTime? initialDateTime = default) { }
-        public System.DateTime CurrentTime { get; }
+        public TestableSaga(System.Func<TSaga> sagaFactory = null, System.DateTimeOffset? initialCurrentTime = default) { }
+        public System.DateTimeOffset CurrentTime { get; }
         public bool HasQueuedMessages { get; }
         public int QueueLength { get; }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaEntity>.MessageProcessingResult[]> AdvanceTime(System.TimeSpan timeToAdvance, System.Threading.CancellationToken cancellationToken = default) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaEntity>.MessageProcessingResult> Process<TMessageType>(TMessageType message, NServiceBus.Testing.TestableMessageHandlerContext context = null, System.Collections.Generic.IReadOnlyDictionary<string, string> messageHeaders = null) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaEntity>.MessageProcessingResult> ProcessAutoCorrelatedReply<TMessageType>(System.Guid sagaId, TMessageType message, NServiceBus.Testing.TestableMessageHandlerContext context = null, System.Collections.Generic.IReadOnlyDictionary<string, string> messageHeaders = null) { }
-        public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaEntity>.MessageProcessingResult> ProcessQueuedMessage(NServiceBus.Testing.TestableMessageHandlerContext context = null) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult[]> AdvanceTime(System.TimeSpan timeToAdvance, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> Handle<TMessage>(TMessage message, NServiceBus.Testing.TestableMessageHandlerContext context = null, System.Collections.Generic.IReadOnlyDictionary<string, string> messageHeaders = null) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> HandleQueuedMessage(NServiceBus.Testing.TestableMessageHandlerContext context = null) { }
+        public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> HandleReply<TMessage>(System.Guid sagaId, TMessage message, NServiceBus.Testing.TestableMessageHandlerContext context = null, System.Collections.Generic.IReadOnlyDictionary<string, string> messageHeaders = null) { }
         public NServiceBus.Testing.QueuedSagaMessage QueuePeek() { }
-        public void SimulateHandlerResponse<TMessageFromSaga, TResponseMessage>(System.Func<TMessageFromSaga, TResponseMessage> responseGenerator) { }
-        [System.Diagnostics.DebuggerDisplay("MessageProcessingResult: {HandledMessage.Message}")]
-        public class MessageProcessingResult
+        public void SimulateReply<TSagaMessage, TReplyMessage>(System.Func<TSagaMessage, TReplyMessage> simulateReply) { }
+        [System.Diagnostics.DebuggerDisplay("HandleResult: {HandledMessage.Message}")]
+        public class HandleResult
         {
             public bool Completed { get; }
             public NServiceBus.Testing.TestableMessageHandlerContext Context { get; }
             public NServiceBus.Testing.QueuedSagaMessage HandledMessage { get; }
-            public TSagaEntity SagaDataSnapshot { get; }
+            public TSagaData SagaDataSnapshot { get; }
             public System.Guid SagaId { get; }
-            public TMessageType FindPublishedMessage<TMessageType>() { }
-            public TMessageType FindReplyMessage<TMessageType>() { }
-            public TMessageType FindSentMessage<TMessageType>() { }
-            public TMessageType FindTimeoutMessage<TMessageType>() { }
+            public TMessageType FirstPublishedMessageOrDefault<TMessageType>() { }
+            public TMessageType FirstRepliedMessageOrDefault<TMessageType>() { }
+            public TMessageType FirstSentMessageOrDefault<TMessageType>() { }
+            public TMessageType FirstTimeoutMessageOrDefault<TMessageType>() { }
         }
     }
     public class TestableSubscribeContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.ISubscribeContext
@@ -300,10 +300,10 @@ namespace NServiceBus.Testing
     }
     public static class TestingExtensions
     {
-        public static TMessageType FindPublishedMessage<TMessageType>(this NServiceBus.Testing.TestablePipelineContext context) { }
-        public static TMessageType FindReplyMessage<TMessageType>(this NServiceBus.Testing.TestableMessageProcessingContext context) { }
-        public static TMessageType FindSentMessage<TMessageType>(this NServiceBus.Testing.TestablePipelineContext context) { }
-        public static TMessageType FindTimeoutMessage<TMessageType>(this NServiceBus.Testing.TestablePipelineContext context) { }
+        public static TMessage FirstPublishedMessageOrDefault<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
+        public static TMessage FirstRepliedMessageOrDefault<TMessage>(this NServiceBus.Testing.TestableMessageProcessingContext context) { }
+        public static TMessage FirstSentMessageOrDefault<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
+        public static TMessage FirstTimeoutMessageOrDefault<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
     }
     public class TestingLoggerFactory : NServiceBus.Logging.LoggingFactoryDefinition
     {

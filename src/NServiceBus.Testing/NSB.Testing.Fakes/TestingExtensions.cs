@@ -8,35 +8,31 @@
     public static class TestingExtensions
     {
         /// <summary>
-        /// Find the first published message of a given type. Returns null if no messages of that type are found.
+        /// Returns the first published message of a given type,
+        /// or a default value if there is no published message of the given type.
         /// </summary>
-        public static TMessageType FindPublishedMessage<TMessageType>(this TestablePipelineContext context)
-        {
-            return (TMessageType)context.PublishedMessages.FirstOrDefault(msg => msg.Message.GetType() == typeof(TMessageType))?.Message;
-        }
+        public static TMessage FirstPublishedMessageOrDefault<TMessage>(this TestablePipelineContext context) =>
+            (TMessage)context.PublishedMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
 
         /// <summary>
-        /// Find the first sent message of a given type. Returns null if no messages of that type are found.
+        /// Returns the first sent message of a given type,
+        /// or a default value if there is no sent message of the given type.
         /// </summary>
-        public static TMessageType FindSentMessage<TMessageType>(this TestablePipelineContext context)
-        {
-            return (TMessageType)context.SentMessages.FirstOrDefault(msg => msg.Message.GetType() == typeof(TMessageType))?.Message;
-        }
+        public static TMessage FirstSentMessageOrDefault<TMessage>(this TestablePipelineContext context) =>
+            (TMessage)context.SentMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
 
         /// <summary>
-        /// Find the first timeout message of a given type. Returns null if no messages of that type are found.
+        /// Returns the first timeout message of a given type,
+        /// or a default value if there is no timeout message of the given type.
         /// </summary>
-        public static TMessageType FindTimeoutMessage<TMessageType>(this TestablePipelineContext context)
-        {
-            return (TMessageType)context.TimeoutMessages.FirstOrDefault(msg => msg.Message.GetType() == typeof(TMessageType))?.Message;
-        }
+        public static TMessage FirstTimeoutMessageOrDefault<TMessage>(this TestablePipelineContext context) =>
+            (TMessage)context.TimeoutMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
 
         /// <summary>
-        /// Find the first reply message of a given type. Returns null if no messages of that type are found.
+        /// Returns the first replied message of a given type,
+        /// or a default value if there is no replied message of the given type.
         /// </summary>
-        public static TMessageType FindReplyMessage<TMessageType>(this TestableMessageProcessingContext context)
-        {
-            return (TMessageType)context.RepliedMessages.FirstOrDefault(msg => msg.Message.GetType() == typeof(TMessageType))?.Message;
-        }
+        public static TMessage FirstRepliedMessageOrDefault<TMessage>(this TestableMessageProcessingContext context) =>
+            (TMessage)context.RepliedMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
     }
 }

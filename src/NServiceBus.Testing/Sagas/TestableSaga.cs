@@ -11,21 +11,22 @@
     using NServiceBus.Sagas;
 
     /// <summary>
-    /// Enables testing of a saga through multiple messages.
+    /// For testing a saga with multiple messages and changes in time.
     /// </summary>
-    /// <typeparam name="TSaga">The saga type being tested.</typeparam>
-    /// <typeparam name="TSagaEntity">The saga data class associated with the saga being tested.</typeparam>
+    /// <typeparam name="TSaga">The type of saga being tested.</typeparam>
+    /// <typeparam name="TSagaData">The type of data stored by the saga.</typeparam>
     [DebuggerDisplay("TestableSaga for {typeof(TSaga).FullName}")]
-    public class TestableSaga<TSaga, TSagaEntity>
-        where TSaga : NServiceBus.Saga<TSagaEntity>
-        where TSagaEntity : class, IContainSagaData, new()
+    public class TestableSaga<TSaga, TSagaData>
+        where TSaga : NServiceBus.Saga<TSagaData>
+        where TSagaData : class, IContainSagaData, new()
     {
+        readonly Queue<QueuedSagaMessage> queue = new Queue<QueuedSagaMessage>();
+        readonly ISagaPersister persister = new NonDurableSagaPersister();
+        readonly List<(DateTimeOffset At, OutgoingMessage<object, SendOptions> Timeout)> storedTimeouts = new List<(DateTimeOffset, OutgoingMessage<object, SendOptions>)>();
+        readonly Dictionary<Type, List<(Type ReplyMessageType, Func<object, object> SimulateReply)>> replySimulators = new Dictionary<Type, List<(Type ReplyMessageType, Func<object, object> SimulateReply)>>();
+
         readonly Func<TSaga> sagaFactory;
-        readonly Queue<QueuedSagaMessage> queue;
-        readonly ISagaPersister persister;
         readonly SagaMapper sagaMapper;
-        readonly List<(DateTime At, OutgoingMessage<object, SendOptions> Timeout)> storedTimeouts;
-        readonly Dictionary<Type, List<(Type, Func<object, object>)>> handlerSimulations;
 
         /// <summary>
         /// Create a tester for a saga.
@@ -33,33 +34,30 @@
         /// <param name="sagaFactory">
         /// A factory to create saga instances. Not necessary if the saga has a parameterless constructor.
         /// Use this to satisfy constructor dependencies for the test instead of using dependency injection.
-        /// This delegate will be called multiple times.
+        /// This delegate is called multiple times.
         /// </param>
-        /// <param name="initialDateTime">
-        /// Supplies a <see cref="CurrentTime"/> for the.
-        /// If not supplied, defaults to the current server time.</param>
-        public TestableSaga(Func<TSaga> sagaFactory = null, DateTime? initialDateTime = null)
+        /// <param name="initialCurrentTime">
+        /// Sets the initial value of <see cref="CurrentTime"/>.
+        /// If not supplied, the default is <see cref="DateTimeOffset.UtcNow"/>.
+        /// </param>
+        public TestableSaga(Func<TSaga> sagaFactory = null, DateTimeOffset? initialCurrentTime = null)
         {
-            this.sagaFactory = sagaFactory ?? (() => Activator.CreateInstance<TSaga>());
-            CurrentTime = initialDateTime ?? DateTime.UtcNow;
-
-            queue = new Queue<QueuedSagaMessage>();
-            persister = new NonDurableSagaPersister();
-            storedTimeouts = new List<(DateTime, OutgoingMessage<object, SendOptions>)>();
-            handlerSimulations = new Dictionary<Type, List<(Type, Func<object, object>)>>();
-
-            sagaMapper = SagaMapper.Get<TSaga, TSagaEntity>(this.sagaFactory);
+            this.sagaFactory = sagaFactory ?? Activator.CreateInstance<TSaga>;
+            sagaMapper = SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory);
+            CurrentTime = initialCurrentTime ?? DateTimeOffset.UtcNow;
         }
 
         /// <summary>
-        /// Shows the "current time" of the saga test, which can be set in the constructor, or will default to the current time.
-        /// As this is advanced using the <see cref="AdvanceTime"/> method, timeouts requested by earlier message handlers
-        /// will be dispatched and the CurrentTime will be updated.
+        /// Shows the "current time" of the saga.
+        /// The initial time defaults to <see cref="DateTimeOffset.UtcNow"/>.
+        /// This can be changed by passing an initial current time in the <see cref="TestableSaga{TSaga,TSagaData}"/> constructor.
+        /// The current time may be advanced by calling <see cref="AdvanceTime"/>,
+        /// which also handle any timeouts due during the specified <see cref="TimeSpan"/>.
         /// </summary>
-        public DateTime CurrentTime { get; private set; }
+        public DateTimeOffset CurrentTime { get; private set; }
 
         /// <summary>
-        /// True if there are any messages in the message queue.
+        /// <c>true</c> if there are any queued messages.
         /// </summary>
         public bool HasQueuedMessages => queue.Any();
 
@@ -72,59 +70,67 @@
         /// Peeks at the first message in the queue.
         /// </summary>
         /// <returns>Details about the next message in the message queue.</returns>
+        /// <exception cref="InvalidOperationException">There are no queued messages.</exception>
         public QueuedSagaMessage QueuePeek() => queue.Peek();
 
         /// <summary>
-        /// Have the saga process a message. This will use the <see cref="NServiceBus.Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/> method
-        /// to find the correct saga data based on correlation ID values from the message, and will dispatch the message to the correct handler method
-        /// based on message type.
+        /// Handle a message in the saga.
+        /// This uses <see cref="NServiceBus.Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/>
+        /// to find the correct saga data based on correlation ID values from the message,
+        /// and invokes the correct handler method based on the message type.
         /// </summary>
-        /// <typeparam name="TMessageType">The type of the message.</typeparam>
-        /// <param name="message">The message for the saga to process.</param>
+        /// <typeparam name="TMessage">The type of the message.</typeparam>
+        /// <param name="message">The message for the saga to handle.</param>
         /// <param name="context">
-        /// An optional <see cref="TestableMessageHandlerContext"/> to use while processing this message.
-        /// If none is supplied one will be created and returned in the resulting <see cref="MessageProcessingResult"/>.
+        /// An optional <see cref="TestableMessageHandlerContext"/> to use while handling the message.
+        /// If none is supplied, an instance is created and returned as <see cref="HandleResult.Context"/>.
         /// </param>
         /// <param name="messageHeaders">
-        /// Optional message headers to include with the message. Usualy not needed unless the
-        /// <see cref="NServiceBus.Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/> method uses header mappings.
+        /// Optional message headers to include with the message. Usually not needed unless
+        /// <see cref="NServiceBus.Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/>
+        /// uses header mappings.
         /// </param>
         /// <returns>
-        /// Returns a <see cref="MessageProcessingResult"/> containing a snapshot of the saga data after the message is processed
+        /// Returns a <see cref="HandleResult"/> containing a snapshot of the saga data after the message is handled
         /// and the <see cref="TestableMessageHandlerContext"/> containing details about context operations that occurred in the message
         /// handler, which can be used for test assertions.
         /// </returns>
-        public Task<MessageProcessingResult> Process<TMessageType>(TMessageType message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
+        public Task<HandleResult> Handle<TMessage>(
+            TMessage message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
         {
             if (context == null)
             {
                 context = new TestableMessageHandlerContext();
             }
 
-            var queueMessage = new QueuedSagaMessage(typeof(TMessageType), message, messageHeaders);
-            return InnerProcess(queueMessage, "Handle", context);
+            var queueMessage = new QueuedSagaMessage(typeof(TMessage), message, messageHeaders);
+            return InnerHandle(queueMessage, "Handle", context);
         }
 
         /// <summary>
-        /// Have the saga process an auto-correlated message, such as a reply from a handler the saga sent a command to.
+        /// Handle a reply in the saga, such as a reply from a handler the saga sent a command to.
+        /// For replies, this method should be used instead of <see cref="Handle{TMessage}"/>
+        /// to ensure the message is auto-correlated to the saga.
         /// </summary>
-        /// <typeparam name="TMessageType">The type of the message.</typeparam>
-        /// <param name="sagaId">The saga Id that would be embedded in the message headers, because it was sent by the saga, or is an auto-correlated reply to a message sent by the saga.</param>
-        /// <param name="message">The message for the saga to process.</param>
+        /// <typeparam name="TMessage">The type of the message.</typeparam>
+        /// <param name="sagaId">The saga Id that would be embedded in the message headers, because it was sent by the saga,
+        /// or is an auto-correlated reply to a message sent by the saga.</param>
+        /// <param name="message">The message for the saga to handle.</param>
         /// <param name="context">
-        /// An optional <see cref="TestableMessageHandlerContext"/> to use while processing this message.
-        /// If none is supplied one will be created and returned in the resulting <see cref="MessageProcessingResult"/>.
+        /// An optional <see cref="TestableMessageHandlerContext"/> to use while handling this message.
+        /// If none is supplied, an instance is created and returned as <see cref="HandleResult.Context"/>.
         /// </param>
         /// <param name="messageHeaders">
-        /// Optional message headers to include with the message. Usualy not needed unless the
+        /// Optional message headers to include with the message. Usually not needed unless the
         /// <see cref="NServiceBus.Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/> method uses header mappings.
         /// </param>
         /// <returns>
-        /// Returns a <see cref="MessageProcessingResult"/> containing a snapshot of the saga data after the message is processed
+        /// Returns a <see cref="HandleResult"/> containing a snapshot of the saga data after the message is handled
         /// and the <see cref="TestableMessageHandlerContext"/> containing details about context operations that occurred in the message
         /// handler, which can be used for test assertions.
         /// </returns>
-        public Task<MessageProcessingResult> ProcessAutoCorrelatedReply<TMessageType>(Guid sagaId, TMessageType message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
+        public Task<HandleResult> HandleReply<TMessage>(
+            Guid sagaId, TMessage message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
         {
             var newHeaders = new Dictionary<string, string>();
             if (messageHeaders != null)
@@ -137,27 +143,28 @@
 
             newHeaders[Headers.SagaId] = sagaId.ToString();
 
-            return Process(message, context, newHeaders);
+            return Handle(message, context, newHeaders);
         }
 
         /// <summary>
-        /// Processes a queued message. Messages can be queued because the saga sends or publishes a message that is handled by this saga,
-        /// or as a result of an automatically-generated reply message from using the <see cref="SimulateHandlerResponse"/> method.
+        /// Handle a queued message in the saga.
+        /// Messages may be queued because the saga sends or publishes a message that is also handled by the saga
+        /// or because a reply has been simulated using <see cref="SimulateReply{TMessageFromSaga,TResponseMessage}"/>.
         /// </summary>
         /// <param name="context">
-        /// An optional <see cref="TestableMessageHandlerContext"/> to use while processing this message.
-        /// If none is supplied one will be created and returned in the resulting <see cref="MessageProcessingResult"/>.
+        /// An optional <see cref="TestableMessageHandlerContext"/> to use while handling this message.
+        /// If none is supplied, an instance is created and returned as <see cref="HandleResult.Context"/>.
         /// </param>
         /// <returns>
-        /// Returns a <see cref="MessageProcessingResult"/> containing a snapshot of the saga data after the message is processed
-        /// and the <see cref="TestableMessageHandlerContext"/> containing details about context operations that occurred in the message
-        /// handler, which can be used for test assertions.
+        /// Returns a <see cref="HandleResult"/> containing a snapshot of the saga data after the message is handled and
+        /// the <see cref="TestableMessageHandlerContext"/> containing details about context operations that
+        /// occurred in the message handler, which can be used for test assertions.
         /// </returns>
-        public Task<MessageProcessingResult> ProcessQueuedMessage(TestableMessageHandlerContext context = null)
+        public Task<HandleResult> HandleQueuedMessage(TestableMessageHandlerContext context = null)
         {
             if (!queue.Any())
             {
-                throw new Exception("Could not process the next message out of the queue, because there are no queued messages.");
+                throw new Exception("There are no queued messages.");
             }
 
             if (context == null)
@@ -166,39 +173,37 @@
             }
 
             var queuedMessage = queue.Dequeue();
-            return InnerProcess(queuedMessage, "Handle", context);
+            return InnerHandle(queuedMessage, "Handle", context);
         }
 
         /// <summary>
-        /// Simulates an external handler replying to a message sent from this saga when used in the commander style. The delegate will be used
-        /// to create a response message, and it will automatically have headers that mark it as belonging to the correct saga data instance,
+        /// Simulates an external handler replying to a message sent from this saga when used in the commander style.
+        /// The delegate is used to create a response message with headers that indicate it belongs to the correct saga data instance,
         /// which mimics how message handlers support auto-correlation when replying to messages from a saga.
         /// </summary>
-        /// <typeparam name="TMessageFromSaga">The message type sent or published by the saga.</typeparam>
-        /// <typeparam name="TResponseMessage">The message type that the external handler would reply with.</typeparam>
-        /// <param name="responseGenerator">
-        /// Generates the response message based on a message sent by the saga. Return null to simulate not replying to the message.
+        /// <typeparam name="TSagaMessage">The message type sent or published by the saga.</typeparam>
+        /// <typeparam name="TReplyMessage">The message type that the external handler would reply with.</typeparam>
+        /// <param name="simulateReply">
+        /// Simulates a reply to a message sent by the saga. Returns <c>null</c> to simulate no reply.
         /// </param>
-        /// <exception cref="Exception"></exception>
-        public void SimulateHandlerResponse<TMessageFromSaga, TResponseMessage>(Func<TMessageFromSaga, TResponseMessage> responseGenerator)
+        public void SimulateReply<TSagaMessage, TReplyMessage>(Func<TSagaMessage, TReplyMessage> simulateReply)
         {
-            if (!sagaMapper.HandlesMessageType(typeof(TResponseMessage)))
+            if (!sagaMapper.HandlesMessageType(typeof(TReplyMessage)))
             {
-                throw new Exception($"Messages of type {typeof(TResponseMessage).FullName} are not handled by the saga.");
+                throw new Exception($"Messages of type {typeof(TReplyMessage).FullName} are not handled by the saga.");
             }
 
-            object wrapperFunc(object messageObject) => responseGenerator((TMessageFromSaga)messageObject);
-
-            if (!handlerSimulations.TryGetValue(typeof(TMessageFromSaga), out var list))
+            if (!replySimulators.TryGetValue(
+                    typeof(TSagaMessage), out List<(Type ReplyMessageType, Func<object, object> SimulateReply)> simulators))
             {
-                list = new List<(Type, Func<object, object>)>();
-                handlerSimulations.Add(typeof(TMessageFromSaga), list);
+                simulators = new List<(Type ReplyMessageType, Func<object, object> SimulateReply)>();
+                replySimulators.Add(typeof(TSagaMessage), simulators);
             }
 
-            list.Add((typeof(TResponseMessage), wrapperFunc));
+            simulators.Add((typeof(TReplyMessage), message => simulateReply((TSagaMessage)message)));
         }
 
-        async Task<MessageProcessingResult> InnerProcess(QueuedSagaMessage message, string handleMethodName, TestableMessageHandlerContext context)
+        async Task<HandleResult> InnerHandle(QueuedSagaMessage message, string handleMethodName, TestableMessageHandlerContext context)
         {
             var saga = sagaFactory();
 
@@ -216,31 +221,32 @@
 
             EnqueueMessagesAndTimeouts(context, saga.Entity.Id);
 
-            return new MessageProcessingResult(saga, message, context);
+            return new HandleResult(saga, message, context);
         }
 
         /// <summary>
-        /// Advance the <see cref="CurrentTime"/> for the test, dispatching any stored timeouts along the way.
+        /// Advance the <see cref="CurrentTime"/> for the saga and handle any timeouts due during <paramref name="timeToAdvance"/>.
         /// </summary>
         /// <param name="timeToAdvance">Amount of time to advance the <see cref="CurrentTime"/>.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>
-        /// Returns an array of <see cref="MessageProcessingResult"/>, one for each timeout that was dispatched and processed
-        /// during the time that was advanced. If no timeouts were fired, the array will be empty.
+        /// Returns an array of <see cref="HandleResult"/>,
+        /// one for each timeout handled during <paramref name="timeToAdvance"/>.
+        /// If no timeouts were handled, the array is empty.
         /// </returns>
-        public async Task<MessageProcessingResult[]> AdvanceTime(TimeSpan timeToAdvance, CancellationToken cancellationToken = default)
+        public async Task<HandleResult[]> AdvanceTime(TimeSpan timeToAdvance, CancellationToken cancellationToken = default)
         {
             var advanceToTime = CurrentTime + timeToAdvance;
 
             var due = storedTimeouts.Where(t => t.At <= advanceToTime).OrderBy(t => t.At).ToArray();
             _ = storedTimeouts.RemoveAll(t => t.At <= advanceToTime);
 
-            var results = new List<MessageProcessingResult>();
+            var results = new List<HandleResult>();
 
             foreach (var storedTimeout in due)
             {
                 CurrentTime = storedTimeout.At;
-                var result = await ProcessTimeout(storedTimeout.Timeout, cancellationToken).ConfigureAwait(false);
+                var result = await HandleTimeout(storedTimeout.Timeout, cancellationToken).ConfigureAwait(false);
                 results.Add(result);
             }
 
@@ -249,28 +255,29 @@
             return results.ToArray();
         }
 
-        async Task<MessageProcessingResult> ProcessTimeout(OutgoingMessage<object, SendOptions> timeoutMessage, CancellationToken cancellationToken)
+        async Task<HandleResult> HandleTimeout(OutgoingMessage<object, SendOptions> timeoutMessage, CancellationToken cancellationToken)
         {
             var messageType = timeoutMessage.Message.GetType();
             var context = new TestableMessageHandlerContext { CancellationToken = cancellationToken };
 
             var queueMessage = new QueuedSagaMessage(messageType, timeoutMessage.Message, timeoutMessage.Options.GetHeaders());
 
-            var methodName = (timeoutMessage is TimeoutMessage<object>) ? "Timeout" : "Handle";
+            var methodName = timeoutMessage is TimeoutMessage<object> ? "Timeout" : "Handle";
 
-            var processingResult = await InnerProcess(queueMessage, methodName, context).ConfigureAwait(false);
-
-            return processingResult;
+            return await InnerHandle(queueMessage, methodName, context).ConfigureAwait(false);
         }
 
-        async Task<(TSagaEntity Data, bool IsNew, object MappedValue)> LoadSagaData(QueuedSagaMessage message, ISynchronizedStorageSession session, ContextBag contextBag, CancellationToken cancellationToken)
+        async Task<(TSagaData Data, bool IsNew, object MappedValue)> LoadSagaData(
+            QueuedSagaMessage message, ISynchronizedStorageSession session, ContextBag contextBag, CancellationToken cancellationToken)
         {
             var messageMetadata = sagaMapper.GetMessageMetadata(message.Type);
-            TSagaEntity sagaData;
+            TSagaData sagaData;
 
-            if (message.Headers != null && message.Headers.TryGetValue(Headers.SagaId, out var sagaIdString) && Guid.TryParse(sagaIdString, out Guid sagaId))
+            if (message.Headers != null &&
+                message.Headers.TryGetValue(Headers.SagaId, out var sagaIdString) &&
+                Guid.TryParse(sagaIdString, out Guid sagaId))
             {
-                sagaData = await persister.Get<TSagaEntity>(sagaId, session, contextBag, cancellationToken).ConfigureAwait(false);
+                sagaData = await persister.Get<TSagaData>(sagaId, session, contextBag, cancellationToken).ConfigureAwait(false);
                 if (sagaData != null)
                 {
                     return (sagaData, false, null);
@@ -279,7 +286,7 @@
 
             var messageMappedValue = sagaMapper.GetMessageMappedValue(message);
 
-            sagaData = await persister.Get<TSagaEntity>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, contextBag, cancellationToken).ConfigureAwait(false);
+            sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, contextBag, cancellationToken).ConfigureAwait(false);
 
             if (sagaData != null)
             {
@@ -288,7 +295,7 @@
 
             if (messageMetadata.IsAllowedToStartSaga)
             {
-                sagaData = new TSagaEntity { Id = Guid.NewGuid() };
+                sagaData = new TSagaData { Id = Guid.NewGuid() };
                 sagaMapper.SetCorrelationPropertyValue(sagaData, messageMappedValue);
                 return (sagaData, true, messageMappedValue);
             }
@@ -296,7 +303,8 @@
             throw new Exception($"Saga not found and message type {message.Type.FullName} is not allowed to start the saga.");
         }
 
-        async Task SaveSagaData(TSaga saga, bool isNew, object mappedValue, ISynchronizedStorageSession session, ContextBag contextBag, CancellationToken cancellationToken)
+        async Task SaveSagaData(
+            TSaga saga, bool isNew, object mappedValue, ISynchronizedStorageSession session, ContextBag contextBag, CancellationToken cancellationToken)
         {
             if (saga.Completed)
             {
@@ -328,7 +336,7 @@
                 }
                 else
                 {
-                    throw new Exception("Unable to process a timeout message with no delivery time set. (This really shouldn't happen.)");
+                    throw new Exception("The timeout message has no delivery time. (This really shouldn't happen.)");
                 }
             }
 
@@ -361,14 +369,14 @@
                         queue.Enqueue(queuedMessage);
                     }
                 }
-                else if (handlerSimulations.TryGetValue(msgType, out var simulators))
+                else if (replySimulators.TryGetValue(msgType, out var simulators))
                 {
-                    foreach (var simulator in simulators)
+                    foreach (var (replyMessageType, simulateReply) in simulators)
                     {
-                        var newMessageObject = simulator.Item2(message.Message);
-                        if (newMessageObject != null)
+                        var repliedMessage = simulateReply(message.Message);
+                        if (repliedMessage != null)
                         {
-                            var queuedMessage = new QueuedSagaMessage(simulator.Item1, newMessageObject, autoCorrelatedSagaId: sagaId);
+                            var queuedMessage = new QueuedSagaMessage(replyMessageType, repliedMessage, autoCorrelatedSagaId: sagaId);
                             queue.Enqueue(queuedMessage);
                         }
                     }
@@ -387,12 +395,12 @@
         }
 
         /// <summary>
-        /// The result of a saga processing a message.
+        /// The result of a saga handling a message.
         /// </summary>
-        [DebuggerDisplay("MessageProcessingResult: {HandledMessage.Message}")]
-        public class MessageProcessingResult
+        [DebuggerDisplay("HandleResult: {HandledMessage.Message}")]
+        public class HandleResult
         {
-            internal MessageProcessingResult(NServiceBus.Saga<TSagaEntity> saga, QueuedSagaMessage handledMessage, TestableMessageHandlerContext context)
+            internal HandleResult(NServiceBus.Saga<TSagaData> saga, QueuedSagaMessage handledMessage, TestableMessageHandlerContext context)
             {
                 SagaId = saga.Data.Id;
                 Completed = saga.Completed;
@@ -405,46 +413,52 @@
             /// <summary>
             /// The Id of the saga that was created or retrieved from storage.
             /// </summary>
-            public Guid SagaId { get; private set; }
+            public Guid SagaId { get; }
+
             /// <summary>
             /// True if the result of the message handler was that the <see cref="Saga.MarkAsComplete"/> method was called.
             /// </summary>
-            public bool Completed { get; private set; }
+            public bool Completed { get; }
 
             /// <summary>
             /// Details about the message that was just handled.
             /// </summary>
-            public QueuedSagaMessage HandledMessage { get; private set; }
+            public QueuedSagaMessage HandledMessage { get; }
 
             /// <summary>
-            /// The <see cref="IMessageHandlerContext"/> that was used to process the message, which contains details of
-            /// what happened during the handler method that can be used for test assertions.
+            /// The <see cref="IMessageHandlerContext"/> that was used to handle the message.
+            /// The context contains details of what happened during the handler method and can be used for test assertions.
             /// </summary>
-            public TestableMessageHandlerContext Context { get; private set; }
-            /// <summary>
-            /// A copy of the saga data after the message was processed.
-            /// </summary>
-            public TSagaEntity SagaDataSnapshot { get; private set; }
+            public TestableMessageHandlerContext Context { get; }
 
             /// <summary>
-            /// Find the first published message of a given type. Returns null if no messages of that type are found.
+            /// A copy of the saga data after the message was handled.
             /// </summary>
-            public TMessageType FindPublishedMessage<TMessageType>() => Context.FindPublishedMessage<TMessageType>();
+            public TSagaData SagaDataSnapshot { get; }
 
             /// <summary>
-            /// Find the first sent message of a given type. Returns null if no messages of that type are found.
+            /// Returns the first published message of a given type,
+            /// or a default value if there is no published message of the given type.
             /// </summary>
-            public TMessageType FindSentMessage<TMessageType>() => Context.FindSentMessage<TMessageType>();
+            public TMessageType FirstPublishedMessageOrDefault<TMessageType>() => Context.FirstPublishedMessageOrDefault<TMessageType>();
 
             /// <summary>
-            /// Find the first timeout message of a given type. Returns null if no messages of that type are found.
+            /// Returns the first sent message of a given type,
+            /// or a default value if there is no sent message of the given type.
             /// </summary>
-            public TMessageType FindTimeoutMessage<TMessageType>() => Context.FindTimeoutMessage<TMessageType>();
+            public TMessageType FirstSentMessageOrDefault<TMessageType>() => Context.FirstSentMessageOrDefault<TMessageType>();
 
             /// <summary>
-            /// Find the first reply message of a given type. Returns null if no messages of that type are found.
+            /// Returns the first timeout message of a given type,
+            /// or a default value if there is no timeout message of the given type.
             /// </summary>
-            public TMessageType FindReplyMessage<TMessageType>() => Context.FindReplyMessage<TMessageType>();
+            public TMessageType FirstTimeoutMessageOrDefault<TMessageType>() => Context.FirstTimeoutMessageOrDefault<TMessageType>();
+
+            /// <summary>
+            /// Returns the first replied message of a given type,
+            /// or a default value if there is no replied message of the given type.
+            /// </summary>
+            public TMessageType FirstRepliedMessageOrDefault<TMessageType>() => Context.FirstRepliedMessageOrDefault<TMessageType>();
         }
     }
 }

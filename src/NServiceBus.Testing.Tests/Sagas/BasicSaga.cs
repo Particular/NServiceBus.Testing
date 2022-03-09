@@ -13,8 +13,8 @@
         {
             var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>();
 
-            var placeResult = await testableSaga.Process(new OrderPlaced { OrderId = "abc" });
-            var billResult = await testableSaga.Process(new OrderBilled { OrderId = "abc" });
+            var placeResult = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
+            var billResult = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
 
             Assert.That(placeResult.Completed, Is.False);
             Assert.That(billResult.Completed, Is.False);
@@ -31,7 +31,7 @@
 
             Assert.That(timeoutResults.Length, Is.EqualTo(1));
 
-            var shipped = timeoutResults.First().FindPublishedMessage<OrderShipped>();
+            var shipped = timeoutResults.First().FirstPublishedMessageOrDefault<OrderShipped>();
             Assert.That(shipped.OrderId == "abc");
         }
 
