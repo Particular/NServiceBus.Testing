@@ -22,8 +22,8 @@
             Assert.That(startResult.SagaDataSnapshot.RegularTimeoutReceived, Is.False);
             Assert.That(startResult.SagaDataSnapshot.DelayedCommandReceived, Is.False);
 
-            var timeout = startResult.FirstTimeoutMessageOrDefault<RegularTimeout>();
-            var delayed = startResult.FirstSentMessageOrDefault<DelayedCmd>();
+            var timeout = startResult.FindTimeoutMessage<RegularTimeout>();
+            var delayed = startResult.FindSentMessage<DelayedCmd>();
 
             Assert.That(timeout, Is.Not.Null);
             Assert.That(delayed, Is.Not.Null);

@@ -21,7 +21,7 @@
             Assert.That(testableSaga.QueuePeek().Type, Is.EqualTo(typeof(Step1Response)));
 
             var continueResult = await testableSaga.HandleQueuedMessage();
-            var doneEvt = continueResult.FirstPublishedMessageOrDefault<DoneEvent>();
+            var doneEvt = continueResult.FindPublishedMessage<DoneEvent>();
 
             Assert.That(doneEvt.CorrId, Is.EqualTo("abc"));
         }

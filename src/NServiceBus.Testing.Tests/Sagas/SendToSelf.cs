@@ -19,7 +19,7 @@
             Assert.That(testableSaga.QueuePeek().Type, Is.EqualTo(typeof(SendToSelfCmd)));
 
             var continueResult = await testableSaga.HandleQueuedMessage();
-            var doneEvt = continueResult.FirstPublishedMessageOrDefault<DoneEvent>();
+            var doneEvt = continueResult.FindPublishedMessage<DoneEvent>();
 
             Assert.That(doneEvt.CorrId, Is.EqualTo("abc"));
         }

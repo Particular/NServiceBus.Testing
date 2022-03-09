@@ -15,7 +15,7 @@
 
             var startResult = await testableSaga.Handle(new StartMsg { ProcessId = processId });
 
-            var step1Cmd = startResult.FirstSentMessageOrDefault<Step1Cmd>();
+            var step1Cmd = startResult.FindSentMessage<Step1Cmd>();
             Assert.That(step1Cmd, Is.Not.Null);
             Assert.That(startResult.SagaDataSnapshot.ReplyReceived, Is.False);
 

@@ -11,28 +11,28 @@
         /// Returns the first published message of a given type,
         /// or a default value if there is no published message of the given type.
         /// </summary>
-        public static TMessage FirstPublishedMessageOrDefault<TMessage>(this TestablePipelineContext context) =>
+        public static TMessage FindPublishedMessage<TMessage>(this TestablePipelineContext context) =>
             (TMessage)context.PublishedMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
 
         /// <summary>
         /// Returns the first sent message of a given type,
         /// or a default value if there is no sent message of the given type.
         /// </summary>
-        public static TMessage FirstSentMessageOrDefault<TMessage>(this TestablePipelineContext context) =>
+        public static TMessage FindSentMessage<TMessage>(this TestablePipelineContext context) =>
             (TMessage)context.SentMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
 
         /// <summary>
         /// Returns the first timeout message of a given type,
         /// or a default value if there is no timeout message of the given type.
         /// </summary>
-        public static TMessage FirstTimeoutMessageOrDefault<TMessage>(this TestablePipelineContext context) =>
+        public static TMessage FindTimeoutMessage<TMessage>(this TestablePipelineContext context) =>
             (TMessage)context.TimeoutMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
 
         /// <summary>
         /// Returns the first replied message of a given type,
         /// or a default value if there is no replied message of the given type.
         /// </summary>
-        public static TMessage FirstRepliedMessageOrDefault<TMessage>(this TestableMessageProcessingContext context) =>
+        public static TMessage FindRepliedMessage<TMessage>(this TestableMessageProcessingContext context) =>
             (TMessage)context.RepliedMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
     }
 }

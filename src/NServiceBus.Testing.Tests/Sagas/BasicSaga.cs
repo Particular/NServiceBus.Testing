@@ -31,7 +31,7 @@
 
             Assert.That(timeoutResults.Length, Is.EqualTo(1));
 
-            var shipped = timeoutResults.First().FirstPublishedMessageOrDefault<OrderShipped>();
+            var shipped = timeoutResults.First().FindPublishedMessage<OrderShipped>();
             Assert.That(shipped.OrderId == "abc");
         }
 

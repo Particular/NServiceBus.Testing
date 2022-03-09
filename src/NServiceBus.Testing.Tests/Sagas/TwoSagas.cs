@@ -19,7 +19,7 @@
             Assert.That(placeResultA.SagaId, Is.Not.EqualTo(billedResultB.SagaId));
 
             var billedResultA = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
-            var shipped = billedResultA.FirstPublishedMessageOrDefault<OrderShipped>();
+            var shipped = billedResultA.FindPublishedMessage<OrderShipped>();
 
             Assert.That(shipped.OrderId == "abc");
         }

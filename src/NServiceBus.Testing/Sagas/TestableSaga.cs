@@ -20,13 +20,12 @@
         where TSaga : NServiceBus.Saga<TSagaData>
         where TSagaData : class, IContainSagaData, new()
     {
-        readonly Queue<QueuedSagaMessage> queue = new Queue<QueuedSagaMessage>();
-        readonly ISagaPersister persister = new NonDurableSagaPersister();
-        readonly List<(DateTimeOffset At, OutgoingMessage<object, SendOptions> Timeout)> storedTimeouts = new List<(DateTimeOffset, OutgoingMessage<object, SendOptions>)>();
-        readonly Dictionary<Type, List<(Type ReplyMessageType, Func<object, object> SimulateReply)>> replySimulators = new Dictionary<Type, List<(Type ReplyMessageType, Func<object, object> SimulateReply)>>();
-
         readonly Func<TSaga> sagaFactory;
+        readonly Queue<QueuedSagaMessage> queue;
+        readonly ISagaPersister persister;
         readonly SagaMapper sagaMapper;
+        readonly List<(DateTime At, OutgoingMessage<object, SendOptions> Timeout)> storedTimeouts;
+        readonly Dictionary<Type, List<(Type, Func<object, object>)>> replySimulators;
 
         /// <summary>
         /// Create a tester for a saga.
@@ -38,23 +37,29 @@
         /// </param>
         /// <param name="initialCurrentTime">
         /// Sets the initial value of <see cref="CurrentTime"/>.
-        /// If not supplied, the default is <see cref="DateTimeOffset.UtcNow"/>.
+        /// If not supplied, the default is <see cref="DateTime.UtcNow"/>.
         /// </param>
-        public TestableSaga(Func<TSaga> sagaFactory = null, DateTimeOffset? initialCurrentTime = null)
+        public TestableSaga(Func<TSaga> sagaFactory = null, DateTime? initialCurrentTime = null)
         {
             this.sagaFactory = sagaFactory ?? Activator.CreateInstance<TSaga>;
+            CurrentTime = initialCurrentTime ?? DateTime.UtcNow;
+
+            queue = new Queue<QueuedSagaMessage>();
+            persister = new NonDurableSagaPersister();
+            storedTimeouts = new List<(DateTime, OutgoingMessage<object, SendOptions>)>();
+            replySimulators = new Dictionary<Type, List<(Type, Func<object, object>)>>();
+
             sagaMapper = SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory);
-            CurrentTime = initialCurrentTime ?? DateTimeOffset.UtcNow;
         }
 
         /// <summary>
         /// Shows the "current time" of the saga.
-        /// The initial time defaults to <see cref="DateTimeOffset.UtcNow"/>.
+        /// The initial time defaults to <see cref="DateTime.UtcNow"/>.
         /// This can be changed by passing an initial current time in the <see cref="TestableSaga{TSaga,TSagaData}"/> constructor.
         /// The current time may be advanced by calling <see cref="AdvanceTime"/>,
         /// which also handle any timeouts due during the specified <see cref="TimeSpan"/>.
         /// </summary>
-        public DateTimeOffset CurrentTime { get; private set; }
+        public DateTime CurrentTime { get; private set; }
 
         /// <summary>
         /// <c>true</c> if there are any queued messages.
@@ -95,8 +100,7 @@
         /// and the <see cref="TestableMessageHandlerContext"/> containing details about context operations that occurred in the message
         /// handler, which can be used for test assertions.
         /// </returns>
-        public Task<HandleResult> Handle<TMessage>(
-            TMessage message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
+        public Task<HandleResult> Handle<TMessage>(TMessage message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
         {
             if (context == null)
             {
@@ -129,8 +133,7 @@
         /// and the <see cref="TestableMessageHandlerContext"/> containing details about context operations that occurred in the message
         /// handler, which can be used for test assertions.
         /// </returns>
-        public Task<HandleResult> HandleReply<TMessage>(
-            Guid sagaId, TMessage message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
+        public Task<HandleResult> HandleReply<TMessage>(Guid sagaId, TMessage message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
         {
             var newHeaders = new Dictionary<string, string>();
             if (messageHeaders != null)
@@ -224,18 +227,21 @@
             return new HandleResult(saga, message, context);
         }
 
+
         /// <summary>
         /// Advance the <see cref="CurrentTime"/> for the saga and handle any timeouts due during <paramref name="timeToAdvance"/>.
         /// </summary>
         /// <param name="timeToAdvance">Amount of time to advance the <see cref="CurrentTime"/>.</param>
+        /// <param name="provideContext">A factory to provide a custom <see cref="TestableMessageHandlerContext"/> for each handled timeout if needed.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>
         /// Returns an array of <see cref="HandleResult"/>,
         /// one for each timeout handled during <paramref name="timeToAdvance"/>.
         /// If no timeouts were handled, the array is empty.
         /// </returns>
-        public async Task<HandleResult[]> AdvanceTime(TimeSpan timeToAdvance, CancellationToken cancellationToken = default)
+        public async Task<HandleResult[]> AdvanceTime(TimeSpan timeToAdvance, Func<OutgoingMessage<object, SendOptions>, TestableMessageHandlerContext> provideContext = null, CancellationToken cancellationToken = default)
         {
+            var contextFactory = provideContext ?? new Func<OutgoingMessage<object, SendOptions>, TestableMessageHandlerContext>(timeout => new TestableMessageHandlerContext());
             var advanceToTime = CurrentTime + timeToAdvance;
 
             var due = storedTimeouts.Where(t => t.At <= advanceToTime).OrderBy(t => t.At).ToArray();
@@ -245,9 +251,16 @@
 
             foreach (var storedTimeout in due)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 CurrentTime = storedTimeout.At;
-                var result = await HandleTimeout(storedTimeout.Timeout, cancellationToken).ConfigureAwait(false);
-                results.Add(result);
+                var context = contextFactory(storedTimeout.Timeout);
+                using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, cancellationToken))
+                {
+                    context.CancellationToken = linkedTokenSource.Token;
+                    var result = await HandleTimeout(storedTimeout.Timeout, context).ConfigureAwait(false);
+                    results.Add(result);
+                }
             }
 
             CurrentTime = advanceToTime;
@@ -255,10 +268,9 @@
             return results.ToArray();
         }
 
-        async Task<HandleResult> HandleTimeout(OutgoingMessage<object, SendOptions> timeoutMessage, CancellationToken cancellationToken)
+        async Task<HandleResult> HandleTimeout(OutgoingMessage<object, SendOptions> timeoutMessage, TestableMessageHandlerContext context)
         {
             var messageType = timeoutMessage.Message.GetType();
-            var context = new TestableMessageHandlerContext { CancellationToken = cancellationToken };
 
             var queueMessage = new QueuedSagaMessage(messageType, timeoutMessage.Message, timeoutMessage.Options.GetHeaders());
 
@@ -440,25 +452,25 @@
             /// Returns the first published message of a given type,
             /// or a default value if there is no published message of the given type.
             /// </summary>
-            public TMessageType FirstPublishedMessageOrDefault<TMessageType>() => Context.FirstPublishedMessageOrDefault<TMessageType>();
+            public TMessageType FindPublishedMessage<TMessageType>() => Context.FindPublishedMessage<TMessageType>();
 
             /// <summary>
             /// Returns the first sent message of a given type,
             /// or a default value if there is no sent message of the given type.
             /// </summary>
-            public TMessageType FirstSentMessageOrDefault<TMessageType>() => Context.FirstSentMessageOrDefault<TMessageType>();
+            public TMessageType FindSentMessage<TMessageType>() => Context.FindSentMessage<TMessageType>();
 
             /// <summary>
             /// Returns the first timeout message of a given type,
             /// or a default value if there is no timeout message of the given type.
             /// </summary>
-            public TMessageType FirstTimeoutMessageOrDefault<TMessageType>() => Context.FirstTimeoutMessageOrDefault<TMessageType>();
+            public TMessageType FindTimeoutMessage<TMessageType>() => Context.FindTimeoutMessage<TMessageType>();
 
             /// <summary>
             /// Returns the first replied message of a given type,
             /// or a default value if there is no replied message of the given type.
             /// </summary>
-            public TMessageType FirstRepliedMessageOrDefault<TMessageType>() => Context.FirstRepliedMessageOrDefault<TMessageType>();
+            public TMessageType FindRepliedMessage<TMessageType>() => Context.FindRepliedMessage<TMessageType>();
         }
     }
 }
