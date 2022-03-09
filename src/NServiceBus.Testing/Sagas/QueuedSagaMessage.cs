@@ -7,7 +7,7 @@
 
     /// <summary>
     /// Represents a queued message waiting to be processed by a saga.
-    /// Use <see cref="TestableSaga{TSaga, TSagaEntity}.ProcessQueuedMessage(TestableMessageHandlerContext)"/> to process the next message in the queue.
+    /// Use <see cref="TestableSaga{TSaga,TSagaData}.HandleQueuedMessage"/> to process the next message in the queue.
     /// </summary>
     [DebuggerDisplay("QueuedSagaMessage: {Message}")]
     public class QueuedSagaMessage
@@ -42,7 +42,6 @@
             {
                 Headers = headers ?? new Dictionary<string, string>();
             }
-
         }
     }
 }

@@ -15,7 +15,7 @@
             var correlationId = Guid.NewGuid().ToString().Substring(0, 8);
 
 
-            var result = await testableSaga.Process(new HeaderMessage(), messageHeaders: new Dictionary<string, string> { { "X-My-Correlation-Id", correlationId } });
+            var result = await testableSaga.Handle(new HeaderMessage(), messageHeaders: new Dictionary<string, string> { { "X-My-Correlation-Id", correlationId } });
 
             Assert.That(result.Completed, Is.False);
             Assert.That(result.SagaDataSnapshot.CorrId, Is.EqualTo(correlationId));

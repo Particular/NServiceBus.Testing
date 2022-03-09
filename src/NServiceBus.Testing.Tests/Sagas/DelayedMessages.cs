@@ -15,7 +15,7 @@
 
             var corrId = Guid.NewGuid().ToString().Substring(0, 8);
 
-            var startResult = await testableSaga.Process(new Start { CorrId = corrId });
+            var startResult = await testableSaga.Handle(new Start { CorrId = corrId });
 
             Assert.That(startResult.Context.TimeoutMessages.Count, Is.EqualTo(1)); // Just timeout
             Assert.That(startResult.Context.SentMessages.Count, Is.EqualTo(2));    // Both

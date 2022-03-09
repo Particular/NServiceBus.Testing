@@ -13,8 +13,8 @@
         {
             var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>();
 
-            var placeResult = await testableSaga.Process(new OrderPlaced { OrderId = "abc" });
-            var billResult = await testableSaga.Process(new OrderBilled { OrderId = "abc" });
+            var placeResult = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
+            var billResult = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
 
             Assert.That(placeResult.Completed, Is.False);
             Assert.That(billResult.Completed, Is.False);

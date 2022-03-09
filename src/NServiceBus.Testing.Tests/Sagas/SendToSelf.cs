@@ -12,13 +12,13 @@
         {
             var testableSaga = new TestableSaga<MySaga, MyData>();
 
-            var startResult = await testableSaga.Process(new StartMsg { CorrId = "abc" });
+            var startResult = await testableSaga.Handle(new StartMsg { CorrId = "abc" });
 
             Assert.That(startResult.Context.SentMessages.Count, Is.EqualTo(1));
             Assert.That(testableSaga.QueueLength, Is.EqualTo(1));
             Assert.That(testableSaga.QueuePeek().Type, Is.EqualTo(typeof(SendToSelfCmd)));
 
-            var continueResult = await testableSaga.ProcessQueuedMessage();
+            var continueResult = await testableSaga.HandleQueuedMessage();
             var doneEvt = continueResult.FindPublishedMessage<DoneEvent>();
 
             Assert.That(doneEvt.CorrId, Is.EqualTo("abc"));
