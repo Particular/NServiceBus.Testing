@@ -12,20 +12,19 @@
 
     class SagaMapper
     {
-        static ConcurrentDictionary<Type, SagaMapper> sagaMappers = new ConcurrentDictionary<Type, SagaMapper>();
+        static readonly ConcurrentDictionary<Type, SagaMapper> sagaMappers = new ConcurrentDictionary<Type, SagaMapper>();
 
-        SagaMetadata metadata;
-        IReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>> mappings;
-        SagaMetadata.CorrelationPropertyMetadata correlationProperty;
-        PropertyInfo correlationPropertyInfo;
-        ConcurrentDictionary<(Type messageType, string methodName), MethodInfo> handlerMethods;
+        readonly SagaMetadata metadata;
+        readonly IReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>> mappings;
+        readonly SagaMetadata.CorrelationPropertyMetadata correlationProperty;
+        readonly PropertyInfo correlationPropertyInfo;
+        readonly ConcurrentDictionary<(Type messageType, string methodName), MethodInfo> handlerMethods;
 
         public string CorrelationPropertyName => correlationProperty.Name;
 
         SagaMapper(Type sagaType, Type sagaDataType, object dummySagaForReflection)
         {
             metadata = SagaMetadata.Create(sagaType);
-            mappings = new Dictionary<Type, Func<QueuedSagaMessage, object>>();
             handlerMethods = new ConcurrentDictionary<(Type messageType, string methodName), MethodInfo>();
 
             if (!metadata.TryGetCorrelationProperty(out correlationProperty))
@@ -51,24 +50,18 @@
             mappings = mappingReader.GetMappings();
         }
 
-        public static SagaMapper Get<TSaga, TSagaEntity>(Func<TSaga> sagaFactory)
-        {
-            return sagaMappers.GetOrAdd(typeof(TSaga), sagaType =>
+        public static SagaMapper Get<TSaga, TSagaEntity>(Func<TSaga> sagaFactory) =>
+            sagaMappers.GetOrAdd(typeof(TSaga), (sagaType, factory) =>
             {
-                var dummySagaForReflection = sagaFactory();
+                var dummySagaForReflection = factory();
                 return new SagaMapper(typeof(TSaga), typeof(TSagaEntity), dummySagaForReflection);
-            });
-        }
+            }, sagaFactory);
 
         public bool HandlesMessageType(Type messageType)
-        {
-            return metadata.AssociatedMessages.Any(m => m.MessageType == messageType);
-        }
+            => metadata.AssociatedMessages.Any(m => m.MessageType == messageType);
 
         public SagaMessage GetMessageMetadata(Type messageType)
-        {
-            return metadata.AssociatedMessages.FirstOrDefault(sagaMsg => messageType == sagaMsg.MessageType);
-        }
+            => metadata.AssociatedMessages.FirstOrDefault(sagaMsg => messageType == sagaMsg.MessageType);
 
         public object GetMessageMappedValue(QueuedSagaMessage message)
         {
@@ -81,20 +74,19 @@
         }
 
         public void SetCorrelationPropertyValue(IContainSagaData sagaEntity, object value)
-        {
-            correlationPropertyInfo.SetValue(sagaEntity, value);
-        }
+            => correlationPropertyInfo.SetValue(sagaEntity, value);
 
         public Task InvokeHandlerMethod<TSaga>(TSaga saga, string methodName, QueuedSagaMessage message, TestableMessageHandlerContext context)
         {
             var key = (message.Type, methodName);
             var handlerMethodInfo = handlerMethods.GetOrAdd(key, newKey =>
             {
-                var handlerTypes = new Type[] { newKey.messageType, typeof(IMessageHandlerContext) };
-                return typeof(TSaga).GetMethod(newKey.methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, handlerTypes, null);
+                (Type messageType, string nameOfTheMethod) = newKey;
+                var handlerTypes = new[] { messageType, typeof(IMessageHandlerContext) };
+                return typeof(TSaga).GetMethod(nameOfTheMethod, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, handlerTypes, null);
             });
 
-            var invokeTask = handlerMethodInfo.Invoke(saga, new object[] { message.Message, context }) as Task;
+            var invokeTask = handlerMethodInfo.Invoke(saga, new[] { message.Message, context }) as Task;
             return invokeTask;
         }
 
@@ -105,25 +97,20 @@
             void IConfigureHowToFindSagaWithMessage.ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, Expression<Func<TMessage, object>> messageProperty)
             {
                 Func<TMessage, object> compiledExpression = messageProperty.Compile();
-                Func<QueuedSagaMessage, object> getValueFromMessage = message => compiledExpression((TMessage)message.Message);
-                mappings.Add(typeof(TMessage), getValueFromMessage);
+                object GetValueFromMessage(QueuedSagaMessage message) => compiledExpression((TMessage)message.Message);
+                mappings.Add(typeof(TMessage), message => GetValueFromMessage(message));
             }
 
             void IConfigureHowToFindSagaWithMessageHeaders.ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, string headerName)
             {
-                Func<QueuedSagaMessage, object> getValueFromMessage = message =>
-                {
-                    if (message.Headers.TryGetValue(headerName, out var value))
-                    {
-                        return value;
-                    }
-                    return null;
-                };
-                mappings.Add(typeof(TMessage), getValueFromMessage);
+                object GetValueFromMessage(QueuedSagaMessage message)
+                    => message.Headers.TryGetValue(headerName, out var value) ? value : null;
+
+                mappings.Add(typeof(TMessage), message => GetValueFromMessage(message));
             }
 
-            public IReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>> GetMappings() =>
-                new ReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>>(mappings);
+            public IReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>> GetMappings()
+                => new ReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>>(mappings);
         }
     }
 }
