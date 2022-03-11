@@ -52,11 +52,11 @@
 
         public static SagaMapper Get<TSaga, TSagaEntity>(Func<TSaga> sagaFactory)
         {
-            return sagaMappers.GetOrAdd(typeof(TSaga), (sagaType, factory) =>
+            return sagaMappers.GetOrAdd(typeof(TSaga), sagaType =>
             {
-                var dummySagaForReflection = factory();
+                var dummySagaForReflection = sagaFactory();
                 return new SagaMapper(typeof(TSaga), typeof(TSagaEntity), dummySagaForReflection);
-            }, sagaFactory);
+            });
         }
 
         public bool HandlesMessageType(Type messageType)
