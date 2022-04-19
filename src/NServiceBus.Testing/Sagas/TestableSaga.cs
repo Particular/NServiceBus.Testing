@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
     using NServiceBus.Persistence;
@@ -242,7 +241,7 @@
             var contextFactory = provideContext ?? new Func<OutgoingMessage<object, SendOptions>, TestableMessageHandlerContext>(timeout => new TestableMessageHandlerContext());
             var advanceToTime = CurrentTime + timeToAdvance;
 
-            var due = storedTimeouts.Where(t => t.Item1 <= advanceToTime).OrderBy(t => t.Item2).ToArray();
+            var due = storedTimeouts.Where(t => t.Item1 <= advanceToTime).OrderBy(t => t.Item1).ToArray();
             storedTimeouts.RemoveAll(t => t.Item1 <= advanceToTime);
 
             var results = new List<HandleResult>();
