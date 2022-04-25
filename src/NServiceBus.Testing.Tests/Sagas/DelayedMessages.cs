@@ -40,6 +40,22 @@
             Assert.That(delayedCmdResult.SagaDataSnapshot.DelayedCommandReceived, Is.True);
         }
 
+        [Test]
+        public async Task TestMultipleDelayedMessages()
+        {
+            var testableSaga = new TestableSaga<DelaySaga, Data>();
+
+            var corrId = Guid.NewGuid().ToString().Substring(0, 8);
+
+            await testableSaga.Handle(new Start { CorrId = corrId });
+
+            var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(120));
+
+            Assert.That(timeoutResults.Length, Is.EqualTo(2));
+            Assert.That(timeoutResults.Last().SagaDataSnapshot.RegularTimeoutReceived, Is.True);
+            Assert.That(timeoutResults.Last().SagaDataSnapshot.DelayedCommandReceived, Is.True);
+        }
+
         public class DelaySaga : NServiceBus.Saga<Data>,
             IAmStartedByMessages<Start>,
             IHandleMessages<DelayedCmd>,
