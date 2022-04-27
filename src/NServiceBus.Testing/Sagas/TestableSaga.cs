@@ -309,6 +309,11 @@
         {
             if (saga.Completed)
             {
+                if (isNew)
+                {
+                    // Can't update a brand new but already-completed saga
+                    return;
+                }
                 await persister.Complete(saga.Entity, session, contextBag).ConfigureAwait(false);
             }
             else if (isNew)
