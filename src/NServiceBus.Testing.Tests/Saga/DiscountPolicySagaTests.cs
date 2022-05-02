@@ -102,14 +102,14 @@
                 {
                     Total = 400
                 }, c))
-                .ExpectSend<ProcessOrder>(m => m.Total == 300*(decimal) 0.9)
+                .ExpectSend<ProcessOrder>(m => m.Total == 300 * (decimal)0.9)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
                 .When((s, c) => s.Handle(new SubmitOrder
                 {
                     Total = 300
                 }, c))
                 .WhenHandlingTimeout<SubmitOrder>()
-                .ExpectSend<ProcessOrder>(m => m.Total == 200*(decimal) 0.9)
+                .ExpectSend<ProcessOrder>(m => m.Total == 200 * (decimal)0.9)
                 .ExpectTimeoutToBeSetIn<SubmitOrder>((state, span) => span == TimeSpan.FromDays(7))
                 .When((s, c) => s.Handle(new SubmitOrder
                 {
@@ -191,7 +191,7 @@
                 {
                     m.CustomerId = Data.CustomerId;
                     m.OrderId = message.OrderId;
-                    m.Total = message.Total*(decimal) 0.9;
+                    m.Total = message.Total * (decimal)0.9;
                 });
             }
 

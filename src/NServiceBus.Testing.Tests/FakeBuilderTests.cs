@@ -12,7 +12,7 @@
 
             var instance = new SomeClass();
 
-            builder.Register(()=> instance);
+            builder.Register(() => instance);
 
             Assert.AreSame(instance, builder.Build<SomeClass>());
         }
@@ -25,7 +25,7 @@
             var instance = new SomeClass();
             var instance2 = new SomeClass();
 
-            builder.Register(() => new []
+            builder.Register(() => new[]
             {
                 instance,
                 instance2
@@ -42,7 +42,7 @@
 
             object instance = new SomeClass();
 
-            builder.Register(typeof(SomeClass),() => instance);
+            builder.Register(typeof(SomeClass), () => instance);
 
             Assert.AreSame(instance, builder.Build<SomeClass>());
         }
