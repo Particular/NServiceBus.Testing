@@ -145,7 +145,7 @@ namespace NServiceBus.Testing
         /// </summary>
         public void Register(Type type, Func<object> factory)
         {
-            factories.Add(type, () => new []
+            factories.Add(type, () => new[]
             {
                 factory()
             });

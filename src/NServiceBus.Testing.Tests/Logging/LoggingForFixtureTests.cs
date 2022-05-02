@@ -16,8 +16,8 @@ namespace NServiceBus.Testing.Tests.Logging
         public void Setup()
         {
             writer = new StringWriter();
-            
-            this.scope = LogManager.Use<TestingLoggerFactory>()
+
+            scope = LogManager.Use<TestingLoggerFactory>()
                 .BeginScope(writer);
         }
 
@@ -26,21 +26,21 @@ namespace NServiceBus.Testing.Tests.Logging
         {
             var Logger = LogManager.GetLogger<LoggingForFixtureTests>();
             Logger.Debug("First");
-            
+
             StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests First", writer.ToString());
             StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests Second", writer.ToString());
         }
-        
+
         [Test]
         public void Should_write_second_independent_from_other()
         {
             var Logger = LogManager.GetLogger<LoggingForFixtureTests>();
             Logger.Debug("Second");
-            
+
             StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests Second", writer.ToString());
             StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests First", writer.ToString());
         }
-        
+
         [TearDown]
         public void Teardown()
         {

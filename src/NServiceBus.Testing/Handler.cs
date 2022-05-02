@@ -286,7 +286,7 @@ namespace NServiceBus.Testing
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
         /// <param name="initializedMessage">A message to be used with message handler.</param>
         /// <remarks>
-        /// This is different from <see cref="OnMessage{TMessage}(System.Action{TMessage})" /> in a way that
+        /// This is different from <see cref="OnMessage{TMessage}(Action{TMessage})" /> in a way that
         /// it uses the message, and not calls to an action.
         /// </remarks>
         /// <example><![CDATA[var message = new TestMessage {//...}; Test.Handler<EmptyHandler>().OnMessage<TestMessage>(message);]]></example>
@@ -294,7 +294,7 @@ namespace NServiceBus.Testing
         {
             OnMessageAsync(initializedMessage).GetAwaiter().GetResult();
         }
-        
+
         /// <summary>
         /// Activates the test that has been set up passing in the given message,
         /// setting the incoming headers and the message Id.
@@ -325,11 +325,11 @@ namespace NServiceBus.Testing
 
             return OnMessageAsync(message);
         }
-        
+
         /// <summary>Activates the test that has been set up passing in a specific message to be used.</summary>
         /// <param name="initializedMessage">A message to be used with message handler.</param>
         /// <remarks>
-        /// This is different from <see cref="OnMessage{TMessage}(System.Action{TMessage})" /> in a way that
+        /// This is different from <see cref="OnMessage{TMessage}(Action{TMessage})" /> in a way that
         /// it uses the message, and not calls to an action.
         /// </remarks>
         /// <example><![CDATA[var message = new TestMessage {//...}; Test.Handler<EmptyHandler>().OnMessage<TestMessage>(message);]]></example>

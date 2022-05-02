@@ -12,11 +12,11 @@ namespace NServiceBus.Testing
 
         public bool IsDebugEnabled => DefaultTestingLoggerFactory.IsDebugEnabled;
         public bool IsInfoEnabled => DefaultTestingLoggerFactory.IsInfoEnabled;
-        
+
         public bool IsWarnEnabled => DefaultTestingLoggerFactory.IsWarnEnabled;
-        
+
         public bool IsErrorEnabled => DefaultTestingLoggerFactory.IsErrorEnabled;
-        
+
         public bool IsFatalEnabled => DefaultTestingLoggerFactory.IsFatalEnabled;
 
         public void Debug(string message)
