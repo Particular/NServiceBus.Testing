@@ -1,0 +1,10 @@
+[*.cs]
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = none
+
+# IDE1006: Naming rule violation: Missing prefix I
+dotnet_diagnostic.IDE1006.severity = suggestion
+
+# Default severity for analyzer diagnostics with category 'Naming'
+dotnet_analyzer_diagnostic.category-Naming.severity = suggestion

@@ -6,7 +6,7 @@ namespace NServiceBus.Testing
     using System.Threading.Tasks;
     using MessageInterfaces.MessageMapper.Reflection;
 
-    internal static class SagaConsts
+    static class SagaConsts
     {
         public const string Originator = "NServiceBus.Testing.SagaOriginator";
     }
@@ -343,7 +343,7 @@ namespace NServiceBus.Testing
         {
             return WhenSagaTimesOutAsync().GetAwaiter().GetResult();
         }
-        
+
         /// <summary>
         /// Initializes the given message type and checks all the expectations previously set up,
         /// and then clears them for continued testing.
@@ -474,7 +474,7 @@ namespace NServiceBus.Testing
         {
             testContext.AddExpectation(new ExpectSagaCompleted<T>(saga, false));
             return this;
-        }      
+        }
 
         /// <summary>
         /// Verifies that the saga is setting the specified timeout
