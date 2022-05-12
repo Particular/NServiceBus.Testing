@@ -213,6 +213,7 @@
             using (var session = new NonDurableSynchronizedStorageSession())
             {
                 var contextBag = new ContextBag();
+                await session.Open(contextBag, context.CancellationToken).ConfigureAwait(false);
 
                 var (data, isNew, mappedValue) = await LoadSagaData(message, session, contextBag, context.CancellationToken).ConfigureAwait(false);
                 saga.Entity = data;
