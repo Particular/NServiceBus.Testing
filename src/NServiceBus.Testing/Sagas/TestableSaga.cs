@@ -212,13 +212,13 @@
 
             using (var session = new NonDurableSynchronizedStorageSession())
             {
-                var contextBag = new ContextBag();
+                await session.Open(context.Extensions, context.CancellationToken).ConfigureAwait(false);
 
-                var (data, isNew, mappedValue) = await LoadSagaData(message, session, contextBag, context.CancellationToken).ConfigureAwait(false);
+                var (data, isNew, mappedValue) = await LoadSagaData(message, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
                 saga.Entity = data;
 
                 await sagaMapper.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
-                await SaveSagaData(saga, isNew, mappedValue, session, contextBag, context.CancellationToken).ConfigureAwait(false);
+                await SaveSagaData(saga, isNew, mappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
                 await session.CompleteAsync(context.CancellationToken).ConfigureAwait(false);
             }
 
