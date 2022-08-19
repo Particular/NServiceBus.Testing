@@ -106,7 +106,6 @@
             {
                 context = new TestableMessageHandlerContext();
             }
-
             var queueMessage = new QueuedSagaMessage(typeof(TMessage), message, messageHeaders);
             return InnerHandle(queueMessage, "Handle", context);
         }

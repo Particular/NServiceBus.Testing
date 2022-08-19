@@ -1,1 +1,4 @@
 [*.cs]
+
+## Justification Test Projects
+dotnet_diagnostic.IDE0074.severity = none
