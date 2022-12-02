@@ -210,13 +210,11 @@
 
             using (var session = new NonDurableSynchronizedStorageSession())
             {
-                var contextBag = new ContextBag();
-
-                var loadResult = await LoadSagaData(message, session, contextBag).ConfigureAwait(false);
+                var loadResult = await LoadSagaData(message, session, context).ConfigureAwait(false);
                 saga.Entity = loadResult.Item1;
 
                 await sagaMapper.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
-                await SaveSagaData(saga, loadResult.Item2, loadResult.Item3, session, contextBag).ConfigureAwait(false);
+                await SaveSagaData(saga, loadResult.Item2, loadResult.Item3, session, context.Extensions).ConfigureAwait(false);
                 await session.CompleteAsync().ConfigureAwait(false);
             }
 
@@ -270,16 +268,14 @@
             return await InnerHandle(queueMessage, methodName, context).ConfigureAwait(false);
         }
 
-        async Task<Tuple<TSagaData, bool, object>> LoadSagaData(QueuedSagaMessage message, SynchronizedStorageSession session, ContextBag contextBag)
+        async Task<Tuple<TSagaData, bool, object>> LoadSagaData(QueuedSagaMessage message, SynchronizedStorageSession session, TestableMessageHandlerContext context)
         {
             var messageMetadata = sagaMapper.GetMessageMetadata(message.Type);
             TSagaData sagaData;
 
-            if (message.Headers != null &&
-                message.Headers.TryGetValue(Headers.SagaId, out var sagaIdString) &&
-                Guid.TryParse(sagaIdString, out Guid sagaId))
+            if (message.Headers.TryGetValue(Headers.SagaId, out var sagaIdString) && Guid.TryParse(sagaIdString, out Guid sagaId))
             {
-                sagaData = await persister.Get<TSagaData>(sagaId, session, contextBag).ConfigureAwait(false);
+                sagaData = await persister.Get<TSagaData>(sagaId, session, context.Extensions).ConfigureAwait(false);
                 if (sagaData != null)
                 {
                     return new Tuple<TSagaData, bool, object>(sagaData, false, null);
@@ -288,7 +284,7 @@
 
             var messageMappedValue = sagaMapper.GetMessageMappedValue(message);
 
-            sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, contextBag).ConfigureAwait(false);
+            sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, context.Extensions).ConfigureAwait(false);
 
             if (sagaData != null)
             {
@@ -297,7 +293,10 @@
 
             if (messageMetadata.IsAllowedToStartSaga)
             {
-                sagaData = new TSagaData { Id = Guid.NewGuid() };
+                var originatorAddress = message.Headers.TryGetValue(Headers.ReplyToAddress, out var replyAddress)
+                    ? replyAddress
+                    : context.ReplyToAddress; // This property has a default value set even when the header isn't set to require less setup for testing
+                sagaData = new TSagaData { Id = Guid.NewGuid(), Originator = originatorAddress };
                 sagaMapper.SetCorrelationPropertyValue(sagaData, messageMappedValue);
                 return new Tuple<TSagaData, bool, object>(sagaData, true, messageMappedValue);
             }
