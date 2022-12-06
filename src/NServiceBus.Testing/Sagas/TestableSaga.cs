@@ -213,7 +213,7 @@
             {
                 await session.Open(context.Extensions, context.CancellationToken).ConfigureAwait(false);
 
-                var (data, isNew, mappedValue) = await LoadSagaData(message, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+                var (data, isNew, mappedValue) = await LoadSagaData(message, session, context).ConfigureAwait(false);
                 saga.Entity = data;
 
                 await sagaMapper.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
@@ -279,16 +279,14 @@
         }
 
         async Task<(TSagaData Data, bool IsNew, object MappedValue)> LoadSagaData(
-            QueuedSagaMessage message, ISynchronizedStorageSession session, ContextBag contextBag, CancellationToken cancellationToken)
+            QueuedSagaMessage message, ISynchronizedStorageSession session, TestableMessageHandlerContext context)
         {
             var messageMetadata = sagaMapper.GetMessageMetadata(message.Type);
             TSagaData sagaData;
 
-            if (message.Headers != null &&
-                message.Headers.TryGetValue(Headers.SagaId, out var sagaIdString) &&
-                Guid.TryParse(sagaIdString, out Guid sagaId))
+            if (message.Headers.TryGetValue(Headers.SagaId, out var sagaIdString) && Guid.TryParse(sagaIdString, out Guid sagaId))
             {
-                sagaData = await persister.Get<TSagaData>(sagaId, session, contextBag, cancellationToken).ConfigureAwait(false);
+                sagaData = await persister.Get<TSagaData>(sagaId, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
                 if (sagaData != null)
                 {
                     return (sagaData, false, null);
@@ -297,7 +295,7 @@
 
             var messageMappedValue = sagaMapper.GetMessageMappedValue(message);
 
-            sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, contextBag, cancellationToken).ConfigureAwait(false);
+            sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
 
             if (sagaData != null)
             {
@@ -306,7 +304,10 @@
 
             if (messageMetadata.IsAllowedToStartSaga)
             {
-                sagaData = new TSagaData { Id = Guid.NewGuid() };
+                var originatorAddress = message.Headers.TryGetValue(Headers.ReplyToAddress, out var replyAddress)
+                    ? replyAddress
+                    : context.ReplyToAddress; // This property has a default value set even when the header isn't set to require less setup for testing
+                sagaData = new TSagaData { Id = Guid.NewGuid(), Originator = originatorAddress };
                 sagaMapper.SetCorrelationPropertyValue(sagaData, messageMappedValue);
                 return (sagaData, true, messageMappedValue);
             }
