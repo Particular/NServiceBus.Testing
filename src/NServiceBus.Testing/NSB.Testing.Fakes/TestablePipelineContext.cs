@@ -111,6 +111,19 @@
         }
 
         /// <summary>
+        /// Resets all the state held by this testable type so that it can be reused.
+        /// </summary>
+        public virtual void Reset()
+        {
+            sentMessages.Clear();
+            publishedMessages.Clear();
+            timeoutMessages.Clear();
+            Extensions = new ContextBag();
+            CancellationToken = default;
+
+        }
+
+        /// <summary>
         /// the <see cref="IMessageCreator" /> instance used to create proxy implementation for message interfaces.
         /// </summary>
         protected IMessageCreator messageCreator;

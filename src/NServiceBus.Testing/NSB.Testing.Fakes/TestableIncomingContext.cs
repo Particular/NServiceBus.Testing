@@ -30,5 +30,12 @@
         {
             return ServiceCollection.BuildServiceProvider();
         }
+
+        /// <inheritdoc/>
+        public override void Reset()
+        {
+            base.Reset();
+            ServiceCollection = new ServiceCollection();
+        }
     }
 }

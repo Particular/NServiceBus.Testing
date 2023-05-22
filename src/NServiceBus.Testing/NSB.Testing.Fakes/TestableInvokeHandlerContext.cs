@@ -63,5 +63,17 @@
         /// Metadata for the incoming message.
         /// </summary>
         public MessageMetadata MessageMetadata { get; set; } = new MessageMetadata(typeof(object));
+
+        /// <inheritdoc/>
+        public override void Reset()
+        {
+            base.Reset();
+            DoNotContinueDispatchingCurrentMessageToHandlersWasCalled = default;
+            SynchronizedStorageSession = default;
+            MessageHandler = new MessageHandler((instance, message, context) => Task.CompletedTask, typeof(object));
+            Headers.Clear();
+            MessageBeingHandled = new object();
+            MessageMetadata = new MessageMetadata(typeof(object));
+        }
     }
 }

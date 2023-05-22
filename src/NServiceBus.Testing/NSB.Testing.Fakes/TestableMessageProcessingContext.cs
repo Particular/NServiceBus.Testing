@@ -76,6 +76,16 @@ namespace NServiceBus.Testing
         /// </summary>
         public string ReplyToAddress { get; set; } = "reply address";
 
+        /// <inheritdoc/>
+        public override void Reset()
+        {
+            base.Reset();
+            forwardedMessages.Clear();
+            MessageHeaders.Clear();
+            MessageId = Guid.NewGuid().ToString();
+            ReplyToAddress = "reply address";
+        }
+
         IReadOnlyDictionary<string, string> IMessageProcessingContext.MessageHeaders => new ReadOnlyDictionary<string, string>(MessageHeaders);
         ConcurrentQueue<string> forwardedMessages = new ConcurrentQueue<string>();
 
