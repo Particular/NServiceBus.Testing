@@ -134,6 +134,19 @@
         }
 
         /// <summary>
+        /// Resets the the stored collections of <see cref="SentMessages"/>, <see cref="PublishedMessages"/>, <see cref="TimeoutMessages"/>,
+        /// <see cref="Subscriptions"/>, and <see cref="Unsubscription"/> requests so that the testable session can be reused.
+        /// </summary>
+        public virtual void Reset()
+        {
+            sentMessages.Clear();
+            publishedMessages.Clear();
+            timeoutMessages.Clear();
+            subscriptions.Clear();
+            unsubscriptions.Clear();
+        }
+
+        /// <summary>
         /// the <see cref="IMessageCreator" /> instance used to create proxy implementation for message interfaces.
         /// </summary>
         protected IMessageCreator messageCreator;
