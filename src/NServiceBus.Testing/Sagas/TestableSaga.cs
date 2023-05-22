@@ -213,11 +213,16 @@
             {
                 await session.Open(context.Extensions, context.CancellationToken).ConfigureAwait(false);
 
-                var (data, isNew, mappedValue) = await LoadSagaData(message, session, context).ConfigureAwait(false);
-                saga.Entity = data;
+                var loadResult = await LoadSagaData(message, session, context).ConfigureAwait(false);
+                if (loadResult.DiscardMessage)
+                {
+                    return null;
+                }
+
+                saga.Entity = loadResult.Data;
 
                 await sagaMapper.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
-                await SaveSagaData(saga, isNew, mappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+                await SaveSagaData(saga, loadResult.IsNew, loadResult.MappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
                 await session.CompleteAsync(context.CancellationToken).ConfigureAwait(false);
             }
 
@@ -258,7 +263,12 @@
                 {
                     context.CancellationToken = linkedTokenSource.Token;
                     var result = await HandleTimeout(storedTimeout.Timeout, context).ConfigureAwait(false);
-                    results.Add(result);
+
+                    // Swallowed messages (such as a timeout after saga completion) result in null
+                    if (result != null)
+                    {
+                        results.Add(result);
+                    }
                 }
             }
 
@@ -278,7 +288,7 @@
             return await InnerHandle(queueMessage, methodName, context).ConfigureAwait(false);
         }
 
-        async Task<(TSagaData Data, bool IsNew, object MappedValue)> LoadSagaData(
+        async Task<SagaLoadResult> LoadSagaData(
             QueuedSagaMessage message, ISynchronizedStorageSession session, TestableMessageHandlerContext context)
         {
             var messageMetadata = sagaMapper.GetMessageMetadata(message.Type);
@@ -289,8 +299,11 @@
                 sagaData = await persister.Get<TSagaData>(sagaId, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
                 if (sagaData != null)
                 {
-                    return (sagaData, false, null);
+                    return new SagaLoadResult { Data = sagaData };
                 }
+
+                // If saga cannot be found by saga id, that means the saga has been completed.
+                return new SagaLoadResult { DiscardMessage = true };
             }
 
             var messageMappedValue = sagaMapper.GetMessageMappedValue(message);
@@ -299,7 +312,7 @@
 
             if (sagaData != null)
             {
-                return (sagaData, false, messageMappedValue);
+                return new SagaLoadResult { Data = sagaData, MappedValue = messageMappedValue };
             }
 
             if (messageMetadata.IsAllowedToStartSaga)
@@ -309,7 +322,7 @@
                     : context.ReplyToAddress; // This property has a default value set even when the header isn't set to require less setup for testing
                 sagaData = new TSagaData { Id = Guid.NewGuid(), Originator = originatorAddress };
                 sagaMapper.SetCorrelationPropertyValue(sagaData, messageMappedValue);
-                return (sagaData, true, messageMappedValue);
+                return new SagaLoadResult { Data = sagaData, IsNew = true, MappedValue = messageMappedValue };
             }
 
             throw new Exception($"Saga not found and message type {message.Type.FullName} is not allowed to start the saga.");
@@ -409,6 +422,14 @@
                     queue.Enqueue(queuedMessage);
                 }
             }
+        }
+
+        class SagaLoadResult
+        {
+            public TSagaData Data { get; set; }
+            public bool IsNew { get; set; }
+            public bool DiscardMessage { get; set; }
+            public object MappedValue { get; set; }
         }
 
         /// <summary>
