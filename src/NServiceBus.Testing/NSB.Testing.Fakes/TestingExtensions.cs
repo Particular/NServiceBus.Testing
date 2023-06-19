@@ -15,11 +15,11 @@
             (TMessage)context.PublishedMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
 
         /// <summary>
-        /// Returns the first sent message of a given type,
-        /// or a default value if there is no sent message of the given type.
+        /// Returns the first published message of a given type,
+        /// or a default value if there is no published message of the given type.
         /// </summary>
-        public static TMessage FindSentMessage<TMessage>(this TestablePipelineContext context) =>
-            (TMessage)context.SentMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
+        public static TMessage FindPublishedMessage<TMessage>(this TestableMessageSession context) =>
+            (TMessage)context.PublishedMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
 
         /// <summary>
         /// Returns the first timeout message of a given type,
@@ -27,6 +27,27 @@
         /// </summary>
         public static TMessage FindTimeoutMessage<TMessage>(this TestablePipelineContext context) =>
             (TMessage)context.TimeoutMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
+
+        /// <summary>
+        /// Returns the first timeout message of a given type,
+        /// or a default value if there is no timeout message of the given type.
+        /// </summary>
+        public static TMessage FindTimeoutMessage<TMessage>(this TestableMessageSession context) =>
+            (TMessage)context.TimeoutMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
+
+        /// <summary>
+        /// Returns the first sent message of a given type,
+        /// or a default value if there is no sent message of the given type.
+        /// </summary>
+        public static TMessage FindSentMessage<TMessage>(this TestableMessageSession context) =>
+            (TMessage)context.SentMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
+
+        /// <summary>
+        /// Returns the first sent message of a given type,
+        /// or a default value if there is no sent message of the given type.
+        /// </summary>
+        public static TMessage FindSentMessage<TMessage>(this TestablePipelineContext context) =>
+            (TMessage)context.SentMessages.FirstOrDefault(msg => msg.Message is TMessage)?.Message;
 
         /// <summary>
         /// Returns the first replied message of a given type,
