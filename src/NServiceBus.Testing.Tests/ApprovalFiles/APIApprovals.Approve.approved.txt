@@ -300,9 +300,12 @@ namespace NServiceBus.Testing
     }
     public static class TestingExtensions
     {
+        public static TMessage FindPublishedMessage<TMessage>(this NServiceBus.Testing.TestableMessageSession context) { }
         public static TMessage FindPublishedMessage<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
         public static TMessage FindReplyMessage<TMessage>(this NServiceBus.Testing.TestableMessageProcessingContext context) { }
+        public static TMessage FindSentMessage<TMessage>(this NServiceBus.Testing.TestableMessageSession context) { }
         public static TMessage FindSentMessage<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
+        public static TMessage FindTimeoutMessage<TMessage>(this NServiceBus.Testing.TestableMessageSession context) { }
         public static TMessage FindTimeoutMessage<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
     }
     public class TestingLoggerFactory : NServiceBus.Logging.LoggingFactoryDefinition
