@@ -2,18 +2,6 @@
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 namespace NServiceBus.Testing
 {
-    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
-        " more details. Will be removed in version 9.0.0.", true)]
-    public class ExpectationException : System.Exception
-    {
-        public ExpectationException() { }
-    }
-    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
-        " more details. Will be removed in version 9.0.0.", true)]
-    public class Handler<T>
-    {
-        public Handler() { }
-    }
     public static class OutgoingMessageExtensions
     {
         public static System.Collections.Generic.IEnumerable<NServiceBus.Testing.PublishedMessage<TMessage>> Containing<TMessage>(this System.Collections.Generic.IEnumerable<NServiceBus.Testing.PublishedMessage<object>> publishedMessages) { }
@@ -48,12 +36,6 @@ namespace NServiceBus.Testing
     {
         public RepliedMessage(TMessage message, NServiceBus.ReplyOptions options) { }
     }
-    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
-        " more details. Will be removed in version 9.0.0.", true)]
-    public class Saga<T>
-    {
-        public Saga() { }
-    }
     public class SentMessage<TMessage> : NServiceBus.Testing.OutgoingMessage<TMessage, NServiceBus.SendOptions>
     {
         public SentMessage(TMessage message, NServiceBus.SendOptions options) { }
@@ -62,24 +44,15 @@ namespace NServiceBus.Testing
     {
         public Subscription(System.Type message, NServiceBus.SubscribeOptions options) { }
     }
-    [System.Obsolete("Use the arrange act assert (AAA) syntax instead. Please see the upgrade guide for" +
-        " more details. Will be removed in version 9.0.0.", true)]
-    public class Test
-    {
-        public Test() { }
-    }
     public class TestableAuditContext : NServiceBus.Testing.TestableBehaviorContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.Pipeline.IAuditActionContext, NServiceBus.Pipeline.IAuditContext, NServiceBus.Pipeline.IBehaviorContext
     {
         public TestableAuditContext() { }
-        [System.Obsolete("Use `AuditMetadata` instead. Will be removed in version 9.0.0.", true)]
-        public System.Collections.Generic.Dictionary<string, string> AddedAuditData { get; }
         public NServiceBus.Audit.AuditAction AuditAction { get; set; }
         public string AuditAddress { get; set; }
         public System.Collections.Generic.Dictionary<string, string> AuditMetadata { get; set; }
         public bool IsLocked { get; }
         public NServiceBus.Transport.OutgoingMessage Message { get; set; }
         public System.TimeSpan? TimeToBeReceived { get; }
-        [System.Obsolete("Use `AuditMetadata` instead. Will be removed in version 9.0.0.", true)]
         public void AddAuditData(string key, string value) { }
         public NServiceBus.Pipeline.IAuditActionContext PreventChanges() { }
     }
@@ -106,12 +79,6 @@ namespace NServiceBus.Testing
         public TestableEndpointInstance() { }
         public bool EndpointStopped { get; }
         public virtual System.Threading.Tasks.Task Stop(System.Threading.CancellationToken cancellationToken = default) { }
-    }
-    [System.Obsolete("Forwarding functionality has been removed from NServiceBus. Will be removed in ve" +
-        "rsion 9.0.0.", true)]
-    public class TestableForwardingContext
-    {
-        public TestableForwardingContext() { }
     }
     public abstract class TestableIncomingContext : NServiceBus.Testing.TestableMessageProcessingContext, NServiceBus.Extensibility.IExtendable, NServiceBus.ICancellableContext, NServiceBus.IMessageProcessingContext, NServiceBus.IPipelineContext, NServiceBus.Pipeline.IBehaviorContext, NServiceBus.Pipeline.IIncomingContext
     {
@@ -165,9 +132,6 @@ namespace NServiceBus.Testing
     {
         protected NServiceBus.IMessageCreator messageCreator;
         public TestableMessageSession(NServiceBus.IMessageCreator messageCreator = null) { }
-        [System.Obsolete("The member currently throws a NotImplementedException. Will be removed in version" +
-            " 9.0.0.", true)]
-        public NServiceBus.Extensibility.ContextBag Extensions { get; set; }
         public virtual NServiceBus.Testing.PublishedMessage<object>[] PublishedMessages { get; }
         public virtual NServiceBus.Testing.SentMessage<object>[] SentMessages { get; }
         public virtual NServiceBus.Testing.Subscription[] Subscriptions { get; }

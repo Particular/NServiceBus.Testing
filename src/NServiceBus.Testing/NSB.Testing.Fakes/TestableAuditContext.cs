@@ -32,6 +32,11 @@
         public Dictionary<string, string> AuditMetadata { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
+        /// This method is being removed from IAuditContext, so this stub method remains until the removal is done in v10.
+        /// </summary>
+        public void AddAuditData(string key, string value) => throw new NotImplementedException();
+
+        /// <summary>
         /// Gets the messages, if any, this audit operation should result in.
         /// </summary>
         public AuditAction AuditAction { get; set; }
