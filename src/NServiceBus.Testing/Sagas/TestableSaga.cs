@@ -47,7 +47,7 @@
             queue = new Queue<QueuedSagaMessage>();
             persister = new NonDurableSagaPersister();
             storedTimeouts = new List<(DateTime, OutgoingMessage<object, SendOptions>)>();
-            replySimulators = new Dictionary<Type, List<(Type, Func<object, object>)>>();
+            replySimulators = [];
 
             sagaMapper = SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory);
         }
@@ -198,7 +198,7 @@
             if (!replySimulators.TryGetValue(
                     typeof(TSagaMessage), out List<(Type ReplyMessageType, Func<object, object> SimulateReply)> simulators))
             {
-                simulators = new List<(Type ReplyMessageType, Func<object, object> SimulateReply)>();
+                simulators = [];
                 replySimulators.Add(typeof(TSagaMessage), simulators);
             }
 
