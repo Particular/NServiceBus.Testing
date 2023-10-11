@@ -25,7 +25,7 @@
         /// <summary>
         /// The headers of the outgoing message.
         /// </summary>
-        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Headers { get; set; } = [];
 
         /// <summary>
         /// Selects the builder returned by <see cref="IBehaviorContext.Builder" />. Override this method to provide your custom <see cref="IServiceProvider" /> implementation.
