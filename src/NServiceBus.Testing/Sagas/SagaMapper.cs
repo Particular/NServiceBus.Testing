@@ -93,7 +93,7 @@
 
         class MappingReader : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders
         {
-            readonly Dictionary<Type, Func<QueuedSagaMessage, object>> mappings = new Dictionary<Type, Func<QueuedSagaMessage, object>>();
+            readonly Dictionary<Type, Func<QueuedSagaMessage, object>> mappings = [];
 
             void IConfigureHowToFindSagaWithMessage.ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, Expression<Func<TMessage, object>> messageProperty)
             {

@@ -34,7 +34,7 @@
 
             if (autoCorrelatedSagaId.HasValue)
             {
-                var editable = headers as Dictionary<string, string> ?? headers?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) ?? new Dictionary<string, string>();
+                var editable = headers as Dictionary<string, string> ?? headers?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) ?? [];
                 editable[NServiceBus.Headers.SagaId] = autoCorrelatedSagaId.Value.ToString();
                 Headers = editable;
             }

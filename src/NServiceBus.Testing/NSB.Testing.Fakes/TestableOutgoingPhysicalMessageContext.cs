@@ -24,11 +24,11 @@
         /// <summary>
         /// A <see cref="T:System.Byte" /> array containing the serialized contents of the outgoing message.
         /// </summary>
-        public ReadOnlyMemory<byte> Body { get; set; } = new byte[0];
+        public ReadOnlyMemory<byte> Body { get; set; } = Array.Empty<byte>();
 
         /// <summary>
         /// The routing strategies for this message.
         /// </summary>
-        public IReadOnlyCollection<RoutingStrategy> RoutingStrategies { get; set; } = new RoutingStrategy[0];
+        public IReadOnlyCollection<RoutingStrategy> RoutingStrategies { get; set; } = Array.Empty<RoutingStrategy>();
     }
 }

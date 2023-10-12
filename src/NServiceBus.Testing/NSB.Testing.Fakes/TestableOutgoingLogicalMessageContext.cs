@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Testing
 {
+    using System;
     using System.Collections.Generic;
     using Pipeline;
     using Routing;
@@ -25,6 +26,6 @@
         /// <summary>
         /// The routing strategies for this message.
         /// </summary>
-        public IReadOnlyCollection<RoutingStrategy> RoutingStrategies { get; set; } = new RoutingStrategy[0];
+        public IReadOnlyCollection<RoutingStrategy> RoutingStrategies { get; set; } = Array.Empty<RoutingStrategy>();
     }
 }

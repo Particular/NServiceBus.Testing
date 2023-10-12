@@ -24,12 +24,12 @@
         /// <summary>
         /// The message to be audited.
         /// </summary>
-        public OutgoingMessage Message { get; set; } = new OutgoingMessage(Guid.NewGuid().ToString(), new Dictionary<string, string>(), new byte[0]);
+        public OutgoingMessage Message { get; set; } = new OutgoingMessage(Guid.NewGuid().ToString(), [], Array.Empty<byte>());
 
         /// <summary>
         /// Metadata of the audited message.
         /// </summary>
-        public Dictionary<string, string> AuditMetadata { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> AuditMetadata { get; set; } = [];
 
         /// <summary>
         /// This method is being removed from IAuditContext, so this stub method remains until the removal is done in v10.
