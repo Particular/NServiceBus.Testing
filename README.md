@@ -4,10 +4,6 @@ NServiceBus.Testing is a testing framework for NServiceBus. It contains a set of
 
 It is part of the [Particular Service Platform](https://particular.net/service-platform), which includes [NServiceBus](https://particular.net/nservicebus) and tools to build, monitor, and debug distributed systems.
 
-## Official documentation
+## Documentation
 
 See the [Testing NServiceBus documentation](https://docs.particular.net/nservicebus/testing/) for more details on how to use it.
-
-## Contributing
-
-If you are interested in contributing, please follow the instructions on [How to contribute](https://docs.particular.net/platform/contributing).
