@@ -1,13 +1,7 @@
-## A testing framework for NServiceBus
+## NServiceBus.Testing
 
-This library contains a set of testable implementations (test-doubles) for various NServiceBus components, making testing things like handlers, sagas and behaviors easy.
+NServiceBus.Testing is a testing framework for NServiceBus. It contains a set of testable implementations (test-doubles) for various NServiceBus components, making testing things like handlers, sagas, and behaviors easy.
 
-### Getting started
+It is part of the [Particular Service Platform](https://particular.net/service-platform), which includes [NServiceBus](https://particular.net/nservicebus) and tools to build, monitor, and debug distributed systems.
 
-To get started, install the package via NuGet:
-
-```
-Install-Package NServiceBus.Testing
-``` 
-
-For usage examples and more information, please consult the [documentation](http://docs.particular.net/nservicebus/testing/).
+See the [Testing NServiceBus documentation](https://docs.particular.net/nservicebus/testing/) for more details on how to use it.
