@@ -22,7 +22,7 @@
             Assert.That(result.SagaDataSnapshot.HeaderMessageReceived, Is.True);
         }
 
-        public class HeaderSaga : NServiceBus.Saga<HeaderSagaData>,
+        public class HeaderSaga : Saga<HeaderSagaData>,
             IAmStartedByMessages<HeaderMessage>
         {
             protected override void ConfigureHowToFindSaga(SagaPropertyMapper<HeaderSagaData> mapper)

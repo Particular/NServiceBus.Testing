@@ -20,7 +20,7 @@
         }
 
         /// <summary>
-        /// Controls the <see cref="Logging.LogLevel" /> for all default logging.
+        /// Controls the <see cref="LogLevel" /> for all default logging.
         /// </summary>
         /// <param name="level">The log level to be used.</param>
         public void Level(LogLevel level)

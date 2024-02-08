@@ -17,7 +17,7 @@
     /// <typeparam name="TSagaData">The type of data stored by the saga.</typeparam>
     [DebuggerDisplay("TestableSaga for {typeof(TSaga).FullName}")]
     public class TestableSaga<TSaga, TSagaData>
-        where TSaga : NServiceBus.Saga<TSagaData>
+        where TSaga : Saga<TSagaData>
         where TSagaData : class, IContainSagaData, new()
     {
         readonly Func<TSaga> sagaFactory;
@@ -80,7 +80,7 @@
 
         /// <summary>
         /// Handle a message in the saga.
-        /// This uses <see cref="NServiceBus.Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/>
+        /// This uses <see cref="Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/>
         /// to find the correct saga data based on correlation ID values from the message,
         /// and invokes the correct handler method based on the message type.
         /// </summary>
@@ -92,7 +92,7 @@
         /// </param>
         /// <param name="messageHeaders">
         /// Optional message headers to include with the message. Usually not needed unless
-        /// <see cref="NServiceBus.Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/>
+        /// <see cref="Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/>
         /// uses header mappings.
         /// </param>
         /// <returns>
@@ -125,7 +125,7 @@
         /// </param>
         /// <param name="messageHeaders">
         /// Optional message headers to include with the message. Usually not needed unless the
-        /// <see cref="NServiceBus.Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/> method uses header mappings.
+        /// <see cref="Saga{TSagaData}.ConfigureHowToFindSaga(SagaPropertyMapper{TSagaData})"/> method uses header mappings.
         /// </param>
         /// <returns>
         /// Returns a <see cref="HandleResult"/> containing a snapshot of the saga data after the message is handled
@@ -438,7 +438,7 @@
         [DebuggerDisplay("HandleResult: {HandledMessage.Message}")]
         public class HandleResult
         {
-            internal HandleResult(NServiceBus.Saga<TSagaData> saga, QueuedSagaMessage handledMessage, TestableMessageHandlerContext context)
+            internal HandleResult(Saga<TSagaData> saga, QueuedSagaMessage handledMessage, TestableMessageHandlerContext context)
             {
                 SagaId = saga.Data.Id;
                 Completed = saga.Completed;

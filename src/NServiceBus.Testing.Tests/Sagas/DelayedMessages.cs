@@ -40,7 +40,7 @@
             Assert.That(delayedCmdResult.SagaDataSnapshot.DelayedCommandReceived, Is.True);
         }
 
-        public class DelaySaga : NServiceBus.Saga<Data>,
+        public class DelaySaga : Saga<Data>,
             IAmStartedByMessages<Start>,
             IHandleMessages<DelayedCmd>,
             IHandleTimeouts<RegularTimeout>

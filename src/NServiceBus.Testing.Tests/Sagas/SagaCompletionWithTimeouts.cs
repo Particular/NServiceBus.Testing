@@ -21,7 +21,7 @@
             Assert.That(result[0].Completed, Is.True);
         }
 
-        public class MyCustomSaga : NServiceBus.Saga<MyCustomSagaData>,
+        public class MyCustomSaga : Saga<MyCustomSagaData>,
             IAmStartedByMessages<MsgHappensTwice>,
             IHandleTimeouts<TimeoutHappensTwice>
         {

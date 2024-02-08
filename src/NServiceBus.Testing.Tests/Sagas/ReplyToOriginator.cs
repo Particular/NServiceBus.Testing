@@ -44,7 +44,7 @@
             Assert.AreEqual(replyAddress, reply.Message<ReplyMessage>().OriginatorAddress);
         }
 
-        class ReplyingSaga : NServiceBus.Saga<ReplyingSagaData>, IAmStartedByMessages<StartSagaMessage>, IHandleMessages<SendReplyMessage>
+        class ReplyingSaga : Saga<ReplyingSagaData>, IAmStartedByMessages<StartSagaMessage>, IHandleMessages<SendReplyMessage>
         {
             protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ReplyingSagaData> mapper) => mapper
                 .ConfigureMapping<StartSagaMessage>(m => m.CorrelationProperty)

@@ -24,7 +24,7 @@
             Assert.That(doneEvt.CorrId, Is.EqualTo("abc"));
         }
 
-        public class MySaga : NServiceBus.Saga<MyData>,
+        public class MySaga : Saga<MyData>,
             IAmStartedByMessages<StartMsg>,
             IHandleMessages<SendToSelfCmd>
         {

@@ -25,7 +25,7 @@
             Assert.That(endResult.SagaDataSnapshot.ReplyReceived, Is.True);
         }
 
-        public class MySaga : NServiceBus.Saga<MyData>,
+        public class MySaga : Saga<MyData>,
             IAmStartedByMessages<StartMsg>,
             IHandleMessages<Step1Reply>
         {
