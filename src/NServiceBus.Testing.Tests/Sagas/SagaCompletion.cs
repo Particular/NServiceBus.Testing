@@ -17,7 +17,7 @@
             Assert.IsTrue(result.Completed);
         }
 
-        class TestSaga : NServiceBus.Saga<TestSagaData>, IAmStartedByMessages<StartSagaMessage>
+        class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<StartSagaMessage>
         {
             protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper) => mapper
                 .MapSaga(d => d.CorrelationId)

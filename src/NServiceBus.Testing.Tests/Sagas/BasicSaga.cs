@@ -35,7 +35,7 @@
             Assert.That(shipped.OrderId == "abc");
         }
 
-        public class ShippingPolicy : NServiceBus.Saga<ShippingPolicyData>,
+        public class ShippingPolicy : Saga<ShippingPolicyData>,
             IAmStartedByMessages<OrderPlaced>,
             IAmStartedByMessages<OrderBilled>,
             IHandleTimeouts<ShippingDelay>

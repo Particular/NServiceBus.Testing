@@ -16,9 +16,7 @@
         /// <summary>
         /// Stops the endpoint.
         /// </summary>
-#pragma warning disable PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         public virtual Task Stop(CancellationToken cancellationToken = default)
-#pragma warning restore PS0002 // Instance methods on types implementing ICancellableContext should not have a CancellationToken parameter
         {
             EndpointStopped = true;
             return Task.CompletedTask;
