@@ -46,7 +46,7 @@
 
             queue = new Queue<QueuedSagaMessage>();
             persister = new NonDurableSagaPersister();
-            storedTimeouts = new List<(DateTime, OutgoingMessage<object, SendOptions>)>();
+            storedTimeouts = [];
             replySimulators = [];
 
             sagaMapper = SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory);
