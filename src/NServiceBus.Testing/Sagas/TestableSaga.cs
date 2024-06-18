@@ -102,10 +102,7 @@
         /// </returns>
         public Task<HandleResult> Handle<TMessage>(TMessage message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
         {
-            if (context == null)
-            {
-                context = new TestableMessageHandlerContext();
-            }
+            context ??= new TestableMessageHandlerContext();
             var queueMessage = new QueuedSagaMessage(typeof(TMessage), message, messageHeaders);
             return InnerHandle(queueMessage, "Handle", context);
         }
@@ -169,10 +166,7 @@
                 throw new Exception("There are no queued messages.");
             }
 
-            if (context == null)
-            {
-                context = new TestableMessageHandlerContext();
-            }
+            context ??= new TestableMessageHandlerContext();
 
             var queuedMessage = queue.Dequeue();
             return InnerHandle(queuedMessage, "Handle", context);

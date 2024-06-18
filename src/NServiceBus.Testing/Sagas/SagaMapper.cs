@@ -38,11 +38,8 @@
                 throw new Exception($"Could not test saga {sagaType.Name} because a property on {sagaType.Name} matching the correlation property '{correlationProperty.Name}' could not be located.");
             }
 
-            var configureHowToFindMethod = sagaType.GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(IConfigureHowToFindSagaWithMessage) }, null);
-            if (configureHowToFindMethod == null)
-            {
-                throw new Exception($"Could not test saga {sagaType.Name} because the ConfigureHowToFindSaga method could not be located.");
-            }
+            var configureHowToFindMethod = sagaType.GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(IConfigureHowToFindSagaWithMessage) }, null)
+                                           ?? throw new Exception($"Could not test saga {sagaType.Name} because the ConfigureHowToFindSaga method could not be located.");
 
             var mappingReader = new MappingReader();
             configureHowToFindMethod.Invoke(dummySagaForReflection, new object[] { mappingReader });
