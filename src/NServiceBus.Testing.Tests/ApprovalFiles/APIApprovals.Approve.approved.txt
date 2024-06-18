@@ -220,7 +220,7 @@ namespace NServiceBus.Testing
         where TSaga : NServiceBus.Saga<TSagaData>
         where TSagaData :  class, NServiceBus.IContainSagaData, new ()
     {
-        public TestableSaga(System.Func<TSaga> sagaFactory = null, System.DateTime? initialCurrentTime = default) { }
+        public TestableSaga(System.Func<TSaga> sagaFactory = null, System.DateTime? initialCurrentTime = default, System.Collections.Generic.List<System.Type> sagaFinders = null) { }
         public System.DateTime CurrentTime { get; }
         public bool HasQueuedMessages { get; }
         public int QueueLength { get; }
