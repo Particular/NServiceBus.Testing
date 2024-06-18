@@ -15,7 +15,7 @@
         [Test]
         public async Task TestSagaWithSagaFinder()
         {
-            var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>(sagaFinders: [typeof(SagaFinder)]);
+            var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>(sagaFinders: [typeof(FakeSagaFinder)]);
 
             var placeResult = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
             var billResult = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });

@@ -14,6 +14,7 @@
     {
         static readonly ConcurrentDictionary<Type, SagaMapper> sagaMappers = new ConcurrentDictionary<Type, SagaMapper>();
 
+        readonly List<Type> sagaFinders;
         readonly SagaMetadata metadata;
         readonly IReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>> mappings;
         readonly SagaMetadata.CorrelationPropertyMetadata correlationProperty;
@@ -22,9 +23,10 @@
 
         public string CorrelationPropertyName => correlationProperty.Name;
 
-        SagaMapper(Type sagaType, Type sagaDataType, object dummySagaForReflection)
+        SagaMapper(Type sagaType, Type sagaDataType, object dummySagaForReflection, List<Type> sagaFinders)
         {
-            metadata = SagaMetadata.Create(sagaType);
+            this.sagaFinders = sagaFinders;
+            metadata = SagaMetadata.Create(sagaType, this.sagaFinders, new Conventions());
             handlerMethods = new ConcurrentDictionary<(Type messageType, string methodName), MethodInfo>();
 
             if (!metadata.TryGetCorrelationProperty(out correlationProperty))
@@ -47,12 +49,12 @@
             mappings = mappingReader.GetMappings();
         }
 
-        public static SagaMapper Get<TSaga, TSagaEntity>(Func<TSaga> sagaFactory)
+        public static SagaMapper Get<TSaga, TSagaEntity>(Func<TSaga> sagaFactory, List<Type> sagaFinders)
         {
             return sagaMappers.GetOrAdd(typeof(TSaga), (sagaType, factory) =>
             {
                 var dummySagaForReflection = factory();
-                return new SagaMapper(typeof(TSaga), typeof(TSagaEntity), dummySagaForReflection);
+                return new SagaMapper(typeof(TSaga), typeof(TSagaEntity), dummySagaForReflection, sagaFinders);
             }, sagaFactory);
         }
 

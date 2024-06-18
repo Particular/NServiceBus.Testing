@@ -20,6 +20,7 @@
         where TSaga : Saga<TSagaData>
         where TSagaData : class, IContainSagaData, new()
     {
+        readonly List<Type> sagaFinders;
         readonly Func<TSaga> sagaFactory;
         readonly Queue<QueuedSagaMessage> queue;
         readonly ISagaPersister persister;
@@ -39,8 +40,16 @@
         /// Sets the initial value of <see cref="CurrentTime"/>.
         /// If not supplied, the default is <see cref="DateTime.UtcNow"/>.
         /// </param>
-        public TestableSaga(Func<TSaga> sagaFactory = null, DateTime? initialCurrentTime = null)
+        /// <param name="sagaFinders">The list of saga finders that can find the tested saga.</param>
+        public TestableSaga(Func<TSaga> sagaFactory = null, DateTime? initialCurrentTime = null,
+            List<Type> sagaFinders = null)
         {
+            this.sagaFinders = sagaFinders ?? [];
+            if (!this.sagaFinders.All(finderType => typeof(IFinder).IsAssignableFrom(finderType)))
+            {
+                throw new ArgumentException("All saga finder types must implement IFinder");
+            }
+
             this.sagaFactory = sagaFactory ?? Activator.CreateInstance<TSaga>;
             CurrentTime = initialCurrentTime ?? DateTime.UtcNow;
 
@@ -49,7 +58,7 @@
             storedTimeouts = [];
             replySimulators = [];
 
-            sagaMapper = SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory);
+            sagaMapper = SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory, this.sagaFinders);
         }
 
         /// <summary>
