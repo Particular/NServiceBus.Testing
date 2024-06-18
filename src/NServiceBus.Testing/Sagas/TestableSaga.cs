@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
@@ -296,6 +297,7 @@
         {
             var messageMetadata = sagaMapper.GetMessageMetadata(message.Type);
             TSagaData sagaData;
+            object messageMappedValue;
 
             if (message.Headers.TryGetValue(Headers.SagaId, out var sagaIdString) && Guid.TryParse(sagaIdString, out Guid sagaId))
             {
@@ -309,9 +311,23 @@
                 return new SagaLoadResult { DiscardMessage = true };
             }
 
-            var messageMappedValue = sagaMapper.GetMessageMappedValue(message);
-
-            sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+            var finder = FindSagaFinder(message.Type);
+            if (finder != null)
+            {
+                var findByMethod = finder.GetType().GetMethod("FindBy",
+                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                    null,
+                    [message.Type, typeof(ISynchronizedStorageSession), typeof(IReadOnlyContextBag), typeof(CancellationToken)],
+                    null);
+                var result = (Task<TSagaData>)findByMethod!.Invoke(finder, [message.Message, session, context.Extensions, context.CancellationToken]);
+                sagaData = await result!.ConfigureAwait(false);
+                messageMappedValue = null;
+            }
+            else
+            {
+                messageMappedValue = sagaMapper.GetMessageMappedValue(message);
+                sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+            }
 
             if (sagaData != null)
             {
@@ -329,6 +345,42 @@
             }
 
             throw new Exception($"Saga not found and message type {message.Type.FullName} is not allowed to start the saga.");
+        }
+
+        IFinder FindSagaFinder(Type messageType)
+        {
+            foreach (var finderType in sagaFinders)
+            {
+                foreach (var interfaceType in finderType.GetInterfaces())
+                {
+                    var args = interfaceType.GetGenericArguments();
+                    //since we don't want to process the IFinder type
+                    if (args.Length != 2)
+                    {
+                        continue;
+                    }
+
+                    var entityTypeArg = args[0];
+                    if (entityTypeArg != typeof(TSagaData))
+                    {
+                        continue;
+                    }
+
+                    var messageTypeArg = args[1];
+                    if (messageTypeArg != messageType)
+                    {
+                        continue;
+                    }
+
+                    var ctor = finderType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, [typeof(ISagaPersister)])
+                        ?? throw new ArgumentException("When using saga finders, the test finder must have a public constructor that accept an ISagaPersister instance.");
+
+                    var finder = (IFinder)ctor.Invoke([persister]);
+                    return finder;
+                }
+            }
+
+            return null;
         }
 
         async Task SaveSagaData(
