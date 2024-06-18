@@ -102,13 +102,12 @@
 
         public class ShippingDelay { }
 
-        public class SagaFinder : ISagaFinder<ShippingPolicyData, OrderBilled>
+        public class FakeSagaFinder(ISagaPersister sagaPersister) : ISagaFinder<ShippingPolicyData, OrderBilled>
         {
             public Task<ShippingPolicyData> FindBy(OrderBilled message, ISynchronizedStorageSession storageSession,
-                IReadOnlyContextBag context, CancellationToken cancellationToken = default)
-            {
-                return Task.FromResult(new ShippingPolicyData());
-            }
+                IReadOnlyContextBag context, CancellationToken cancellationToken = default) =>
+                sagaPersister.Get<ShippingPolicyData>("OrderId", message.OrderId, storageSession, (ContextBag)context,
+                    cancellationToken);
         }
     }
 }
