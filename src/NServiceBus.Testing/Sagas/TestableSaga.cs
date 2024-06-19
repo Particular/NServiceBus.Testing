@@ -21,7 +21,7 @@
         where TSaga : Saga<TSagaData>
         where TSagaData : class, IContainSagaData, new()
     {
-        Dictionary<Type, IFinder> mockSagaFinders = [];
+        readonly Dictionary<Type, IFinder> mockSagaFinders = [];
         readonly Func<TSaga> sagaFactory;
         readonly Queue<QueuedSagaMessage> queue;
         readonly ISagaPersister persister;
@@ -41,7 +41,6 @@
         /// Sets the initial value of <see cref="CurrentTime"/>.
         /// If not supplied, the default is <see cref="DateTime.UtcNow"/>.
         /// </param>
-        /// <param name="sagaFinders">The list of saga finders that can find the tested saga.</param>
         public TestableSaga(Func<TSaga> sagaFactory = null, DateTime? initialCurrentTime = null)
         {
             this.sagaFactory = sagaFactory ?? Activator.CreateInstance<TSaga>;
