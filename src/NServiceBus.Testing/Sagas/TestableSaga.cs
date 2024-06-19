@@ -21,7 +21,7 @@
         where TSaga : Saga<TSagaData>
         where TSagaData : class, IContainSagaData, new()
     {
-        readonly List<Type> sagaFinders;
+        Dictionary<Type, IFinder> mockSagaFinders = [];
         readonly Func<TSaga> sagaFactory;
         readonly Queue<QueuedSagaMessage> queue;
         readonly ISagaPersister persister;
@@ -42,15 +42,8 @@
         /// If not supplied, the default is <see cref="DateTime.UtcNow"/>.
         /// </param>
         /// <param name="sagaFinders">The list of saga finders that can find the tested saga.</param>
-        public TestableSaga(Func<TSaga> sagaFactory = null, DateTime? initialCurrentTime = null,
-            List<Type> sagaFinders = null)
+        public TestableSaga(Func<TSaga> sagaFactory = null, DateTime? initialCurrentTime = null)
         {
-            this.sagaFinders = sagaFinders ?? [];
-            if (!this.sagaFinders.All(finderType => typeof(IFinder).IsAssignableFrom(finderType)))
-            {
-                throw new ArgumentException("All saga finder types must implement IFinder");
-            }
-
             this.sagaFactory = sagaFactory ?? Activator.CreateInstance<TSaga>;
             CurrentTime = initialCurrentTime ?? DateTime.UtcNow;
 
@@ -325,8 +318,6 @@
             }
             else
             {
-                messageMappedValue = sagaMapper.GetMessageMappedValue(message);
-                sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
                 messageMappedValue = lazySagaMapper.Value.GetMessageMappedValue(message);
                 sagaData = await persister.Get<TSagaData>(lazySagaMapper.Value.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
             }
@@ -351,7 +342,8 @@
 
         IFinder FindSagaFinder(Type messageType)
         {
-            foreach (var finderType in sagaFinders)
+            var sagaFinderTypes = mockSagaFinders.Keys.ToList();
+            foreach (var finderType in sagaFinderTypes)
             {
                 foreach (var interfaceType in finderType.GetInterfaces())
                 {
@@ -374,10 +366,7 @@
                         continue;
                     }
 
-                    var ctor = finderType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, [typeof(ISagaPersister)])
-                        ?? throw new ArgumentException("When using saga finders, the test finder must have a public constructor that accept an ISagaPersister instance.");
-
-                    var finder = (IFinder)ctor.Invoke([persister]);
+                    var finder = mockSagaFinders[finderType];
                     return finder;
                 }
             }
@@ -554,6 +543,17 @@
             /// or a default value if there is no replied message of the given type.
             /// </summary>
             public TMessage FindReplyMessage<TMessage>() => Context.FindReplyMessage<TMessage>();
+        }
+
+        /// <summary>
+        /// Add a mock saga finder for the given message type.
+        /// </summary>
+        /// <param name="mockFinder">A delegate that returns the saga property name and value to match</param>
+        /// <typeparam name="TMessage">The message type to use with the saga finder</typeparam>
+        public void MockSagaFinder<TMessage>(Func<TMessage, (string propertyName, object propertyValue)> mockFinder)
+        {
+            var finder = new PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(persister, mockFinder);
+            mockSagaFinders.Add(finder.GetType(), finder);
         }
     }
 }

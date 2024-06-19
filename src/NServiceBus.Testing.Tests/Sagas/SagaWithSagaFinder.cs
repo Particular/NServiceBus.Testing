@@ -2,12 +2,8 @@
 {
     using System;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
-    using Extensibility;
-    using NServiceBus.Sagas;
     using NUnit.Framework;
-    using Persistence;
 
     [TestFixture]
     public class SagaWithSagaFinder
@@ -15,7 +11,8 @@
         [Test]
         public async Task TestSagaWithSagaFinder()
         {
-            var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>(sagaFinders: [typeof(FakeSagaFinder)]);
+            var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>();
+            testableSaga.MockSagaFinder<OrderBilled>(message => ("OrderId", message.OrderId));
 
             var placeResult = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
             var billResult = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
@@ -101,13 +98,5 @@
         }
 
         public class ShippingDelay { }
-
-        public class FakeSagaFinder(ISagaPersister sagaPersister) : ISagaFinder<ShippingPolicyData, OrderBilled>
-        {
-            public Task<ShippingPolicyData> FindBy(OrderBilled message, ISynchronizedStorageSession storageSession,
-                IReadOnlyContextBag context, CancellationToken cancellationToken = default) =>
-                sagaPersister.Get<ShippingPolicyData>("OrderId", message.OrderId, storageSession, (ContextBag)context,
-                    cancellationToken);
-        }
     }
 }
