@@ -7,10 +7,12 @@ using Extensibility;
 using Persistence;
 using Sagas;
 
-class PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(ISagaPersister sagaPersister, Func<TMessage, (string propertyName, object propertyValue)> mockFinder)
-    : ISagaFinder<TSagaData, TMessage>
+class PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(ISagaPersister sagaPersister, Func<TMessage, object> correlationIdGetter, Func<TMessage, (string propertyName, object propertyValue)> mockFinder)
+    : ISagaFinder<TSagaData, TMessage>, IExposeCorrelationId<TMessage>
     where TSagaData : class, IContainSagaData
 {
+    public object GetCorrelationId(TMessage message) => correlationIdGetter(message);
+
     public Task<TSagaData> FindBy(TMessage message, ISynchronizedStorageSession storageSession,
         IReadOnlyContextBag context, CancellationToken cancellationToken = default)
     {

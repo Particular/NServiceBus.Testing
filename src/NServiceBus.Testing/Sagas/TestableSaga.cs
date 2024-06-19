@@ -311,9 +311,15 @@
                     null,
                     [message.Type, typeof(ISynchronizedStorageSession), typeof(IReadOnlyContextBag), typeof(CancellationToken)],
                     null);
+                var getCorrelationIdMethod = finder.GetType().GetMethod("GetCorrelationId",
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                    null,
+                    [message.Type],
+                    null);
+
                 var result = (Task<TSagaData>)findByMethod!.Invoke(finder, [message.Message, session, context.Extensions, context.CancellationToken]);
                 sagaData = await result!.ConfigureAwait(false);
-                messageMappedValue = null;
+                messageMappedValue = getCorrelationIdMethod!.Invoke(finder, [message.Message]);
             }
             else
             {
@@ -550,9 +556,9 @@
         /// <param name="mockFinder">A delegate that returns the saga property name and value to match</param>
         /// <typeparam name="TMessage">The message type to use with the saga finder</typeparam>
         /// <returns>The property name and value to use to find the saga instance</returns>
-        public void MockSagaFinder<TMessage>(Func<TMessage, (string propertyName, object propertyValue)> mockFinder)
+        public void MockSagaFinder<TMessage>(Func<TMessage, object> correlationIdGetter, Func<TMessage, (string propertyName, object propertyValue)> mockFinder)
         {
-            var finder = new PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(persister, mockFinder);
+            var finder = new PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(persister, correlationIdGetter, mockFinder);
             mockSagaFinders.Add(finder.GetType(), finder);
         }
 
@@ -562,9 +568,9 @@
         /// <param name="mockFinder">A delegate that returns the saga property name and value to match</param>
         /// <typeparam name="TMessage">The message type to use with the saga finder</typeparam>
         /// <returns>The saga identifier or null to signal that a new saga instance should be created</returns>
-        public void MockSagaFinder<TMessage>(Func<TMessage, Guid?> mockFinder)
+        public void MockSagaFinder<TMessage>(Func<TMessage, object> correlationIdGetter, Func<TMessage, Guid?> mockFinder)
         {
-            var finder = new SagaIdMockSagaFinder<TSagaData, TMessage>(persister, mockFinder);
+            var finder = new SagaIdMockSagaFinder<TSagaData, TMessage>(persister, correlationIdGetter, mockFinder);
             mockSagaFinders.Add(finder.GetType(), finder);
         }
     }
