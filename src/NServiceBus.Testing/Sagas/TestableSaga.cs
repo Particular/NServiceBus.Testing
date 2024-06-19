@@ -25,7 +25,7 @@
         readonly Func<TSaga> sagaFactory;
         readonly Queue<QueuedSagaMessage> queue;
         readonly ISagaPersister persister;
-        readonly SagaMapper sagaMapper;
+        readonly Lazy<SagaMapper> lazySagaMapper;
         readonly List<(DateTime At, OutgoingMessage<object, SendOptions> Timeout)> storedTimeouts;
         readonly Dictionary<Type, List<(Type, Func<object, object>)>> replySimulators;
 
@@ -59,7 +59,7 @@
             storedTimeouts = [];
             replySimulators = [];
 
-            sagaMapper = SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory, this.sagaFinders);
+            lazySagaMapper = new Lazy<SagaMapper>(() => SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory, [.. mockSagaFinders.Keys]));
         }
 
         /// <summary>
@@ -194,7 +194,7 @@
         /// </param>
         public void SimulateReply<TSagaMessage, TReplyMessage>(Func<TSagaMessage, TReplyMessage> simulateReply)
         {
-            if (!sagaMapper.HandlesMessageType(typeof(TReplyMessage)))
+            if (!lazySagaMapper.Value.HandlesMessageType(typeof(TReplyMessage)))
             {
                 throw new Exception($"Messages of type {typeof(TReplyMessage).FullName} are not handled by the saga.");
             }
@@ -225,7 +225,7 @@
 
                 saga.Entity = loadResult.Data;
 
-                await sagaMapper.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
+                await lazySagaMapper.Value.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
                 await SaveSagaData(saga, loadResult.IsNew, loadResult.MappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
                 await session.CompleteAsync(context.CancellationToken).ConfigureAwait(false);
             }
@@ -295,7 +295,7 @@
         async Task<SagaLoadResult> LoadSagaData(
             QueuedSagaMessage message, ISynchronizedStorageSession session, TestableMessageHandlerContext context)
         {
-            var messageMetadata = sagaMapper.GetMessageMetadata(message.Type);
+            var messageMetadata = lazySagaMapper.Value.GetMessageMetadata(message.Type);
             TSagaData sagaData;
             object messageMappedValue;
 
@@ -327,6 +327,8 @@
             {
                 messageMappedValue = sagaMapper.GetMessageMappedValue(message);
                 sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+                messageMappedValue = lazySagaMapper.Value.GetMessageMappedValue(message);
+                sagaData = await persister.Get<TSagaData>(lazySagaMapper.Value.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
             }
 
             if (sagaData != null)
@@ -340,7 +342,7 @@
                     ? replyAddress
                     : context.ReplyToAddress; // This property has a default value set even when the header isn't set to require less setup for testing
                 sagaData = new TSagaData { Id = Guid.NewGuid(), Originator = originatorAddress };
-                sagaMapper.SetCorrelationPropertyValue(sagaData, messageMappedValue);
+                lazySagaMapper.Value.SetCorrelationPropertyValue(sagaData, messageMappedValue);
                 return new SagaLoadResult { Data = sagaData, IsNew = true, MappedValue = messageMappedValue };
             }
 
@@ -397,7 +399,7 @@
             }
             else if (isNew)
             {
-                var saveCorrelationProperty = new SagaCorrelationProperty(sagaMapper.CorrelationPropertyName, mappedValue);
+                var saveCorrelationProperty = new SagaCorrelationProperty(lazySagaMapper.Value.CorrelationPropertyName, mappedValue);
                 await persister.Save(saga.Entity, saveCorrelationProperty, session, contextBag, cancellationToken).ConfigureAwait(false);
             }
             else
@@ -435,7 +437,7 @@
                 }
 
                 var msgType = message.Message.GetType();
-                if (sagaMapper.HandlesMessageType(msgType))
+                if (lazySagaMapper.Value.HandlesMessageType(msgType))
                 {
                     var deliveryDelay = message.Options.GetDeliveryDelay();
                     var deliverAt = message.Options.GetDeliveryDate();
@@ -471,7 +473,7 @@
             foreach (var message in context.PublishedMessages)
             {
                 var msgType = message.Message.GetType();
-                if (sagaMapper.HandlesMessageType(msgType))
+                if (lazySagaMapper.Value.HandlesMessageType(msgType))
                 {
                     var queuedMessage = new QueuedSagaMessage(msgType, message.Message, message.Options.GetHeaders(), sagaId);
                     queue.Enqueue(queuedMessage);
