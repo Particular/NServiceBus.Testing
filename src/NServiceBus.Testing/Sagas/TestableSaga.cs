@@ -553,6 +553,7 @@
         /// <summary>
         /// Add a mock saga finder for the given message type.
         /// </summary>
+        /// <param name="correlationIdGetter">A delegate that returns to saga correlation property value</param>
         /// <param name="mockFinder">A delegate that returns the saga property name and value to match</param>
         /// <typeparam name="TMessage">The message type to use with the saga finder</typeparam>
         /// <returns>The property name and value to use to find the saga instance</returns>
@@ -565,6 +566,7 @@
         /// <summary>
         /// Add a mock saga finder for the given message type.
         /// </summary>
+        /// <param name="correlationIdGetter">A delegate that returns to saga correlation property value</param>
         /// <param name="mockFinder">A delegate that returns the saga property name and value to match</param>
         /// <typeparam name="TMessage">The message type to use with the saga finder</typeparam>
         /// <returns>The saga identifier or null to signal that a new saga instance should be created</returns>
