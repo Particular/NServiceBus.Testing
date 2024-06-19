@@ -220,7 +220,7 @@ namespace NServiceBus.Testing
         where TSaga : NServiceBus.Saga<TSagaData>
         where TSagaData :  class, NServiceBus.IContainSagaData, new ()
     {
-        public TestableSaga(System.Func<TSaga> sagaFactory = null, System.DateTime? initialCurrentTime = default, System.Collections.Generic.List<System.Type> sagaFinders = null) { }
+        public TestableSaga(System.Func<TSaga> sagaFactory = null, System.DateTime? initialCurrentTime = default) { }
         public System.DateTime CurrentTime { get; }
         public bool HasQueuedMessages { get; }
         public int QueueLength { get; }
@@ -228,6 +228,9 @@ namespace NServiceBus.Testing
         public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> Handle<TMessage>(TMessage message, NServiceBus.Testing.TestableMessageHandlerContext context = null, System.Collections.Generic.IReadOnlyDictionary<string, string> messageHeaders = null) { }
         public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> HandleQueuedMessage(NServiceBus.Testing.TestableMessageHandlerContext context = null) { }
         public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> HandleReply<TMessage>(System.Guid sagaId, TMessage message, NServiceBus.Testing.TestableMessageHandlerContext context = null, System.Collections.Generic.IReadOnlyDictionary<string, string> messageHeaders = null) { }
+        public void MockSagaFinder<TMessage>([System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "propertyName",
+                "propertyValue"})] System.Func<TMessage, System.ValueTuple<string, object>> mockFinder) { }
         public NServiceBus.Testing.QueuedSagaMessage QueuePeek() { }
         public void SimulateReply<TSagaMessage, TReplyMessage>(System.Func<TSagaMessage, TReplyMessage> simulateReply) { }
         [System.Diagnostics.DebuggerDisplay("HandleResult: {HandledMessage.Message}")]
