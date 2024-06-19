@@ -228,7 +228,7 @@ namespace NServiceBus.Testing
         public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> Handle<TMessage>(TMessage message, NServiceBus.Testing.TestableMessageHandlerContext context = null, System.Collections.Generic.IReadOnlyDictionary<string, string> messageHeaders = null) { }
         public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> HandleQueuedMessage(NServiceBus.Testing.TestableMessageHandlerContext context = null) { }
         public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> HandleReply<TMessage>(System.Guid sagaId, TMessage message, NServiceBus.Testing.TestableMessageHandlerContext context = null, System.Collections.Generic.IReadOnlyDictionary<string, string> messageHeaders = null) { }
-        public void MockSagaFinder<TMessage>(System.Func<TMessage, System.Guid> mockFinder) { }
+        public void MockSagaFinder<TMessage>(System.Func<TMessage, System.Guid?> mockFinder) { }
         public void MockSagaFinder<TMessage>([System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "propertyName",
                 "propertyValue"})] System.Func<TMessage, System.ValueTuple<string, object>> mockFinder) { }

@@ -549,13 +549,20 @@
         /// </summary>
         /// <param name="mockFinder">A delegate that returns the saga property name and value to match</param>
         /// <typeparam name="TMessage">The message type to use with the saga finder</typeparam>
+        /// <returns>The property name and value to use to find the saga instance</returns>
         public void MockSagaFinder<TMessage>(Func<TMessage, (string propertyName, object propertyValue)> mockFinder)
         {
             var finder = new PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(persister, mockFinder);
             mockSagaFinders.Add(finder.GetType(), finder);
         }
 
-        public void MockSagaFinder<TMessage>(Func<TMessage, Guid> mockFinder)
+        /// <summary>
+        /// Add a mock saga finder for the given message type.
+        /// </summary>
+        /// <param name="mockFinder">A delegate that returns the saga property name and value to match</param>
+        /// <typeparam name="TMessage">The message type to use with the saga finder</typeparam>
+        /// <returns>The saga identifier or null to signal that a new saga instance should be created</returns>
+        public void MockSagaFinder<TMessage>(Func<TMessage, Guid?> mockFinder)
         {
             var finder = new SagaIdMockSagaFinder<TSagaData, TMessage>(persister, mockFinder);
             mockSagaFinders.Add(finder.GetType(), finder);

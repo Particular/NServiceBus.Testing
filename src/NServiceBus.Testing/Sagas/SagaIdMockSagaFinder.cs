@@ -7,15 +7,19 @@ using Extensibility;
 using Persistence;
 using Sagas;
 
-class PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(ISagaPersister sagaPersister, Func<TMessage, (string propertyName, object propertyValue)> mockFinder)
+class SagaIdMockSagaFinder<TSagaData, TMessage>(ISagaPersister sagaPersister, Func<TMessage, Guid?> mockFinder)
     : ISagaFinder<TSagaData, TMessage>
     where TSagaData : class, IContainSagaData
 {
     public Task<TSagaData> FindBy(TMessage message, ISynchronizedStorageSession storageSession,
         IReadOnlyContextBag context, CancellationToken cancellationToken = default)
     {
-        var (propertyName, propertyValue) = mockFinder(message);
-        return sagaPersister.Get<TSagaData>(propertyName, propertyValue, storageSession, (ContextBag)context,
-            cancellationToken);
+        var sagaId = mockFinder(message);
+        var sagaData = sagaId == null
+            ? Task.FromResult((TSagaData)null)
+            : sagaPersister.Get<TSagaData>(sagaId.Value, storageSession, (ContextBag)context,
+                cancellationToken);
+
+        return sagaData;
     }
 }
