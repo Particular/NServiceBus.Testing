@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
@@ -20,10 +21,11 @@
         where TSaga : Saga<TSagaData>
         where TSagaData : class, IContainSagaData, new()
     {
+        readonly Dictionary<Type, IFinder> mockSagaFinders = [];
         readonly Func<TSaga> sagaFactory;
         readonly Queue<QueuedSagaMessage> queue;
         readonly ISagaPersister persister;
-        readonly SagaMapper sagaMapper;
+        readonly Lazy<SagaMapper> lazySagaMapper;
         readonly List<(DateTime At, OutgoingMessage<object, SendOptions> Timeout)> storedTimeouts;
         readonly Dictionary<Type, List<(Type, Func<object, object>)>> replySimulators;
 
@@ -49,7 +51,7 @@
             storedTimeouts = [];
             replySimulators = [];
 
-            sagaMapper = SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory);
+            lazySagaMapper = new Lazy<SagaMapper>(() => SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory, [.. mockSagaFinders.Keys]));
         }
 
         /// <summary>
@@ -102,10 +104,7 @@
         /// </returns>
         public Task<HandleResult> Handle<TMessage>(TMessage message, TestableMessageHandlerContext context = null, IReadOnlyDictionary<string, string> messageHeaders = null)
         {
-            if (context == null)
-            {
-                context = new TestableMessageHandlerContext();
-            }
+            context ??= new TestableMessageHandlerContext();
             var queueMessage = new QueuedSagaMessage(typeof(TMessage), message, messageHeaders);
             return InnerHandle(queueMessage, "Handle", context);
         }
@@ -169,10 +168,7 @@
                 throw new Exception("There are no queued messages.");
             }
 
-            if (context == null)
-            {
-                context = new TestableMessageHandlerContext();
-            }
+            context ??= new TestableMessageHandlerContext();
 
             var queuedMessage = queue.Dequeue();
             return InnerHandle(queuedMessage, "Handle", context);
@@ -190,7 +186,7 @@
         /// </param>
         public void SimulateReply<TSagaMessage, TReplyMessage>(Func<TSagaMessage, TReplyMessage> simulateReply)
         {
-            if (!sagaMapper.HandlesMessageType(typeof(TReplyMessage)))
+            if (!lazySagaMapper.Value.HandlesMessageType(typeof(TReplyMessage)))
             {
                 throw new Exception($"Messages of type {typeof(TReplyMessage).FullName} are not handled by the saga.");
             }
@@ -221,7 +217,7 @@
 
                 saga.Entity = loadResult.Data;
 
-                await sagaMapper.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
+                await lazySagaMapper.Value.InvokeHandlerMethod(saga, handleMethodName, message, context).ConfigureAwait(false);
                 await SaveSagaData(saga, loadResult.IsNew, loadResult.MappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
                 await session.CompleteAsync(context.CancellationToken).ConfigureAwait(false);
             }
@@ -291,8 +287,9 @@
         async Task<SagaLoadResult> LoadSagaData(
             QueuedSagaMessage message, ISynchronizedStorageSession session, TestableMessageHandlerContext context)
         {
-            var messageMetadata = sagaMapper.GetMessageMetadata(message.Type);
+            var messageMetadata = lazySagaMapper.Value.GetMessageMetadata(message.Type);
             TSagaData sagaData;
+            object messageMappedValue;
 
             if (message.Headers.TryGetValue(Headers.SagaId, out var sagaIdString) && Guid.TryParse(sagaIdString, out Guid sagaId))
             {
@@ -306,9 +303,29 @@
                 return new SagaLoadResult { DiscardMessage = true };
             }
 
-            var messageMappedValue = sagaMapper.GetMessageMappedValue(message);
+            var finder = FindSagaFinder(message.Type);
+            if (finder != null)
+            {
+                var findByMethod = finder.GetType().GetMethod("FindBy",
+                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                    null,
+                    [message.Type, typeof(ISynchronizedStorageSession), typeof(IReadOnlyContextBag), typeof(CancellationToken)],
+                    null);
+                var getCorrelationIdMethod = finder.GetType().GetMethod("GetCorrelationId",
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                    null,
+                    [message.Type],
+                    null);
 
-            sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+                var result = (Task<TSagaData>)findByMethod!.Invoke(finder, [message.Message, session, context.Extensions, context.CancellationToken]);
+                sagaData = await result!.ConfigureAwait(false);
+                messageMappedValue = getCorrelationIdMethod!.Invoke(finder, [message.Message]);
+            }
+            else
+            {
+                messageMappedValue = lazySagaMapper.Value.GetMessageMappedValue(message);
+                sagaData = await persister.Get<TSagaData>(lazySagaMapper.Value.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+            }
 
             if (sagaData != null)
             {
@@ -321,11 +338,45 @@
                     ? replyAddress
                     : context.ReplyToAddress; // This property has a default value set even when the header isn't set to require less setup for testing
                 sagaData = new TSagaData { Id = Guid.NewGuid(), Originator = originatorAddress };
-                sagaMapper.SetCorrelationPropertyValue(sagaData, messageMappedValue);
+                lazySagaMapper.Value.SetCorrelationPropertyValue(sagaData, messageMappedValue);
                 return new SagaLoadResult { Data = sagaData, IsNew = true, MappedValue = messageMappedValue };
             }
 
             throw new Exception($"Saga not found and message type {message.Type.FullName} is not allowed to start the saga.");
+        }
+
+        IFinder FindSagaFinder(Type messageType)
+        {
+            var sagaFinderTypes = mockSagaFinders.Keys.ToList();
+            foreach (var finderType in sagaFinderTypes)
+            {
+                foreach (var interfaceType in finderType.GetInterfaces())
+                {
+                    var args = interfaceType.GetGenericArguments();
+                    //since we don't want to process the IFinder type
+                    if (args.Length != 2)
+                    {
+                        continue;
+                    }
+
+                    var entityTypeArg = args[0];
+                    if (entityTypeArg != typeof(TSagaData))
+                    {
+                        continue;
+                    }
+
+                    var messageTypeArg = args[1];
+                    if (messageTypeArg != messageType)
+                    {
+                        continue;
+                    }
+
+                    var finder = mockSagaFinders[finderType];
+                    return finder;
+                }
+            }
+
+            return null;
         }
 
         async Task SaveSagaData(
@@ -342,7 +393,7 @@
             }
             else if (isNew)
             {
-                var saveCorrelationProperty = new SagaCorrelationProperty(sagaMapper.CorrelationPropertyName, mappedValue);
+                var saveCorrelationProperty = new SagaCorrelationProperty(lazySagaMapper.Value.CorrelationPropertyName, mappedValue);
                 await persister.Save(saga.Entity, saveCorrelationProperty, session, contextBag, cancellationToken).ConfigureAwait(false);
             }
             else
@@ -380,7 +431,7 @@
                 }
 
                 var msgType = message.Message.GetType();
-                if (sagaMapper.HandlesMessageType(msgType))
+                if (lazySagaMapper.Value.HandlesMessageType(msgType))
                 {
                     var deliveryDelay = message.Options.GetDeliveryDelay();
                     var deliverAt = message.Options.GetDeliveryDate();
@@ -416,7 +467,7 @@
             foreach (var message in context.PublishedMessages)
             {
                 var msgType = message.Message.GetType();
-                if (sagaMapper.HandlesMessageType(msgType))
+                if (lazySagaMapper.Value.HandlesMessageType(msgType))
                 {
                     var queuedMessage = new QueuedSagaMessage(msgType, message.Message, message.Options.GetHeaders(), sagaId);
                     queue.Enqueue(queuedMessage);
@@ -497,6 +548,32 @@
             /// or a default value if there is no replied message of the given type.
             /// </summary>
             public TMessage FindReplyMessage<TMessage>() => Context.FindReplyMessage<TMessage>();
+        }
+
+        /// <summary>
+        /// Add a mock saga finder for the given message type.
+        /// </summary>
+        /// <param name="correlationIdGetter">A delegate that returns to saga correlation property value</param>
+        /// <param name="mockFinder">A delegate that returns the saga property name and value to match</param>
+        /// <typeparam name="TMessage">The message type to use with the saga finder</typeparam>
+        /// <returns>The property name and value to use to find the saga instance</returns>
+        public void MockSagaFinder<TMessage>(Func<TMessage, object> correlationIdGetter, Func<TMessage, (string propertyName, object propertyValue)> mockFinder)
+        {
+            var finder = new PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(persister, correlationIdGetter, mockFinder);
+            mockSagaFinders.Add(finder.GetType(), finder);
+        }
+
+        /// <summary>
+        /// Add a mock saga finder for the given message type.
+        /// </summary>
+        /// <param name="correlationIdGetter">A delegate that returns to saga correlation property value</param>
+        /// <param name="mockFinder">A delegate that returns the saga property name and value to match</param>
+        /// <typeparam name="TMessage">The message type to use with the saga finder</typeparam>
+        /// <returns>The saga identifier or null to signal that a new saga instance should be created</returns>
+        public void MockSagaFinder<TMessage>(Func<TMessage, object> correlationIdGetter, Func<TMessage, Guid?> mockFinder)
+        {
+            var finder = new SagaIdMockSagaFinder<TSagaData, TMessage>(persister, correlationIdGetter, mockFinder);
+            mockSagaFinders.Add(finder.GetType(), finder);
         }
     }
 }

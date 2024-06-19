@@ -53,10 +53,7 @@
         /// </summary>
         protected override ILoggerFactory GetLoggingFactory()
         {
-            if (testingLoggerFactory == null)
-            {
-                testingLoggerFactory = new DefaultTestingLoggerFactory();
-            }
+            testingLoggerFactory ??= new DefaultTestingLoggerFactory();
 
             return testingLoggerFactory;
         }
