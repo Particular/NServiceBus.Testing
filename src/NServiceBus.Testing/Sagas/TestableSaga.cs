@@ -554,5 +554,11 @@
             var finder = new PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(persister, mockFinder);
             mockSagaFinders.Add(finder.GetType(), finder);
         }
+
+        public void MockSagaFinder<TMessage>(Func<TMessage, Guid> mockFinder)
+        {
+            var finder = new SagaIdMockSagaFinder<TSagaData, TMessage>(persister, mockFinder);
+            mockSagaFinders.Add(finder.GetType(), finder);
+        }
     }
 }

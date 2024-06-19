@@ -19,3 +19,16 @@ class PropertyNameAndValueMockSagaFinder<TSagaData, TMessage>(ISagaPersister sag
             cancellationToken);
     }
 }
+
+class SagaIdMockSagaFinder<TSagaData, TMessage>(ISagaPersister sagaPersister, Func<TMessage, Guid> mockFinder)
+    : ISagaFinder<TSagaData, TMessage>
+    where TSagaData : class, IContainSagaData
+{
+    public Task<TSagaData> FindBy(TMessage message, ISynchronizedStorageSession storageSession,
+        IReadOnlyContextBag context, CancellationToken cancellationToken = default)
+    {
+        var sagaId = mockFinder(message);
+        return sagaPersister.Get<TSagaData>(sagaId, storageSession, (ContextBag)context,
+            cancellationToken);
+    }
+}

@@ -9,12 +9,42 @@
     public class SagaWithSagaFinder
     {
         [Test]
-        public async Task TestSagaWithSagaFinder()
+        public async Task TestSagaWithPropertyNameAndValueSagaFinder()
         {
             var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>();
             testableSaga.MockSagaFinder<OrderBilled>(message => ("OrderId", message.OrderId));
 
             var placeResult = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
+            var billResult = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
+
+            Assert.That(placeResult.Completed, Is.False);
+            Assert.That(billResult.Completed, Is.False);
+
+            // Snapshots of data should still be assertable even after multiple operations have occurred.
+            Assert.That(placeResult.SagaDataSnapshot.OrderId, Is.EqualTo("abc"));
+            Assert.That(placeResult.SagaDataSnapshot.Placed, Is.True);
+            Assert.That(placeResult.SagaDataSnapshot.Billed, Is.False);
+
+            var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(10));
+            Assert.That(noResults.Length, Is.EqualTo(0));
+
+            var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromHours(1));
+
+            Assert.That(timeoutResults.Length, Is.EqualTo(1));
+
+            var shipped = timeoutResults.First().FindPublishedMessage<OrderShipped>();
+            Assert.That(shipped.OrderId == "abc");
+        }
+
+        [Test]
+        public async Task TestSagaWithSagaIdSagaFinder()
+        {
+            Guid sagaId = default;
+            var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>();
+            testableSaga.MockSagaFinder<OrderBilled>(_ => sagaId);
+
+            var placeResult = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
+            sagaId = placeResult.SagaId;
             var billResult = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
 
             Assert.That(placeResult.Completed, Is.False);
