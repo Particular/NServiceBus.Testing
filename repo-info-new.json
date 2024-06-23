@@ -1,0 +1,2129 @@
+[
+  {
+    "Id": 647429974,
+    "Name": "adsd-london-2023",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 35476214,
+    "Name": "Announcements",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 763747539,
+    "Name": "check-links-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 513418149,
+    "Name": "CloudPlatformExperience",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 301344675,
+    "Name": "CompanyGaps",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 39829278,
+    "Name": "CustomerSuccess",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "stale-prs.yml"
+    ]
+  },
+  {
+    "Id": 357867873,
+    "Name": "DataDashboard",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "deploy-prod.yml"
+    ]
+  },
+  {
+    "Id": 97869811,
+    "Name": "Deployment",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 40233293,
+    "Name": "DeveloperEducation",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "action-item-issue-project-automation.yml",
+      "backlog-stale.yml",
+      "create-event-sponsorship-issue.yml",
+      "create-ssl-renewal-issue.yml",
+      "discussion-issue-project-automation.yml",
+      "has-taskforce-issue-project-automation.yml",
+      "metrics-review-project-automation.yml",
+      "new-issue-project-automation.yml",
+      "rfc-review-project-automation.yml",
+      "small-tasks-stale.yml",
+      "townhall-issues-project-automation.yml"
+    ]
+  },
+  {
+    "Id": 11727301,
+    "Name": "docs.particular.net",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "build-samples-and-snippets.yml",
+      "run-scripts.yml",
+      "stale.yml",
+      "validate-pull-requests.yml",
+      "verify-master.yml"
+    ]
+  },
+  {
+    "Id": 11516637,
+    "Name": "DocsEngine",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 29472549,
+    "Name": "Events",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 131043217,
+    "Name": "Exploration",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 505531268,
+    "Name": "ExternalDocumentationContributions",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 151372107,
+    "Name": "GeneralPlatformExperience",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "add-date-added.yml",
+      "create-dependabot-cleanup-issue.yml",
+      "process-review.yml",
+      "squad-retrospective.yml"
+    ]
+  },
+  {
+    "Id": 28809053,
+    "Name": "Hiring",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 426414568,
+    "Name": "install-sql-server-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 165633693,
+    "Name": "InteractiveTutorial",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml",
+      "release.yml"
+    ]
+  },
+  {
+    "Id": 558570862,
+    "Name": "internal-data",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml"
+    ]
+  },
+  {
+    "Id": 180665424,
+    "Name": "InternalAutomation",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 185717741,
+    "Name": "InternalAutomationSandbox",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml",
+      "test-dispatch-inputs.yml"
+    ]
+  },
+  {
+    "Id": 219744313,
+    "Name": "JTBDVisualiser",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 485734816,
+    "Name": "LearningGroups",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 107121368,
+    "Name": "MonitoringDemo",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml",
+      "release.yml"
+    ]
+  },
+  {
+    "Id": 1056713,
+    "Name": "NServiceBus",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-7.8",
+      "release-8.1",
+      "release-8.2",
+      "release-9.0"
+    ],
+    "DefaultPackage": "NServiceBus",
+    "AssetsPackages": [
+      "NServiceBus",
+      "NServiceBus.AcceptanceTesting",
+      "NServiceBus.AcceptanceTests.Sources",
+      "NServiceBus.PersistenceTests.Sources",
+      "NServiceBus.TransportTests.Sources"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 28653941,
+    "Name": "NServiceBus.AmazonSQS",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-5.7",
+      "release-6.2",
+      "release-7.0"
+    ],
+    "DefaultPackage": "NServiceBus.AmazonSQS",
+    "AssetsPackages": [
+      "NServiceBus.AmazonSQS",
+      "NServiceBus.AmazonSQS.CommandLine"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "approve-dependencies.yml",
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "tests-cleanup.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 203861530,
+    "Name": "NServiceBus.AwsLambda.Sqs",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.1",
+      "release-2.0"
+    ],
+    "DefaultPackage": "NServiceBus.AwsLambda.SQS",
+    "AssetsPackages": [
+      "NServiceBus.AwsLambda.SQS"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 203420097,
+    "Name": "NServiceBus.AzureFunctions.InProcess.ServiceBus",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.0",
+      "release-4.3",
+      "release-4.4"
+    ],
+    "DefaultPackage": "NServiceBus.AzureFunctions.InProcess.ServiceBus",
+    "AssetsPackages": [
+      "NServiceBus.AzureFunctions.InProcess.ServiceBus"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 397795687,
+    "Name": "NServiceBus.AzureFunctions.Worker.ServiceBus",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.1",
+      "release-4.2",
+      "release-5.0",
+      "release-5.1"
+    ],
+    "DefaultPackage": "NServiceBus.AzureFunctions.Worker.ServiceBus",
+    "AssetsPackages": [
+      "NServiceBus.AzureFunctions.Worker.ServiceBus"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 29925374,
+    "Name": "NServiceBus.AzureStorageQueues",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-10.0",
+      "release-12.0",
+      "release-13.0"
+    ],
+    "DefaultPackage": "NServiceBus.Transport.AzureStorageQueues",
+    "AssetsPackages": [
+      "NServiceBus.Transport.AzureStorageQueues"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 39256075,
+    "Name": "NServiceBus.Callbacks",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.0",
+      "release-4.0",
+      "release-5.0"
+    ],
+    "DefaultPackage": "NServiceBus.Callbacks",
+    "AssetsPackages": [
+      "NServiceBus.Callbacks",
+      "NServiceBus.Callbacks.Testing"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 107956927,
+    "Name": "NServiceBus.CustomChecks",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.0",
+      "release-4.0",
+      "release-5.0"
+    ],
+    "DefaultPackage": "NServiceBus.CustomChecks",
+    "AssetsPackages": [
+      "NServiceBus.CustomChecks"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 57989348,
+    "Name": "NServiceBus.DataBus.AzureBlobStorage",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-4.0",
+      "release-5.0",
+      "release-6.0"
+    ],
+    "DefaultPackage": "NServiceBus.DataBus.AzureBlobStorage",
+    "AssetsPackages": [
+      "NServiceBus.DataBus.AzureBlobStorage"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 495339851,
+    "Name": "NServiceBus.DataBus.BinarySerializer",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.0",
+      "release-2.0"
+    ],
+    "DefaultPackage": "NServiceBus.DataBus.BinarySerializer",
+    "AssetsPackages": [
+      "NServiceBus.DataBus.BinarySerializer"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 79951196,
+    "Name": "NServiceBus.Encryption.MessageProperty",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.0",
+      "release-4.0",
+      "release-5.0"
+    ],
+    "DefaultPackage": "NServiceBus.Encryption.MessageProperty",
+    "AssetsPackages": [
+      "NServiceBus.Encryption.MessageProperty"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 734413826,
+    "Name": "NServiceBus.Exercise",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 218605697,
+    "Name": "NServiceBus.Extensions.Hosting",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.1",
+      "release-2.0",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.Extensions.Hosting",
+    "AssetsPackages": [
+      "NServiceBus.Extensions.Hosting"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 242097912,
+    "Name": "NServiceBus.Extensions.Logging",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.0",
+      "release-2.0",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.Extensions.Logging",
+    "AssetsPackages": [
+      "NServiceBus.Extensions.Logging"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 17479910,
+    "Name": "NServiceBus.Gateway",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.3",
+      "release-4.0",
+      "release-5.0"
+    ],
+    "DefaultPackage": "NServiceBus.Gateway",
+    "AssetsPackages": [
+      "NServiceBus.Gateway",
+      "NServiceBus.Gateway.AcceptanceTests.Sources",
+      "NServiceBus.Gateway.PersistenceTests.Sources"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 237219456,
+    "Name": "NServiceBus.Gateway.RavenDB",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.0",
+      "release-3.0",
+      "release-4.0"
+    ],
+    "DefaultPackage": "NServiceBus.Gateway.RavenDB",
+    "AssetsPackages": [
+      "NServiceBus.Gateway.RavenDB"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 236850942,
+    "Name": "NServiceBus.Gateway.Sql",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.0",
+      "release-2.0",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.Gateway.Sql",
+    "AssetsPackages": [
+      "NServiceBus.Gateway.Sql"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 107224571,
+    "Name": "NServiceBus.Heartbeat",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.0",
+      "release-4.0",
+      "release-5.0"
+    ],
+    "DefaultPackage": "NServiceBus.Heartbeat",
+    "AssetsPackages": [
+      "NServiceBus.Heartbeat"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 699443831,
+    "Name": "NServiceBus.MessageInterfaces",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.0"
+    ],
+    "DefaultPackage": "NServiceBus.MessageInterfaces",
+    "AssetsPackages": [
+      "NServiceBus.MessageInterfaces"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 472894024,
+    "Name": "NServiceBus.MessagingBridge",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.0",
+      "release-2.2",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.MessagingBridge",
+    "AssetsPackages": [
+      "NServiceBus.MessagingBridge",
+      "NServiceBus.MessagingBridge.Msmq"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 84970395,
+    "Name": "NServiceBus.Metrics",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.1",
+      "release-4.0",
+      "release-5.0"
+    ],
+    "DefaultPackage": "NServiceBus.Metrics",
+    "AssetsPackages": [
+      "NServiceBus.Metrics"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 82737791,
+    "Name": "NServiceBus.Metrics.PerformanceCounters",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-4.0",
+      "release-5.0",
+      "release-6.0"
+    ],
+    "DefaultPackage": "NServiceBus.Metrics.PerformanceCounters",
+    "AssetsPackages": [
+      "NServiceBus.Metrics.PerformanceCounters"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 102092198,
+    "Name": "NServiceBus.Metrics.ServiceControl",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.0",
+      "release-4.0",
+      "release-5.0"
+    ],
+    "DefaultPackage": "NServiceBus.Metrics.ServiceControl",
+    "AssetsPackages": [
+      "NServiceBus.Metrics.ServiceControl"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 129991148,
+    "Name": "NServiceBus.Metrics.ServiceControl.Msmq",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.0",
+      "release-4.0"
+    ],
+    "DefaultPackage": "NServiceBus.Metrics.ServiceControl.Msmq",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 26036782,
+    "Name": "NServiceBus.Newtonsoft.Json",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.4",
+      "release-3.0",
+      "release-4.0"
+    ],
+    "DefaultPackage": "NServiceBus.Newtonsoft.Json",
+    "AssetsPackages": [
+      "NServiceBus.Newtonsoft.Json"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 14360139,
+    "Name": "NServiceBus.NHibernate",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-10.0",
+      "release-8.6",
+      "release-9.0"
+    ],
+    "DefaultPackage": "NServiceBus.NHibernate",
+    "AssetsPackages": [
+      "NServiceBus.NHibernate",
+      "NServiceBus.NHibernate.TransactionalSession"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 35106312,
+    "Name": "NServiceBus.Persistence.AzureTable",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.2",
+      "release-5.0",
+      "release-6.0"
+    ],
+    "DefaultPackage": "NServiceBus.Persistence.AzureTable",
+    "AssetsPackages": [
+      "NServiceBus.Persistence.AzureTable",
+      "NServiceBus.Persistence.AzureTable.TransactionalSession"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 207359804,
+    "Name": "NServiceBus.Persistence.CosmosDB",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.2",
+      "release-2.0",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.Persistence.CosmosDB",
+    "AssetsPackages": [
+      "NServiceBus.Persistence.CosmosDB",
+      "NServiceBus.Persistence.CosmosDB.TransactionalSession"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 509355797,
+    "Name": "NServiceBus.Persistence.DynamoDB",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [
+      "release-1.0",
+      "release-2.0"
+    ],
+    "DefaultPackage": "NServiceBus.Persistence.DynamoDB",
+    "AssetsPackages": [
+      "NServiceBus.Persistence.DynamoDB",
+      "NServiceBus.Persistence.DynamoDB.TransactionalSession"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "approve-dependencies.yml",
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 297964657,
+    "Name": "NServiceBus.Persistence.NonDurable",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.0",
+      "release-2.0"
+    ],
+    "DefaultPackage": "NServiceBus.Persistence.NonDurable",
+    "AssetsPackages": [
+      "NServiceBus.Persistence.NonDurable"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 80517487,
+    "Name": "NServiceBus.Persistence.ServiceFabric",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.7",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.Persistence.ServiceFabric",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 42932319,
+    "Name": "NServiceBus.Persistence.Sql",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-6.6",
+      "release-7.0",
+      "release-8.0",
+      "release-8.1"
+    ],
+    "DefaultPackage": "NServiceBus.Persistence.Sql",
+    "AssetsPackages": [
+      "NServiceBus.Persistence.Sql",
+      "NServiceBus.Persistence.Sql.CommandLine",
+      "NServiceBus.Persistence.Sql.ScriptBuilder",
+      "NServiceBus.Persistence.Sql.TransactionalSession"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "aurora.yml",
+      "ci.yml",
+      "release.yml",
+      "scripts",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 12695271,
+    "Name": "NServiceBus.RabbitMQ",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-7.0",
+      "release-8.0",
+      "release-9.0"
+    ],
+    "DefaultPackage": "NServiceBus.RabbitMQ",
+    "AssetsPackages": [
+      "NServiceBus.RabbitMQ",
+      "NServiceBus.Transport.RabbitMQ.CommandLine"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 15000736,
+    "Name": "NServiceBus.RavenDB",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-7.2",
+      "release-8.2",
+      "release-9.0"
+    ],
+    "DefaultPackage": "NServiceBus.RavenDB",
+    "AssetsPackages": [
+      "NServiceBus.RavenDB",
+      "NServiceBus.RavenDB.TransactionalSession"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 105517958,
+    "Name": "NServiceBus.SagaAudit",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-3.0",
+      "release-4.0",
+      "release-5.0"
+    ],
+    "DefaultPackage": "NServiceBus.SagaAudit",
+    "AssetsPackages": [
+      "NServiceBus.SagaAudit"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 75618988,
+    "Name": "NServiceBus.Serializers.CompatTests",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 427247742,
+    "Name": "NServiceBus.ServicePlatform.Connector",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [
+      "release-1.0",
+      "release-2.0",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.ServicePlatform.Connector",
+    "AssetsPackages": [
+      "NServiceBus.ServicePlatform.Connector"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 12769207,
+    "Name": "NServiceBus.SqlServer",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-6.3",
+      "release-7.0",
+      "release-8.0",
+      "release-8.1"
+    ],
+    "DefaultPackage": "NServiceBus.Transport.SqlServer",
+    "AssetsPackages": [
+      "NServiceBus.Transport.SqlServer"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 183570211,
+    "Name": "NServiceBus.Storage.MongoDB",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.3",
+      "release-3.0",
+      "release-4.0"
+    ],
+    "DefaultPackage": "NServiceBus.Storage.MongoDB",
+    "AssetsPackages": [
+      "NServiceBus.Storage.MongoDB",
+      "NServiceBus.Storage.MongoDB.TransactionalSession"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 25034101,
+    "Name": "NServiceBus.Testing",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-7.4",
+      "release-8.1",
+      "release-9.0"
+    ],
+    "DefaultPackage": "NServiceBus.Testing",
+    "AssetsPackages": [
+      "NServiceBus.Testing"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 478916876,
+    "Name": "NServiceBus.TransactionalSession",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [
+      "release-1.0",
+      "release-2.0",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.TransactionalSession",
+    "AssetsPackages": [
+      "NServiceBus.TransactionalSession"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 131673887,
+    "Name": "NServiceBus.Transport.AzureServiceBus",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.0",
+      "release-3.2",
+      "release-4.0"
+    ],
+    "DefaultPackage": "NServiceBus.Transport.AzureServiceBus",
+    "AssetsPackages": [
+      "NServiceBus.Transport.AzureServiceBus",
+      "NServiceBus.Transport.AzureServiceBus.CommandLine"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 88633612,
+    "Name": "NServiceBus.Transport.Msmq",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-1.2",
+      "release-2.0",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.Transport.Msmq",
+    "AssetsPackages": [
+      "NServiceBus.Transport.Msmq"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 108099182,
+    "Name": "NServiceBus.UniformSession",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.2",
+      "release-3.0",
+      "release-4.0"
+    ],
+    "DefaultPackage": "NServiceBus.UniformSession",
+    "AssetsPackages": [
+      "NServiceBus.UniformSession",
+      "NServiceBus.UniformSession.Testing"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 68010723,
+    "Name": "NServiceBus.Wcf",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.0",
+      "release-3.0"
+    ],
+    "DefaultPackage": "NServiceBus.Wcf",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 17208392,
+    "Name": "Operations.Licensing",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-4.0",
+      "release-5.1",
+      "release-6.0"
+    ],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 46321802,
+    "Name": "Particular.Analyzers",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "Particular.Analyzers",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 140474452,
+    "Name": "Particular.Approvals",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "Particular.Approvals",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 392062161,
+    "Name": "Particular.AzureTable.Export",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "Particular.AzureTable.Export",
+    "AssetsPackages": [
+      "Particular.AzureTable.Export"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 340100046,
+    "Name": "Particular.DevStandards",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 528051512,
+    "Name": "Particular.EndpointThroughputCounter",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "approve-dependencies.yml",
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 340089664,
+    "Name": "Particular.GitHubExtensions",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 806268692,
+    "Name": "Particular.LicensingComponent.Report",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 701539962,
+    "Name": "Particular.Msmq",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [
+      "release-1.0"
+    ],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 101382388,
+    "Name": "Particular.Packaging",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "Particular.Packaging",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 159227068,
+    "Name": "Particular.PlatformSample",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.40"
+    ],
+    "DefaultPackage": "Particular.PlatformSample",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 92737446,
+    "Name": "ParticularTemplates",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-5.0",
+      "release-6.0"
+    ],
+    "DefaultPackage": "ParticularTemplates",
+    "AssetsPackages": [
+      "ParticularTemplates"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 465858629,
+    "Name": "ParticularTools",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "deploy.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 313672174,
+    "Name": "Platform",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 153740194,
+    "Name": "PlatformBugs",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "add-issue-to-platform-internals-board.yml",
+      "cleanup-azure-actions.yml"
+    ]
+  },
+  {
+    "Id": 518640199,
+    "Name": "PlatformInternals",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "add-issue-to-platform-internals-board.yml"
+    ]
+  },
+  {
+    "Id": 49998922,
+    "Name": "Presentations",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 520246188,
+    "Name": "push-octopus-package-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 531418427,
+    "Name": "RavenDB.StatsCollector",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 757743885,
+    "Name": "repo-integrity-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 12912142,
+    "Name": "RepoStandards",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 475003847,
+    "Name": "RFC-for-CS-2697",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 65412973,
+    "Name": "Risk",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "add-issues-to-project.yml",
+      "create-quarterly-squad-interim-retrospective.yml"
+    ]
+  },
+  {
+    "Id": 390563002,
+    "Name": "run-tests-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 302581263,
+    "Name": "Salesforce",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 7913469,
+    "Name": "ServiceControl",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-4.33",
+      "release-5.2"
+    ],
+    "DefaultPackage": "",
+    "AssetsPackages": [
+      "Particular.ServiceControl-5.2.4.exe",
+      "Particular.ServiceControl.Management.zip"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "clean-ghcr.yml",
+      "push-container-images.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 24321688,
+    "Name": "ServiceControl.Contracts",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-4.0"
+    ],
+    "DefaultPackage": "ServiceControl.Contracts",
+    "AssetsPackages": [
+      "ServiceControl.Contracts"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 101634492,
+    "Name": "ServiceControl.Monitoring.Data",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 681228754,
+    "Name": "ServiceControl.SmokeTest",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 71561346,
+    "Name": "ServiceControl.TransportAdapter",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [
+      "release-2.0"
+    ],
+    "DefaultPackage": "ServiceControl.TransportAdapter",
+    "AssetsPackages": [
+      "ServiceControl.TransportAdapter"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 8025385,
+    "Name": "ServiceInsight",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [
+      "ServiceInsight-2.13.0.exe"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 11944410,
+    "Name": "ServicePulse",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [
+      "Particular.ServicePulse-1.38.3.exe"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 430957477,
+    "Name": "setup-azureservicebus-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml"
+    ]
+  },
+  {
+    "Id": 430948624,
+    "Name": "setup-azurestorage-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml"
+    ]
+  },
+  {
+    "Id": 429580269,
+    "Name": "setup-cosmosdb-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml"
+    ]
+  },
+  {
+    "Id": 527983276,
+    "Name": "setup-mongodb-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 499488214,
+    "Name": "setup-oracle-action",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml",
+      "scripts"
+    ]
+  },
+  {
+    "Id": 481017579,
+    "Name": "setup-rabbitmq-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml"
+    ]
+  },
+  {
+    "Id": 528486726,
+    "Name": "setup-ravendb-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml"
+    ]
+  },
+  {
+    "Id": 520603960,
+    "Name": "sign-nuget-packages-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 739000776,
+    "Name": "SimpleBus.Exercise",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 39374226,
+    "Name": "StaffSuccess",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "check-links.yml",
+      "education-policy-reminder.yml",
+      "label-merged-small-decisions.yml",
+      "small-decision-completion-check.yml",
+      "small-tasks-stale.yml",
+      "stale-prs.yml"
+    ]
+  },
+  {
+    "Id": 90169974,
+    "Name": "StaffTraining",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 540055029,
+    "Name": "stale-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml"
+    ]
+  },
+  {
+    "Id": 172255091,
+    "Name": "Strategy",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 340159413,
+    "Name": "StrategyCapability",
+    "Private": true,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 263315506,
+    "Name": "TimeoutMigrationTool",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "Particular.TimeoutMigration",
+    "AssetsPackages": [
+      "Particular.TimeoutMigration"
+    ],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml",
+      "virus-scan.yml"
+    ]
+  },
+  {
+    "Id": 408590046,
+    "Name": "virus-scan-action",
+    "Private": false,
+    "DefaultBranch": "main",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [
+      "test-file.txt"
+    ],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 33246037,
+    "Name": "Vision",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "rotation-automation-activity.yml",
+      "rotation-automation-confidence.yml",
+      "rotation-automation-not-scored.yml"
+    ]
+  },
+  {
+    "Id": 99963705,
+    "Name": "Website",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "deploy-prod.yml",
+      "deploy-test.yml",
+      "test-site-on-pr.yml"
+    ]
+  },
+  {
+    "Id": 1075941,
+    "Name": "Website.Backend",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "release.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 122665555,
+    "Name": "WebsiteTestEngine",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": true,
+    "Workflows": [
+      "ci.yml",
+      "stale.yml"
+    ]
+  },
+  {
+    "Id": 60376623,
+    "Name": "Workshop",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": [
+      "ci.yml"
+    ]
+  },
+  {
+    "Id": 123261878,
+    "Name": "Workshop.NServiceBus",
+    "Private": false,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 123261982,
+    "Name": "Workshop.NServiceBus.Slides",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  },
+  {
+    "Id": 113290890,
+    "Name": "Workshop.Slides",
+    "Private": true,
+    "DefaultBranch": "master",
+    "ReleaseBranches": [],
+    "DefaultPackage": "",
+    "AssetsPackages": [],
+    "RepoSync": false,
+    "Workflows": []
+  }
+]
