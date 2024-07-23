@@ -53,6 +53,16 @@
             Assert.AreEqual(true, context.EndpointStopped);
         }
 
+        [Test]
+        public async Task MessageSessionExtensionsSendIncorrectType()
+        {
+            var context = new TestableEndpointInstance();
+
+            await context.Send(new Cmd { Number = 1 });
+
+            Assert.AreEqual(typeof(SentMessage<Cmd>), context.SentMessages[0].GetType());
+        }
+
         public static async Task RunTestableMessageSessionInternal<TContext>(TContext context, CancellationToken cancellationToken = default)
             where TContext : TestableMessageSession
         {
