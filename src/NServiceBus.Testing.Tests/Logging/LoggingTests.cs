@@ -64,7 +64,7 @@ namespace NServiceBus.Testing.Tests.Logging
             var secondLogString = secondStringWriter.ToString();
 
             Assert.That(secondLogString, Is.Not.EqualTo(firstLogString));
-            Assert.IsEmpty(firstLogString);
+            Assert.That(firstLogString, Is.Empty);
             StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", secondLogString);
         }
 
