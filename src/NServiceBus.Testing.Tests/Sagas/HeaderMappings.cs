@@ -17,9 +17,12 @@
 
             var result = await testableSaga.Handle(new HeaderMessage(), messageHeaders: new Dictionary<string, string> { { "X-My-Correlation-Id", correlationId } });
 
-            Assert.That(result.Completed, Is.False);
-            Assert.That(result.SagaDataSnapshot.CorrId, Is.EqualTo(correlationId));
-            Assert.That(result.SagaDataSnapshot.HeaderMessageReceived, Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Completed, Is.False);
+                Assert.That(result.SagaDataSnapshot.CorrId, Is.EqualTo(correlationId));
+                Assert.That(result.SagaDataSnapshot.HeaderMessageReceived, Is.True);
+            });
         }
 
         public class HeaderSaga : Saga<HeaderSagaData>,

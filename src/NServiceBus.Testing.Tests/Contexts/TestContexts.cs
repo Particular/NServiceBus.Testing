@@ -29,9 +29,12 @@
 
             Assert.That(context.SentMessages.Length, Is.EqualTo(6));
             string sentNumbers = string.Join(",", context.SentMessages.Select(m => (m.Message as Cmd).Number.ToString()));
-            Assert.That(sentNumbers, Is.EqualTo("1,2,3,4,5,6"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(sentNumbers, Is.EqualTo("1,2,3,4,5,6"));
 
-            Assert.That(context.PublishedMessages.Length, Is.EqualTo(5));
+                Assert.That(context.PublishedMessages.Length, Is.EqualTo(5));
+            });
             string publishedNumbers = string.Join(",", context.PublishedMessages.Select(m => (m.Message as Evt).Number.ToString()));
             Assert.That(publishedNumbers, Is.EqualTo("0,1,2,3,4"));
         }
@@ -71,9 +74,12 @@
 
             Assert.That(context.SentMessages.Length, Is.EqualTo(6));
             string sentNumbers = string.Join(",", context.SentMessages.Select(m => (m.Message as Cmd).Number.ToString()));
-            Assert.That(sentNumbers, Is.EqualTo("1,2,3,4,5,6"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(sentNumbers, Is.EqualTo("1,2,3,4,5,6"));
 
-            Assert.That(context.PublishedMessages.Length, Is.EqualTo(5));
+                Assert.That(context.PublishedMessages.Length, Is.EqualTo(5));
+            });
             string publishedNumbers = string.Join(",", context.PublishedMessages.Select(m => (m.Message as Evt).Number.ToString()));
             Assert.That(publishedNumbers, Is.EqualTo("0,1,2,3,4"));
         }

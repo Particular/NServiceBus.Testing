@@ -16,13 +16,16 @@
             var placeResult = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
             var billResult = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
 
-            Assert.That(placeResult.Completed, Is.False);
-            Assert.That(billResult.Completed, Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(placeResult.Completed, Is.False);
+                Assert.That(billResult.Completed, Is.False);
 
-            // Snapshots of data should still be assertable even after multiple operations have occurred.
-            Assert.That(placeResult.SagaDataSnapshot.OrderId, Is.EqualTo("abc"));
-            Assert.That(placeResult.SagaDataSnapshot.Placed, Is.True);
-            Assert.That(placeResult.SagaDataSnapshot.Billed, Is.False);
+                // Snapshots of data should still be assertable even after multiple operations have occurred.
+                Assert.That(placeResult.SagaDataSnapshot.OrderId, Is.EqualTo("abc"));
+                Assert.That(placeResult.SagaDataSnapshot.Placed, Is.True);
+                Assert.That(placeResult.SagaDataSnapshot.Billed, Is.False);
+            });
 
             var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(10));
             Assert.That(noResults.Length, Is.EqualTo(0));

@@ -24,8 +24,11 @@
 
             var reply = result.Context.RepliedMessages.SingleOrDefault();
             Assert.That(reply, Is.Not.Null);
-            Assert.That(reply.Options.GetDestination(), Is.EqualTo(originatorAddress));
-            Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(originatorAddress));
+            Assert.Multiple(() =>
+            {
+                Assert.That(reply.Options.GetDestination(), Is.EqualTo(originatorAddress));
+                Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(originatorAddress));
+            });
         }
 
         [Test]
@@ -40,8 +43,11 @@
             var reply = result.Context.RepliedMessages.SingleOrDefault();
             Assert.That(reply, Is.Not.Null);
             string replyAddress = reply.Options.GetDestination();
-            Assert.That(replyAddress, Is.Not.Null);
-            Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(replyAddress));
+            Assert.Multiple(() =>
+            {
+                Assert.That(replyAddress, Is.Not.Null);
+                Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(replyAddress));
+            });
         }
 
         class ReplyingSaga : Saga<ReplyingSagaData>, IAmStartedByMessages<StartSagaMessage>, IHandleMessages<SendReplyMessage>
