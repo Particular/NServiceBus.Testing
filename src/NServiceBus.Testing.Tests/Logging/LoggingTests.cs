@@ -36,10 +36,10 @@ namespace NServiceBus.Testing.Tests.Logging
             var secondLogString = secondStringWriter.ToString();
 
             Assert.That(secondLogString, Is.Not.EqualTo(firstLogString));
-            StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0", firstLogString);
-            StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", firstLogString);
-            StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", secondLogString);
-            StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0", secondLogString);
+            Assert.That(firstLogString, Does.Contain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0"));
+            Assert.That(firstLogString, Does.Not.Contain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1"));
+            Assert.That(secondLogString, Does.Contain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1"));
+            Assert.That(secondLogString, Does.Not.Contain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0"));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace NServiceBus.Testing.Tests.Logging
                 Assert.That(secondLogString, Is.Not.EqualTo(firstLogString));
                 Assert.That(firstLogString, Is.Empty);
             });
-            StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", secondLogString);
+            Assert.That(secondLogString, Does.Contain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1"));
         }
 
         [Test]
@@ -92,10 +92,10 @@ namespace NServiceBus.Testing.Tests.Logging
             var scopedLogString = secondStringWriter.ToString();
 
             Assert.That(scopedLogString, Is.Not.EqualTo(globalLogString));
-            StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0", globalLogString);
-            StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", globalLogString);
-            StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", scopedLogString);
-            StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0", scopedLogString);
+            Assert.That(globalLogString, Does.Contain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0"));
+            Assert.That(globalLogString, Does.Not.Contain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1"));
+            Assert.That(scopedLogString, Does.Contain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1"));
+            Assert.That(scopedLogString, Does.Not.Contain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0"));
         }
 
         [Test]

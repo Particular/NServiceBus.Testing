@@ -27,8 +27,8 @@ namespace NServiceBus.Testing.Tests.Logging
             var Logger = LogManager.GetLogger<LoggingForFixtureTests>();
             Logger.Debug("First");
 
-            StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests First", writer.ToString());
-            StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests Second", writer.ToString());
+            Assert.That(writer.ToString(), Does.Contain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests First"));
+            Assert.That(writer.ToString(), Does.Not.Contain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests Second"));
         }
 
         [Test]
@@ -37,8 +37,8 @@ namespace NServiceBus.Testing.Tests.Logging
             var Logger = LogManager.GetLogger<LoggingForFixtureTests>();
             Logger.Debug("Second");
 
-            StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests Second", writer.ToString());
-            StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests First", writer.ToString());
+            Assert.That(writer.ToString(), Does.Contain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests Second"));
+            Assert.That(writer.ToString(), Does.Not.Contain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests First"));
         }
 
         [TearDown]
