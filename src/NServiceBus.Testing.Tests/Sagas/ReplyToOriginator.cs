@@ -23,7 +23,7 @@
             var result = await saga.HandleQueuedMessage();
 
             var reply = result.Context.RepliedMessages.SingleOrDefault();
-            Assert.NotNull(reply);
+            Assert.That(reply, Is.Not.Null);
             Assert.That(reply.Options.GetDestination(), Is.EqualTo(originatorAddress));
             Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(originatorAddress));
         }
@@ -38,9 +38,9 @@
             var result = await saga.HandleQueuedMessage();
 
             var reply = result.Context.RepliedMessages.SingleOrDefault();
-            Assert.NotNull(reply);
+            Assert.That(reply, Is.Not.Null);
             string replyAddress = reply.Options.GetDestination();
-            Assert.NotNull(replyAddress);
+            Assert.That(replyAddress, Is.Not.Null);
             Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(replyAddress));
         }
 
