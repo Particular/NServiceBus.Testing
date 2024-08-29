@@ -35,7 +35,7 @@ namespace NServiceBus.Testing.Tests.Logging
             var firstLogString = firstStringWriter.ToString();
             var secondLogString = secondStringWriter.ToString();
 
-            Assert.AreNotEqual(firstLogString, secondLogString);
+            Assert.That(secondLogString, Is.Not.EqualTo(firstLogString));
             StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0", firstLogString);
             StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", firstLogString);
             StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", secondLogString);
@@ -63,7 +63,7 @@ namespace NServiceBus.Testing.Tests.Logging
             var firstLogString = firstStringWriter.ToString();
             var secondLogString = secondStringWriter.ToString();
 
-            Assert.AreNotEqual(firstLogString, secondLogString);
+            Assert.That(secondLogString, Is.Not.EqualTo(firstLogString));
             Assert.IsEmpty(firstLogString);
             StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", secondLogString);
         }
@@ -88,7 +88,7 @@ namespace NServiceBus.Testing.Tests.Logging
             var globalLogString = globalWriter.ToString();
             var scopedLogString = secondStringWriter.ToString();
 
-            Assert.AreNotEqual(globalLogString, scopedLogString);
+            Assert.That(scopedLogString, Is.Not.EqualTo(globalLogString));
             StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 0", globalLogString);
             StringAssert.DoesNotContain("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", globalLogString);
             StringAssert.Contains("NServiceBus.Testing.Tests.Logging.LoggingTests+SomeClassThatUsesStaticLogger 1", scopedLogString);
