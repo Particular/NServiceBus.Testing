@@ -14,7 +14,7 @@
 
             var result = await saga.Handle(new StartSagaMessage() { CorrelationId = Guid.NewGuid() });
 
-            Assert.IsTrue(result.Completed);
+            Assert.That(result.Completed, Is.True);
         }
 
         class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<StartSagaMessage>
