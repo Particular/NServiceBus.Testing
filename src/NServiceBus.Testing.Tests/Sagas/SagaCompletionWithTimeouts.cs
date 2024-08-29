@@ -17,7 +17,7 @@
 
             var result = await saga.AdvanceTime(TimeSpan.FromHours(2));
 
-            Assert.That(result.Length, Is.EqualTo(1));
+            Assert.That(result, Has.Length.EqualTo(1));
             Assert.That(result[0].Completed, Is.True);
         }
 
