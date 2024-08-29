@@ -19,25 +19,37 @@
 
             Assert.That(startResult.Context.TimeoutMessages.Count, Is.EqualTo(1)); // Just timeout
             Assert.That(startResult.Context.SentMessages.Count, Is.EqualTo(2));    // Both
-            Assert.That(startResult.SagaDataSnapshot.RegularTimeoutReceived, Is.False);
-            Assert.That(startResult.SagaDataSnapshot.DelayedCommandReceived, Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(startResult.SagaDataSnapshot.RegularTimeoutReceived, Is.False);
+                Assert.That(startResult.SagaDataSnapshot.DelayedCommandReceived, Is.False);
+            });
 
             var timeout = startResult.FindTimeoutMessage<RegularTimeout>();
             var delayed = startResult.FindSentMessage<DelayedCmd>();
 
-            Assert.That(timeout, Is.Not.Null);
-            Assert.That(delayed, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(timeout, Is.Not.Null);
+                Assert.That(delayed, Is.Not.Null);
+            });
             Assert.That(delayed.CorrId, Is.EqualTo(corrId));
 
             var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(30));
             var timeoutResult = timeoutResults.Single();
-            Assert.That(timeoutResult.SagaDataSnapshot.RegularTimeoutReceived, Is.True);
-            Assert.That(timeoutResult.SagaDataSnapshot.DelayedCommandReceived, Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(timeoutResult.SagaDataSnapshot.RegularTimeoutReceived, Is.True);
+                Assert.That(timeoutResult.SagaDataSnapshot.DelayedCommandReceived, Is.False);
+            });
 
             var delayedCmdResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(30));
             var delayedCmdResult = delayedCmdResults.Single();
-            Assert.That(delayedCmdResult.SagaDataSnapshot.RegularTimeoutReceived, Is.True);
-            Assert.That(delayedCmdResult.SagaDataSnapshot.DelayedCommandReceived, Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(delayedCmdResult.SagaDataSnapshot.RegularTimeoutReceived, Is.True);
+                Assert.That(delayedCmdResult.SagaDataSnapshot.DelayedCommandReceived, Is.True);
+            });
         }
 
         public class DelaySaga : Saga<Data>,

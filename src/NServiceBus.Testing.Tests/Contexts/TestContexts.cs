@@ -27,13 +27,16 @@
             await context.Publish<Evt>(cmd => cmd.Number = 3);
             await context.Publish<Evt>(cmd => cmd.Number = 4, new PublishOptions());
 
-            Assert.That(context.SentMessages.Length == 6);
+            Assert.That(context.SentMessages, Has.Length.EqualTo(6));
             string sentNumbers = string.Join(",", context.SentMessages.Select(m => (m.Message as Cmd).Number.ToString()));
-            Assert.AreEqual("1,2,3,4,5,6", sentNumbers);
+            Assert.Multiple(() =>
+            {
+                Assert.That(sentNumbers, Is.EqualTo("1,2,3,4,5,6"));
 
-            Assert.That(context.PublishedMessages.Length == 5);
+                Assert.That(context.PublishedMessages, Has.Length.EqualTo(5));
+            });
             string publishedNumbers = string.Join(",", context.PublishedMessages.Select(m => (m.Message as Evt).Number.ToString()));
-            Assert.AreEqual("0,1,2,3,4", publishedNumbers);
+            Assert.That(publishedNumbers, Is.EqualTo("0,1,2,3,4"));
         }
 
         [Test]
@@ -50,7 +53,7 @@
             await RunTestableMessageSessionInternal(context, CancellationToken.None);
 
             await context.Stop();
-            Assert.AreEqual(true, context.EndpointStopped);
+            Assert.That(context.EndpointStopped, Is.EqualTo(true));
         }
 
         public static async Task RunTestableMessageSessionInternal<TContext>(TContext context, CancellationToken cancellationToken = default)
@@ -69,13 +72,16 @@
             await context.Publish<Evt>(cmd => cmd.Number = 3, cancellationToken: cancellationToken);
             await context.Publish<Evt>(cmd => cmd.Number = 4, new PublishOptions(), cancellationToken);
 
-            Assert.That(context.SentMessages.Length == 6);
+            Assert.That(context.SentMessages, Has.Length.EqualTo(6));
             string sentNumbers = string.Join(",", context.SentMessages.Select(m => (m.Message as Cmd).Number.ToString()));
-            Assert.AreEqual("1,2,3,4,5,6", sentNumbers);
+            Assert.Multiple(() =>
+            {
+                Assert.That(sentNumbers, Is.EqualTo("1,2,3,4,5,6"));
 
-            Assert.That(context.PublishedMessages.Length == 5);
+                Assert.That(context.PublishedMessages, Has.Length.EqualTo(5));
+            });
             string publishedNumbers = string.Join(",", context.PublishedMessages.Select(m => (m.Message as Evt).Number.ToString()));
-            Assert.AreEqual("0,1,2,3,4", publishedNumbers);
+            Assert.That(publishedNumbers, Is.EqualTo("0,1,2,3,4"));
         }
 
         class Cmd : ICommand, IHaveNumber

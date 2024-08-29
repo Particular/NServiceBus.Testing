@@ -14,14 +14,17 @@
             var placeResultA = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
             var billedResultB = await testableSaga.Handle(new OrderBilled { OrderId = "def" });
 
-            Assert.That(placeResultA.Completed, Is.False);
-            Assert.That(billedResultB.Completed, Is.False);
-            Assert.That(placeResultA.SagaId, Is.Not.EqualTo(billedResultB.SagaId));
+            Assert.Multiple(() =>
+            {
+                Assert.That(placeResultA.Completed, Is.False);
+                Assert.That(billedResultB.Completed, Is.False);
+                Assert.That(placeResultA.SagaId, Is.Not.EqualTo(billedResultB.SagaId));
+            });
 
             var billedResultA = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
             var shipped = billedResultA.FindPublishedMessage<OrderShipped>();
 
-            Assert.That(shipped.OrderId == "abc");
+            Assert.That(shipped.OrderId, Is.EqualTo("abc"));
         }
 
         public class ShippingPolicy : Saga<ShippingPolicyData>,

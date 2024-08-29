@@ -23,9 +23,12 @@
             var result = await saga.HandleQueuedMessage();
 
             var reply = result.Context.RepliedMessages.SingleOrDefault();
-            Assert.NotNull(reply);
-            Assert.AreEqual(originatorAddress, reply.Options.GetDestination());
-            Assert.AreEqual(originatorAddress, reply.Message<ReplyMessage>().OriginatorAddress);
+            Assert.That(reply, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reply.Options.GetDestination(), Is.EqualTo(originatorAddress));
+                Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(originatorAddress));
+            });
         }
 
         [Test]
@@ -38,10 +41,13 @@
             var result = await saga.HandleQueuedMessage();
 
             var reply = result.Context.RepliedMessages.SingleOrDefault();
-            Assert.NotNull(reply);
+            Assert.That(reply, Is.Not.Null);
             string replyAddress = reply.Options.GetDestination();
-            Assert.NotNull(replyAddress);
-            Assert.AreEqual(replyAddress, reply.Message<ReplyMessage>().OriginatorAddress);
+            Assert.Multiple(() =>
+            {
+                Assert.That(replyAddress, Is.Not.Null);
+                Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(replyAddress));
+            });
         }
 
         class ReplyingSaga : Saga<ReplyingSagaData>, IAmStartedByMessages<StartSagaMessage>, IHandleMessages<SendReplyMessage>
