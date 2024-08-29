@@ -17,7 +17,7 @@ namespace NServiceBus.Testing.Tests.Logging
         {
             writer = new StringWriter();
 
-            this.scope = LogManager.Use<TestingLoggerFactory>()
+            scope = LogManager.Use<TestingLoggerFactory>()
                 .BeginScope(writer);
         }
 
@@ -45,6 +45,7 @@ namespace NServiceBus.Testing.Tests.Logging
         public void Teardown()
         {
             scope.Dispose();
+            writer.Dispose();
         }
     }
 }
