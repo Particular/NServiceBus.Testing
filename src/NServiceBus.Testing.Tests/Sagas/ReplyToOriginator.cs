@@ -24,8 +24,8 @@
 
             var reply = result.Context.RepliedMessages.SingleOrDefault();
             Assert.NotNull(reply);
-            Assert.AreEqual(originatorAddress, reply.Options.GetDestination());
-            Assert.AreEqual(originatorAddress, reply.Message<ReplyMessage>().OriginatorAddress);
+            Assert.That(reply.Options.GetDestination(), Is.EqualTo(originatorAddress));
+            Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(originatorAddress));
         }
 
         [Test]
@@ -41,7 +41,7 @@
             Assert.NotNull(reply);
             string replyAddress = reply.Options.GetDestination();
             Assert.NotNull(replyAddress);
-            Assert.AreEqual(replyAddress, reply.Message<ReplyMessage>().OriginatorAddress);
+            Assert.That(reply.Message<ReplyMessage>().OriginatorAddress, Is.EqualTo(replyAddress));
         }
 
         class ReplyingSaga : Saga<ReplyingSagaData>, IAmStartedByMessages<StartSagaMessage>, IHandleMessages<SendReplyMessage>

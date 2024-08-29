@@ -29,11 +29,11 @@
 
             Assert.That(context.SentMessages.Length == 6);
             string sentNumbers = string.Join(",", context.SentMessages.Select(m => (m.Message as Cmd).Number.ToString()));
-            Assert.AreEqual("1,2,3,4,5,6", sentNumbers);
+            Assert.That(sentNumbers, Is.EqualTo("1,2,3,4,5,6"));
 
             Assert.That(context.PublishedMessages.Length == 5);
             string publishedNumbers = string.Join(",", context.PublishedMessages.Select(m => (m.Message as Evt).Number.ToString()));
-            Assert.AreEqual("0,1,2,3,4", publishedNumbers);
+            Assert.That(publishedNumbers, Is.EqualTo("0,1,2,3,4"));
         }
 
         [Test]
@@ -50,7 +50,7 @@
             await RunTestableMessageSessionInternal(context, CancellationToken.None);
 
             await context.Stop();
-            Assert.AreEqual(true, context.EndpointStopped);
+            Assert.That(context.EndpointStopped, Is.EqualTo(true));
         }
 
         public static async Task RunTestableMessageSessionInternal<TContext>(TContext context, CancellationToken cancellationToken = default)
@@ -71,11 +71,11 @@
 
             Assert.That(context.SentMessages.Length == 6);
             string sentNumbers = string.Join(",", context.SentMessages.Select(m => (m.Message as Cmd).Number.ToString()));
-            Assert.AreEqual("1,2,3,4,5,6", sentNumbers);
+            Assert.That(sentNumbers, Is.EqualTo("1,2,3,4,5,6"));
 
             Assert.That(context.PublishedMessages.Length == 5);
             string publishedNumbers = string.Join(",", context.PublishedMessages.Select(m => (m.Message as Evt).Number.ToString()));
-            Assert.AreEqual("0,1,2,3,4", publishedNumbers);
+            Assert.That(publishedNumbers, Is.EqualTo("0,1,2,3,4"));
         }
 
         class Cmd : ICommand, IHaveNumber
