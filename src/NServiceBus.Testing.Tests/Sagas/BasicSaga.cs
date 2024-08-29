@@ -32,7 +32,7 @@
             Assert.That(timeoutResults.Length, Is.EqualTo(1));
 
             var shipped = timeoutResults.First().FindPublishedMessage<OrderShipped>();
-            Assert.That(shipped.OrderId == "abc");
+            Assert.That(shipped.OrderId, Is.EqualTo("abc"));
         }
 
         public class ShippingPolicy : Saga<ShippingPolicyData>,

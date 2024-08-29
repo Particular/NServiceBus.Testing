@@ -21,7 +21,7 @@
             var billedResultA = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
             var shipped = billedResultA.FindPublishedMessage<OrderShipped>();
 
-            Assert.That(shipped.OrderId == "abc");
+            Assert.That(shipped.OrderId, Is.EqualTo("abc"));
         }
 
         public class ShippingPolicy : Saga<ShippingPolicyData>,
