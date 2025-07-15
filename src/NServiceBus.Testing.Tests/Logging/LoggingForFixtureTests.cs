@@ -1,3 +1,4 @@
+#pragma warning disable IDE1006 // Ignoring naming rule for test
 namespace NServiceBus.Testing.Tests.Logging
 {
     using System;
