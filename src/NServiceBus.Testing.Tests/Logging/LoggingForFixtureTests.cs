@@ -24,8 +24,8 @@ namespace NServiceBus.Testing.Tests.Logging
         [Test]
         public void Should_write_first_independent_from_other()
         {
-            var Logger = LogManager.GetLogger<LoggingForFixtureTests>();
-            Logger.Debug("First");
+            var logger = LogManager.GetLogger<LoggingForFixtureTests>();
+            logger.Debug("First");
 
             Assert.That(writer.ToString(), Does.Contain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests First"));
             Assert.That(writer.ToString(), Does.Not.Contain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests Second"));
@@ -34,8 +34,8 @@ namespace NServiceBus.Testing.Tests.Logging
         [Test]
         public void Should_write_second_independent_from_other()
         {
-            var Logger = LogManager.GetLogger<LoggingForFixtureTests>();
-            Logger.Debug("Second");
+            var logger = LogManager.GetLogger<LoggingForFixtureTests>();
+            logger.Debug("Second");
 
             Assert.That(writer.ToString(), Does.Contain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests Second"));
             Assert.That(writer.ToString(), Does.Not.Contain("NServiceBus.Testing.Tests.Logging.LoggingForFixtureTests First"));
