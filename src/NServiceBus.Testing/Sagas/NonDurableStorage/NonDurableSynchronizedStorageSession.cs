@@ -18,6 +18,13 @@
             Transaction = null;
         }
 
+        public ValueTask DisposeAsync()
+        {
+            Transaction = null;
+
+            return ValueTask.CompletedTask;
+        }
+
         public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = new CancellationToken())
         {
             throw new NotImplementedException("Outbox transactions are not supported in the testing framework.");
