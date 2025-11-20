@@ -26,10 +26,7 @@
         /// Tells the endpoint to stop dispatching the current message to additional
         /// handlers.
         /// </summary>
-        public void DoNotContinueDispatchingCurrentMessageToHandlers()
-        {
-            DoNotContinueDispatchingCurrentMessageToHandlersWasCalled = true;
-        }
+        public void DoNotContinueDispatchingCurrentMessageToHandlers() => DoNotContinueDispatchingCurrentMessageToHandlersWasCalled = true;
 
         /// <summary>
         /// Gets the synchronized storage session for processing the current message. NServiceBus makes sure the changes made
@@ -53,7 +50,7 @@
         /// <summary>
         /// The message instance being handled.
         /// </summary>
-        public object MessageBeingHandled { get; set; } = new object();
+        public object MessageBeingHandled { get; set; } = new();
 
         /// <summary>
         /// <code>true</code> if
@@ -64,6 +61,6 @@
         /// <summary>
         /// Metadata for the incoming message.
         /// </summary>
-        public MessageMetadata MessageMetadata { get; set; } = new MessageMetadata(typeof(object));
+        public MessageMetadata MessageMetadata { get; set; } = new(typeof(object));
     }
 }
