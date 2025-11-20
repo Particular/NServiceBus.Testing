@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Testing
 {
     using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Persistence;
     using Pipeline;
     using Unicast.Messages;
@@ -27,10 +26,7 @@
         /// Tells the endpoint to stop dispatching the current message to additional
         /// handlers.
         /// </summary>
-        public void DoNotContinueDispatchingCurrentMessageToHandlers()
-        {
-            DoNotContinueDispatchingCurrentMessageToHandlersWasCalled = true;
-        }
+        public void DoNotContinueDispatchingCurrentMessageToHandlers() => DoNotContinueDispatchingCurrentMessageToHandlersWasCalled = true;
 
         /// <summary>
         /// Gets the synchronized storage session for processing the current message. NServiceBus makes sure the changes made
@@ -41,7 +37,10 @@
         /// <summary>
         /// The current <see cref="T:NServiceBus.IHandleMessages`1" /> being executed.
         /// </summary>
-        public MessageHandler MessageHandler { get; set; } = new MessageHandler((instance, message, context) => Task.CompletedTask, typeof(object));
+        public MessageHandler MessageHandler { get; set; } = new()
+        {
+            HandlerType = typeof(object)
+        };
 
         /// <summary>
         /// Message headers.
@@ -51,7 +50,7 @@
         /// <summary>
         /// The message instance being handled.
         /// </summary>
-        public object MessageBeingHandled { get; set; } = new object();
+        public object MessageBeingHandled { get; set; } = new();
 
         /// <summary>
         /// <code>true</code> if
@@ -62,6 +61,6 @@
         /// <summary>
         /// Metadata for the incoming message.
         /// </summary>
-        public MessageMetadata MessageMetadata { get; set; } = new MessageMetadata(typeof(object));
+        public MessageMetadata MessageMetadata { get; set; } = new(typeof(object));
     }
 }
