@@ -43,12 +43,10 @@
             IAmStartedByMessages<OrderBilled>,
             IHandleTimeouts<ShippingDelay>
         {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ShippingPolicyData> mapper)
-            {
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ShippingPolicyData> mapper) =>
                 mapper.MapSaga(saga => saga.OrderId)
                     .ToMessage<OrderPlaced>(msg => msg.OrderId)
                     .ToMessage<OrderBilled>(msg => msg.OrderId);
-            }
 
             public Task Handle(OrderPlaced message, IMessageHandlerContext context)
             {

@@ -33,21 +33,13 @@
             IAmStartedByMessages<StartMsg>,
             IHandleMessages<Step1Response>
         {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyData> mapper)
-            {
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyData> mapper) =>
                 mapper.MapSaga(saga => saga.CorrId)
                     .ToMessage<StartMsg>(msg => msg.CorrId);
-            }
 
-            public Task Handle(StartMsg message, IMessageHandlerContext context)
-            {
-                return context.Send(new RunStep1Command());
-            }
-            public Task Handle(Step1Response message, IMessageHandlerContext context)
-            {
-                return context.Publish(new DoneEvent { CorrId = Data.CorrId });
-            }
+            public Task Handle(StartMsg message, IMessageHandlerContext context) => context.Send(new RunStep1Command());
 
+            public Task Handle(Step1Response message, IMessageHandlerContext context) => context.Publish(new DoneEvent { CorrId = Data.CorrId });
         }
 
         public class MyData : ContainSagaData

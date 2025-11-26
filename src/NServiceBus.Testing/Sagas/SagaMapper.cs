@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Sagas;
 
@@ -22,20 +23,18 @@ class SagaMapper
 
     public string CorrelationPropertyName => correlationProperty.Name;
 
-    SagaMapper(Type sagaType, Type sagaDataType, object dummySagaForReflection)
+    SagaMapper(Type sagaType, Type sagaDataType)
     {
         metadata = SagaMetadata.Create(sagaType);
         handlerMethods = new ConcurrentDictionary<(Type messageType, string methodName), MethodInfo>();
 
-        if (!metadata.TryGetCorrelationProperty(out correlationProperty))
+        if (metadata.TryGetCorrelationProperty(out correlationProperty))
         {
-            throw new Exception($"Could not test saga {sagaType.Name} because the correlation property could not be determined.");
-        }
-
-        correlationPropertyInfo = sagaDataType.GetProperty(correlationProperty.Name);
-        if (correlationPropertyInfo == null)
-        {
-            throw new Exception($"Could not test saga {sagaType.Name} because a property on {sagaType.Name} matching the correlation property '{correlationProperty.Name}' could not be located.");
+            correlationPropertyInfo = sagaDataType.GetProperty(correlationProperty.Name);
+            if (correlationPropertyInfo == null)
+            {
+                throw new Exception($"Could not test saga {sagaType.Name} because a property on {sagaType.Name} matching the correlation property '{correlationProperty.Name}' could not be located.");
+            }
         }
 
         var configureHowToFindMethod = sagaType.GetMethod("ConfigureHowToFindSaga", BindingFlags.NonPublic | BindingFlags.Instance, null, [typeof(IConfigureHowToFindSagaWithMessage)], null);
@@ -44,18 +43,16 @@ class SagaMapper
             throw new Exception($"Could not test saga {sagaType.Name} because the ConfigureHowToFindSaga method could not be located.");
         }
 
+        var saga = (Saga)RuntimeHelpers.GetUninitializedObject(sagaType);
+
         var mappingReader = new MappingReader();
-        configureHowToFindMethod.Invoke(dummySagaForReflection, [mappingReader]);
+        configureHowToFindMethod.Invoke(saga, [mappingReader]);
 
         mappings = mappingReader.GetMappings();
     }
 
     public static SagaMapper Get<TSaga, TSagaEntity>(Func<TSaga> sagaFactory) =>
-        sagaMappers.GetOrAdd(typeof(TSaga), static (_, factory) =>
-        {
-            var dummySagaForReflection = factory();
-            return new SagaMapper(typeof(TSaga), typeof(TSagaEntity), dummySagaForReflection);
-        }, sagaFactory);
+        sagaMappers.GetOrAdd(typeof(TSaga), static (_, __) => new SagaMapper(typeof(TSaga), typeof(TSagaEntity)), sagaFactory);
 
     public bool HandlesMessageType(Type messageType)
         => metadata.AssociatedMessages.Any(m => m.MessageType == messageType);
@@ -89,7 +86,7 @@ class SagaMapper
         return invokeTask;
     }
 
-    class MappingReader : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders
+    class MappingReader : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders, IConfigureHowToFindSagaWithFinder
     {
         readonly Dictionary<Type, Func<QueuedSagaMessage, object>> mappings = [];
 
@@ -107,6 +104,8 @@ class SagaMapper
 
             mappings.Add(typeof(TMessage), GetValueFromMessage);
         }
+
+        void IConfigureHowToFindSagaWithFinder.ConfigureMapping<TSagaEntity, TMessage, TFinder>() => mappings.Add(typeof(TMessage), null);
 
         public IReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>> GetMappings() =>
             new ReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>>(mappings);

@@ -16,10 +16,7 @@
 
             var saga = new TestableSaga<ReplyingSaga, ReplyingSagaData>();
             // the Originator value is populated by the header value, not the context property
-            await saga.Handle(new StartSagaMessage() { CorrelationProperty = Guid.NewGuid() }, messageHeaders: new Dictionary<string, string>()
-            {
-                {Headers.ReplyToAddress, originatorAddress}
-            });
+            await saga.Handle(new StartSagaMessage() { CorrelationProperty = Guid.NewGuid() }, messageHeaders: new Dictionary<string, string>() { { Headers.ReplyToAddress, originatorAddress } });
             var result = await saga.HandleQueuedMessage();
 
             var reply = result.Context.RepliedMessages.SingleOrDefault();
@@ -53,18 +50,11 @@
         class ReplyingSaga : Saga<ReplyingSagaData>, IAmStartedByMessages<StartSagaMessage>, IHandleMessages<SendReplyMessage>
         {
             protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ReplyingSagaData> mapper) => mapper
-                .ConfigureMapping<StartSagaMessage>(m => m.CorrelationProperty)
-                .ToSaga(s => s.CorrelationProperty);
+                .MapSaga(s => s.CorrelationProperty).ToMessage<StartSagaMessage>(m => m.CorrelationProperty);
 
-            public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
-            {
-                return context.SendLocal(new SendReplyMessage());
-            }
+            public Task Handle(StartSagaMessage message, IMessageHandlerContext context) => context.SendLocal(new SendReplyMessage());
 
-            public Task Handle(SendReplyMessage message, IMessageHandlerContext context)
-            {
-                return ReplyToOriginator(context, new ReplyMessage { OriginatorAddress = Data.Originator });
-            }
+            public Task Handle(SendReplyMessage message, IMessageHandlerContext context) => ReplyToOriginator(context, new ReplyMessage { OriginatorAddress = Data.Originator });
         }
 
         class ReplyingSagaData : ContainSagaData
@@ -77,10 +67,7 @@
             public Guid CorrelationProperty { get; set; }
         }
 
-        class SendReplyMessage : ICommand
-        {
-            public Guid CorrelationProperty { get; set; }
-        }
+        class SendReplyMessage : ICommand;
 
         class ReplyMessage : IMessage
         {

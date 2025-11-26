@@ -57,12 +57,10 @@
             IHandleMessages<DelayedCmd>,
             IHandleTimeouts<RegularTimeout>
         {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<Data> mapper)
-            {
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<Data> mapper) =>
                 mapper.MapSaga(saga => saga.CorrId)
                     .ToMessage<Start>(msg => msg.CorrId)
                     .ToMessage<DelayedCmd>(msg => msg.CorrId);
-            }
 
             public async Task Handle(Start message, IMessageHandlerContext context)
             {

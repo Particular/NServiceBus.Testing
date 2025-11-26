@@ -12,9 +12,11 @@ using Persistence;
 public class CustomFinders
 {
     [Test]
-    public async Task TestHeaderMappings()
+    public async Task TestFinderMappings()
     {
         var testableSaga = new TestableSaga<FinderSaga, FinderSagaData>();
+
+        testableSaga.AddMockFinder<FinderMessage>(m => new FinderSagaData { CorrId = m.PartA + m.PartB });
 
         var finderMessage = new FinderMessage
         {
@@ -33,7 +35,7 @@ public class CustomFinders
     }
 
     public class FinderSaga : Saga<FinderSagaData>,
-        IHandleMessages<FinderMessage>
+        IAmStartedByMessages<FinderMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<FinderSagaData> mapper) => mapper.ConfigureFinderMapping<FinderMessage, CustomFinder>();
 
@@ -46,10 +48,7 @@ public class CustomFinders
         class CustomFinder : ISagaFinder<FinderSagaData, FinderMessage>
         {
             public Task<FinderSagaData> FindBy(FinderMessage message, ISynchronizedStorageSession storageSession, IReadOnlyContextBag context, CancellationToken cancellationToken = default) =>
-                Task.FromResult(new FinderSagaData
-                {
-                    CorrId = message.PartA + message.PartB
-                });
+                Task.FromResult(new FinderSagaData { CorrId = message.PartA + message.PartB });
         }
     }
 

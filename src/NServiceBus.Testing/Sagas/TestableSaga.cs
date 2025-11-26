@@ -26,6 +26,8 @@
         readonly SagaMapper sagaMapper;
         readonly List<(DateTime At, OutgoingMessage<object, SendOptions> Timeout)> storedTimeouts;
         readonly Dictionary<Type, List<(Type, Func<object, object>)>> replySimulators;
+        readonly Dictionary<Type, IFinderMock> finderMocks = [];
+
 
         /// <summary>
         /// Create a tester for a saga.
@@ -60,6 +62,11 @@
         /// which also handle any timeouts due during the specified <see cref="TimeSpan"/>.
         /// </summary>
         public DateTime CurrentTime { get; private set; }
+
+        /// <summary>
+        /// Mocks the given finder type.
+        /// </summary>
+        public void AddMockFinder<TMessage>(Func<TMessage, TSagaData> mockingFunc) where TMessage : class => finderMocks[typeof(TMessage)] = new FinderMock<TMessage>(mockingFunc);
 
         /// <summary>
         /// <c>true</c> if there are any queued messages.
@@ -106,6 +113,7 @@
             {
                 context = new TestableMessageHandlerContext();
             }
+
             var queueMessage = new QueuedSagaMessage(typeof(TMessage), message, messageHeaders);
             return InnerHandle(queueMessage, "Handle", context);
         }
@@ -306,13 +314,34 @@
                 return new SagaLoadResult { DiscardMessage = true };
             }
 
-            var messageMappedValue = sagaMapper.GetMessageMappedValue(message);
+            object messageMappedValue;
+            if (finderMocks.TryGetValue(message.Type, out var finderMock))
+            {
+                sagaData = finderMock.Mock(message);
 
-            sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+                if (sagaData.Id == Guid.Empty)
+                {
+                    sagaData.Id = Guid.NewGuid();
+                }
+
+                await persister.Save(sagaData, SagaCorrelationProperty.None, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+
+                messageMappedValue = null;
+            }
+            else
+            {
+                messageMappedValue = sagaMapper.GetMessageMappedValue(message);
+
+                sagaData = await persister.Get<TSagaData>(sagaMapper.CorrelationPropertyName, messageMappedValue, session, context.Extensions, context.CancellationToken).ConfigureAwait(false);
+            }
 
             if (sagaData != null)
             {
-                return new SagaLoadResult { Data = sagaData, MappedValue = messageMappedValue };
+                return new SagaLoadResult
+                {
+                    Data = sagaData,
+                    MappedValue = messageMappedValue
+                };
             }
 
             if (messageMetadata.IsAllowedToStartSaga)
@@ -320,9 +349,18 @@
                 var originatorAddress = message.Headers.TryGetValue(Headers.ReplyToAddress, out var replyAddress)
                     ? replyAddress
                     : context.ReplyToAddress; // This property has a default value set even when the header isn't set to require less setup for testing
-                sagaData = new TSagaData { Id = Guid.NewGuid(), Originator = originatorAddress };
+                sagaData = new TSagaData
+                {
+                    Id = Guid.NewGuid(),
+                    Originator = originatorAddress
+                };
                 sagaMapper.SetCorrelationPropertyValue(sagaData, messageMappedValue);
-                return new SagaLoadResult { Data = sagaData, IsNew = true, MappedValue = messageMappedValue };
+                return new SagaLoadResult
+                {
+                    Data = sagaData,
+                    IsNew = true,
+                    MappedValue = messageMappedValue
+                };
             }
 
             throw new Exception($"Saga not found and message type {message.Type.FullName} is not allowed to start the saga.");
@@ -338,6 +376,7 @@
                     // Can't update a brand new but already-completed saga
                     return;
                 }
+
                 await persister.Complete(saga.Entity, session, contextBag, cancellationToken).ConfigureAwait(false);
             }
             else if (isNew)
@@ -497,6 +536,16 @@
             /// or a default value if there is no replied message of the given type.
             /// </summary>
             public TMessage FindReplyMessage<TMessage>() => Context.FindReplyMessage<TMessage>();
+        }
+
+        interface IFinderMock
+        {
+            TSagaData Mock(QueuedSagaMessage message);
+        }
+
+        class FinderMock<TMessage>(Func<TMessage, TSagaData> mockingFunc) : IFinderMock
+        {
+            public TSagaData Mock(QueuedSagaMessage message) => mockingFunc((TMessage)message.Message);
         }
     }
 }
