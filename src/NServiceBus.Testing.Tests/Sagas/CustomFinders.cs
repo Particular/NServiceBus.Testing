@@ -14,9 +14,9 @@ public class CustomFinders
     [Test]
     public async Task TestFinderMappings()
     {
-        var testableSaga = new TestableSaga<FinderSaga, FinderSagaData>();
+        var testableSaga = new TestableSaga<FinderSaga, FinderSaga.FinderSagaData>();
 
-        testableSaga.AddMockFinder<FinderMessage>(m => new FinderSagaData { CorrId = m.PartA + m.PartB });
+        testableSaga.AddMockFinder<FinderMessage>(m => new FinderSaga.FinderSagaData { CorrId = m.PartA + m.PartB });
 
         var finderMessage = new FinderMessage
         {
@@ -34,9 +34,15 @@ public class CustomFinders
         });
     }
 
-    public class FinderSaga : Saga<FinderSagaData>,
+    public class FinderSaga : Saga<FinderSaga.FinderSagaData>,
         IAmStartedByMessages<FinderMessage>
     {
+        public class FinderSagaData : ContainSagaData
+        {
+            public string CorrId { get; set; }
+            public bool MessageReceived { get; set; }
+        }
+
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<FinderSagaData> mapper) => mapper.ConfigureFinderMapping<FinderMessage, CustomFinder>();
 
         public Task Handle(FinderMessage message, IMessageHandlerContext context)
@@ -50,12 +56,6 @@ public class CustomFinders
             public Task<FinderSagaData> FindBy(FinderMessage message, ISynchronizedStorageSession storageSession, IReadOnlyContextBag context, CancellationToken cancellationToken = default) =>
                 Task.FromResult(new FinderSagaData { CorrId = message.PartA + message.PartB });
         }
-    }
-
-    public class FinderSagaData : ContainSagaData
-    {
-        public string CorrId { get; set; }
-        public bool MessageReceived { get; set; }
     }
 
     public class FinderMessage : ICommand
