@@ -32,16 +32,12 @@
             IAmStartedByMessages<StartMsg>,
             IHandleMessages<Step1Reply>
         {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyData> mapper)
-            {
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyData> mapper) =>
                 mapper.MapSaga(saga => saga.ProcessId)
                     .ToMessage<StartMsg>(msg => msg.ProcessId);
-            }
 
-            public async Task Handle(StartMsg message, IMessageHandlerContext context)
-            {
-                await context.Send(new Step1Cmd());
-            }
+            public async Task Handle(StartMsg message, IMessageHandlerContext context) => await context.Send(new Step1Cmd());
+
             public Task Handle(Step1Reply message, IMessageHandlerContext context)
             {
                 Data.ReplyReceived = true;

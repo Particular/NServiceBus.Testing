@@ -25,16 +25,11 @@
             IAmStartedByMessages<MsgHappensTwice>,
             IHandleTimeouts<TimeoutHappensTwice>
         {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyCustomSagaData> mapper)
-            {
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyCustomSagaData> mapper) =>
                 mapper.MapSaga(saga => saga.CorrId)
                     .ToMessage<MsgHappensTwice>(message => message.CorrId);
-            }
 
-            public Task Handle(MsgHappensTwice message, IMessageHandlerContext context)
-            {
-                return RequestTimeout<TimeoutHappensTwice>(context, TimeSpan.FromHours(1));
-            }
+            public Task Handle(MsgHappensTwice message, IMessageHandlerContext context) => RequestTimeout<TimeoutHappensTwice>(context, TimeSpan.FromHours(1));
 
             public Task Timeout(TimeoutHappensTwice state, IMessageHandlerContext context)
             {

@@ -28,11 +28,9 @@
         public class HeaderSaga : Saga<HeaderSagaData>,
             IAmStartedByMessages<HeaderMessage>
         {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<HeaderSagaData> mapper)
-            {
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<HeaderSagaData> mapper) =>
                 mapper.MapSaga(saga => saga.CorrId)
                     .ToMessageHeader<HeaderMessage>("X-My-Correlation-Id");
-            }
 
             public Task Handle(HeaderMessage message, IMessageHandlerContext context)
             {

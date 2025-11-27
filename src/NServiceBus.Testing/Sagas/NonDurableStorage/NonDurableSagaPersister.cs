@@ -90,6 +90,8 @@
                 {
                     throw new Exception("A saga with this identifier already exists. This should never happened as saga identifier are meant to be unique.");
                 }
+
+                SetEntry(context, sagaData.Id, entry);
             });
 
             return Task.CompletedTask;
@@ -117,6 +119,7 @@
                 entries = [];
                 context.Set(ContextKey, entries);
             }
+
             entries[sagaId] = value;
         }
 
@@ -129,6 +132,7 @@
                     return entry;
                 }
             }
+
             throw new Exception("The saga should be retrieved with Get method before it's updated");
         }
 
@@ -186,10 +190,7 @@
 
             static Func<object, object> GenerateMemberwiseClone()
             {
-                var method = new DynamicMethod("CloneMemberwise", typeof(object), new[]
-                {
-                    typeof(object)
-                }, typeof(object).Assembly.ManifestModule, true);
+                var method = new DynamicMethod("CloneMemberwise", typeof(object), new[] { typeof(object) }, typeof(object).Assembly.ManifestModule, true);
                 var ilGenerator = method.GetILGenerator();
                 ilGenerator.Emit(OpCodes.Ldarg_0);
                 var methodInfo = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -272,7 +273,7 @@
     }
 
     static class CachedSagaDataTask<TSagaData>
-                    where TSagaData : IContainSagaData
+        where TSagaData : IContainSagaData
     {
         public static Task<TSagaData> Default = Task.FromResult(default(TSagaData));
     }

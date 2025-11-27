@@ -31,21 +31,13 @@
             IAmStartedByMessages<StartMsg>,
             IHandleMessages<SendToSelfCmd>
         {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyData> mapper)
-            {
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyData> mapper) =>
                 mapper.MapSaga(saga => saga.CorrId)
                     .ToMessage<StartMsg>(msg => msg.CorrId);
-            }
 
-            public Task Handle(StartMsg message, IMessageHandlerContext context)
-            {
-                return context.SendLocal(new SendToSelfCmd());
-            }
-            public Task Handle(SendToSelfCmd message, IMessageHandlerContext context)
-            {
-                return context.Publish(new DoneEvent { CorrId = Data.CorrId });
-            }
+            public Task Handle(StartMsg message, IMessageHandlerContext context) => context.SendLocal(new SendToSelfCmd());
 
+            public Task Handle(SendToSelfCmd message, IMessageHandlerContext context) => context.Publish(new DoneEvent { CorrId = Data.CorrId });
         }
 
         public class MyData : ContainSagaData
