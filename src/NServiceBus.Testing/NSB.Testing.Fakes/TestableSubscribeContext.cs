@@ -1,21 +1,20 @@
-﻿namespace NServiceBus.Testing
+﻿namespace NServiceBus.Testing;
+
+using System;
+using Pipeline;
+
+/// <summary>
+/// A testable implementation of <see cref="ISubscribeContext" />.
+/// </summary>
+public partial class TestableSubscribeContext : TestableBehaviorContext, ISubscribeContext
 {
-    using System;
-    using Pipeline;
+    /// <summary>
+    /// The type of the event.
+    /// </summary>
+    public Type EventType { get; set; } = typeof(object);
 
     /// <summary>
-    /// A testable implementation of <see cref="ISubscribeContext" />.
+    /// Events being subscribed to.
     /// </summary>
-    public partial class TestableSubscribeContext : TestableBehaviorContext, ISubscribeContext
-    {
-        /// <summary>
-        /// The type of the event.
-        /// </summary>
-        public Type EventType { get; set; } = typeof(object);
-
-        /// <summary>
-        /// Events being subscribed to.
-        /// </summary>
-        public Type[] EventTypes { get; set; } = Array.Empty<Type>();
-    }
+    public Type[] EventTypes { get; set; } = Array.Empty<Type>();
 }

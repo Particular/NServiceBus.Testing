@@ -1,279 +1,269 @@
-﻿namespace NServiceBus.Testing
+﻿namespace NServiceBus.Testing;
+
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Threading;
+using System.Threading.Tasks;
+using Extensibility;
+using Persistence;
+using Sagas;
+
+class NonDurableSagaPersister : ISagaPersister
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Reflection.Emit;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Extensibility;
-    using Persistence;
-    using Sagas;
-
-    class NonDurableSagaPersister : ISagaPersister
+    public NonDurableSagaPersister()
     {
-        public NonDurableSagaPersister()
-        {
-            sagas = new ConcurrentDictionary<Guid, Entry>();
-            sagasCollection = sagas;
-            byCorrelationId = new ConcurrentDictionary<CorrelationId, Guid>();
-            byCorrelationIdCollection = byCorrelationId;
-        }
+        sagas = new ConcurrentDictionary<Guid, Entry>();
+        sagasCollection = sagas;
+        byCorrelationId = new ConcurrentDictionary<CorrelationId, Guid>();
+        byCorrelationIdCollection = byCorrelationId;
+    }
 
-        public Task Complete(IContainSagaData sagaData, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+    public Task Complete(IContainSagaData sagaData, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+    {
+        ((NonDurableSynchronizedStorageSession)session).Enlist(() =>
         {
-            ((NonDurableSynchronizedStorageSession)session).Enlist(() =>
+            var entry = GetEntry(context, sagaData.Id);
+
+            if (sagasCollection.Remove(new KeyValuePair<Guid, Entry>(sagaData.Id, entry)) == false)
             {
-                var entry = GetEntry(context, sagaData.Id);
-
-                if (sagasCollection.Remove(new KeyValuePair<Guid, Entry>(sagaData.Id, entry)) == false)
-                {
-                    throw new Exception("Saga can't be completed as it was updated by another process.");
-                }
-
-                // saga removed
-                // clean the index
-                if (Equals(entry.CorrelationId, NoCorrelationId) == false)
-                {
-                    byCorrelationIdCollection.Remove(new KeyValuePair<CorrelationId, Guid>(entry.CorrelationId, sagaData.Id));
-                }
-            });
-
-            return Task.CompletedTask;
-        }
-
-        public Task<TSagaData> Get<TSagaData>(Guid sagaId, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
-            where TSagaData : class, IContainSagaData
-        {
-            if (sagas.TryGetValue(sagaId, out var value))
-            {
-                SetEntry(context, sagaId, value);
-
-                var data = value.GetSagaCopy();
-                return Task.FromResult((TSagaData)data);
+                throw new Exception("Saga can't be completed as it was updated by another process.");
             }
 
-            return CachedSagaDataTask<TSagaData>.Default;
+            // saga removed
+            // clean the index
+            if (Equals(entry.CorrelationId, NoCorrelationId) == false)
+            {
+                byCorrelationIdCollection.Remove(new KeyValuePair<CorrelationId, Guid>(entry.CorrelationId, sagaData.Id));
+            }
+        });
+
+        return Task.CompletedTask;
+    }
+
+    public Task<TSagaData> Get<TSagaData>(Guid sagaId, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        where TSagaData : class, IContainSagaData
+    {
+        if (sagas.TryGetValue(sagaId, out var value))
+        {
+            SetEntry(context, sagaId, value);
+
+            var data = value.GetSagaCopy();
+            return Task.FromResult((TSagaData)data);
         }
 
-        public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
-            where TSagaData : class, IContainSagaData
-        {
-            var key = new CorrelationId(typeof(TSagaData), propertyName, propertyValue);
+        return CachedSagaDataTask<TSagaData>.Default;
+    }
 
-            if (byCorrelationId.TryGetValue(key, out var id))
+    public Task<TSagaData> Get<TSagaData>(string propertyName, object propertyValue, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        where TSagaData : class, IContainSagaData
+    {
+        var key = new CorrelationId(typeof(TSagaData), propertyName, propertyValue);
+
+        if (byCorrelationId.TryGetValue(key, out var id))
+        {
+            // this isn't updated atomically and may return null for an entry that has been indexed but not inserted yet
+            return Get<TSagaData>(id, session, context, cancellationToken);
+        }
+
+        return CachedSagaDataTask<TSagaData>.Default;
+    }
+
+    public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+    {
+        ((NonDurableSynchronizedStorageSession)session).Enlist(() =>
+        {
+            var correlationId = NoCorrelationId;
+            if (correlationProperty != SagaCorrelationProperty.None)
             {
-                // this isn't updated atomically and may return null for an entry that has been indexed but not inserted yet
-                return Get<TSagaData>(id, session, context, cancellationToken);
+                correlationId = new CorrelationId(sagaData.GetType(), correlationProperty);
+                if (byCorrelationId.TryAdd(correlationId, sagaData.Id) == false)
+                {
+                    throw new InvalidOperationException($"The saga with the correlation id 'Name: {correlationProperty.Name} Value: {correlationProperty.Value}' already exists");
+                }
             }
 
-            return CachedSagaDataTask<TSagaData>.Default;
+            var entry = new Entry(sagaData, correlationId);
+            if (sagas.TryAdd(sagaData.Id, entry) == false)
+            {
+                throw new Exception("A saga with this identifier already exists. This should never happened as saga identifier are meant to be unique.");
+            }
+        });
+
+        return Task.CompletedTask;
+    }
+
+    public Task Update(IContainSagaData sagaData, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+    {
+        ((NonDurableSynchronizedStorageSession)session).Enlist(() =>
+        {
+            var entry = GetEntry(context, sagaData.Id);
+
+            if (sagas.TryUpdate(sagaData.Id, entry.UpdateTo(sagaData), entry) == false)
+            {
+                throw new Exception($"NonDurableSagaPersister concurrency violation: saga entity Id[{sagaData.Id}] already saved.");
+            }
+        });
+
+        return Task.CompletedTask;
+    }
+
+    static void SetEntry(ContextBag context, Guid sagaId, Entry value)
+    {
+        if (context.TryGet(ContextKey, out Dictionary<Guid, Entry> entries) == false)
+        {
+            entries = [];
+            context.Set(ContextKey, entries);
+        }
+        entries[sagaId] = value;
+    }
+
+    static Entry GetEntry(IReadOnlyContextBag context, Guid sagaDataId)
+    {
+        if (context.TryGet(ContextKey, out Dictionary<Guid, Entry> entries))
+        {
+            if (entries.TryGetValue(sagaDataId, out var entry))
+            {
+                return entry;
+            }
+        }
+        throw new Exception("The saga should be retrieved with Get method before it's updated");
+    }
+
+    readonly ConcurrentDictionary<Guid, Entry> sagas;
+    readonly ConcurrentDictionary<CorrelationId, Guid> byCorrelationId;
+    readonly ICollection<KeyValuePair<Guid, Entry>> sagasCollection;
+    readonly ICollection<KeyValuePair<CorrelationId, Guid>> byCorrelationIdCollection;
+    const string ContextKey = "NServiceBus.NonDurableSagaPersistence.Sagas";
+    static readonly CorrelationId NoCorrelationId = new CorrelationId(typeof(object), "", new object());
+
+    class Entry
+    {
+        static Entry()
+        {
+            var func = GenerateMemberwiseClone();
+            shallowCopy = sagaData => (IContainSagaData)func(sagaData);
         }
 
-        public Task Save(IContainSagaData sagaData, SagaCorrelationProperty correlationProperty, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Entry(IContainSagaData sagaData, CorrelationId correlationId)
         {
-            ((NonDurableSynchronizedStorageSession)session).Enlist(() =>
+            CorrelationId = correlationId;
+            data = sagaData;
+        }
+
+        public CorrelationId CorrelationId { get; }
+
+        static IContainSagaData DeepCopy(IContainSagaData source) => source.DeepCopy();
+
+        public IContainSagaData GetSagaCopy()
+        {
+            var canBeShallowCopied = canBeShallowCopiedCache.GetOrAdd(data.GetType(), type => CanBeShallowCopied(type));
+            return canBeShallowCopied ? shallowCopy(data) : DeepCopy(data);
+        }
+
+        static bool CanBeShallowCopied(Type type)
+        {
+            foreach (var fi in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy))
             {
-                var correlationId = NoCorrelationId;
-                if (correlationProperty != SagaCorrelationProperty.None)
+                var fieldType = fi.FieldType;
+
+                if (fieldType.IsPrimitive == false)
                 {
-                    correlationId = new CorrelationId(sagaData.GetType(), correlationProperty);
-                    if (byCorrelationId.TryAdd(correlationId, sagaData.Id) == false)
+                    if (fieldType != typeof(string) && fieldType != typeof(Guid))
                     {
-                        throw new InvalidOperationException($"The saga with the correlation id 'Name: {correlationProperty.Name} Value: {correlationProperty.Value}' already exists");
+                        return false;
                     }
                 }
+            }
 
-                var entry = new Entry(sagaData, correlationId);
-                if (sagas.TryAdd(sagaData.Id, entry) == false)
-                {
-                    throw new Exception("A saga with this identifier already exists. This should never happened as saga identifier are meant to be unique.");
-                }
-            });
-
-            return Task.CompletedTask;
+            return true;
         }
 
-        public Task Update(IContainSagaData sagaData, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        static Func<object, object> GenerateMemberwiseClone()
         {
-            ((NonDurableSynchronizedStorageSession)session).Enlist(() =>
+            var method = new DynamicMethod("CloneMemberwise", typeof(object), new[]
             {
-                var entry = GetEntry(context, sagaData.Id);
+                typeof(object)
+            }, typeof(object).Assembly.ManifestModule, true);
+            var ilGenerator = method.GetILGenerator();
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            var methodInfo = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            ilGenerator.EmitCall(OpCodes.Call, methodInfo, null);
+            ilGenerator.Emit(OpCodes.Ret);
 
-                if (sagas.TryUpdate(sagaData.Id, entry.UpdateTo(sagaData), entry) == false)
-                {
-                    throw new Exception($"NonDurableSagaPersister concurrency violation: saga entity Id[{sagaData.Id}] already saved.");
-                }
-            });
-
-            return Task.CompletedTask;
+            return (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
         }
 
-        static void SetEntry(ContextBag context, Guid sagaId, Entry value)
+        public Entry UpdateTo(IContainSagaData sagaData) => new(sagaData, CorrelationId);
+
+        readonly IContainSagaData data;
+        static ConcurrentDictionary<Type, bool> canBeShallowCopiedCache = new ConcurrentDictionary<Type, bool>();
+        static Func<IContainSagaData, IContainSagaData> shallowCopy;
+    }
+
+    /// <summary>
+    /// This correlation id is cheap to create as type and the propertyName are not allocated (they are stored in the saga
+    /// metadata).
+    /// The only thing that is allocated is the correlationId itself and the propertyValue, which again, is allocated anyway
+    /// by the saga behavior.
+    /// </summary>
+    class CorrelationId
+    {
+        public CorrelationId(Type type, string propertyName, object propertyValue)
         {
-            if (context.TryGet(ContextKey, out Dictionary<Guid, Entry> entries) == false)
-            {
-                entries = [];
-                context.Set(ContextKey, entries);
-            }
-            entries[sagaId] = value;
+            this.type = type;
+            this.propertyName = propertyName;
+            this.propertyValue = propertyValue;
         }
 
-        static Entry GetEntry(IReadOnlyContextBag context, Guid sagaDataId)
+        public CorrelationId(Type sagaType, SagaCorrelationProperty correlationProperty)
+            : this(sagaType, correlationProperty.Name, correlationProperty.Value)
         {
-            if (context.TryGet(ContextKey, out Dictionary<Guid, Entry> entries))
-            {
-                if (entries.TryGetValue(sagaDataId, out var entry))
-                {
-                    return entry;
-                }
-            }
-            throw new Exception("The saga should be retrieved with Get method before it's updated");
         }
 
-        readonly ConcurrentDictionary<Guid, Entry> sagas;
-        readonly ConcurrentDictionary<CorrelationId, Guid> byCorrelationId;
-        readonly ICollection<KeyValuePair<Guid, Entry>> sagasCollection;
-        readonly ICollection<KeyValuePair<CorrelationId, Guid>> byCorrelationIdCollection;
-        const string ContextKey = "NServiceBus.NonDurableSagaPersistence.Sagas";
-        static readonly CorrelationId NoCorrelationId = new CorrelationId(typeof(object), "", new object());
+        bool Equals(CorrelationId other) => type == other.type && string.Equals(propertyName, other.propertyName) && propertyValue.Equals(other.propertyValue);
 
-        class Entry
+        public override bool Equals(object obj)
         {
-            static Entry()
+            if (obj is null)
             {
-                var func = GenerateMemberwiseClone();
-                shallowCopy = sagaData => (IContainSagaData)func(sagaData);
+                return false;
             }
 
-            public Entry(IContainSagaData sagaData, CorrelationId correlationId)
+            if (ReferenceEquals(this, obj))
             {
-                CorrelationId = correlationId;
-                data = sagaData;
-            }
-
-            public CorrelationId CorrelationId { get; }
-
-            static IContainSagaData DeepCopy(IContainSagaData source)
-            {
-                return source.DeepCopy();
-            }
-
-            public IContainSagaData GetSagaCopy()
-            {
-                var canBeShallowCopied = canBeShallowCopiedCache.GetOrAdd(data.GetType(), type => CanBeShallowCopied(type));
-                return canBeShallowCopied ? shallowCopy(data) : DeepCopy(data);
-            }
-
-            static bool CanBeShallowCopied(Type type)
-            {
-                foreach (var fi in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy))
-                {
-                    var fieldType = fi.FieldType;
-
-                    if (fieldType.IsPrimitive == false)
-                    {
-                        if (fieldType != typeof(string) && fieldType != typeof(Guid))
-                        {
-                            return false;
-                        }
-                    }
-                }
-
                 return true;
             }
 
-            static Func<object, object> GenerateMemberwiseClone()
+            if (obj.GetType() != GetType())
             {
-                var method = new DynamicMethod("CloneMemberwise", typeof(object), new[]
-                {
-                    typeof(object)
-                }, typeof(object).Assembly.ManifestModule, true);
-                var ilGenerator = method.GetILGenerator();
-                ilGenerator.Emit(OpCodes.Ldarg_0);
-                var methodInfo = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                ilGenerator.EmitCall(OpCodes.Call, methodInfo, null);
-                ilGenerator.Emit(OpCodes.Ret);
-
-                return (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+                return false;
             }
 
-            public Entry UpdateTo(IContainSagaData sagaData)
-            {
-                return new Entry(sagaData, CorrelationId);
-            }
-
-            readonly IContainSagaData data;
-            static ConcurrentDictionary<Type, bool> canBeShallowCopiedCache = new ConcurrentDictionary<Type, bool>();
-            static Func<IContainSagaData, IContainSagaData> shallowCopy;
+            return Equals((CorrelationId)obj);
         }
 
-        /// <summary>
-        /// This correlation id is cheap to create as type and the propertyName are not allocated (they are stored in the saga
-        /// metadata).
-        /// The only thing that is allocated is the correlationId itself and the propertyValue, which again, is allocated anyway
-        /// by the saga behavior.
-        /// </summary>
-        class CorrelationId
+        public override int GetHashCode()
         {
-            public CorrelationId(Type type, string propertyName, object propertyValue)
+            unchecked
             {
-                this.type = type;
-                this.propertyName = propertyName;
-                this.propertyValue = propertyValue;
+                // propertyName isn't taken into consideration as there will be only one property per saga to correlate.
+                var hashCode = type.GetHashCode();
+                hashCode = (hashCode * 397) ^ propertyValue.GetHashCode();
+                return hashCode;
             }
-
-            public CorrelationId(Type sagaType, SagaCorrelationProperty correlationProperty)
-                : this(sagaType, correlationProperty.Name, correlationProperty.Value)
-            {
-            }
-
-            bool Equals(CorrelationId other)
-            {
-                return type == other.type && string.Equals(propertyName, other.propertyName) && propertyValue.Equals(other.propertyValue);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (obj is null)
-                {
-                    return false;
-                }
-
-                if (ReferenceEquals(this, obj))
-                {
-                    return true;
-                }
-
-                if (obj.GetType() != GetType())
-                {
-                    return false;
-                }
-
-                return Equals((CorrelationId)obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    // propertyName isn't taken into consideration as there will be only one property per saga to correlate.
-                    var hashCode = type.GetHashCode();
-                    hashCode = (hashCode * 397) ^ propertyValue.GetHashCode();
-                    return hashCode;
-                }
-            }
-
-            readonly Type type;
-            readonly string propertyName;
-            readonly object propertyValue;
         }
-    }
 
-    static class CachedSagaDataTask<TSagaData>
-                    where TSagaData : IContainSagaData
-    {
-        public static Task<TSagaData> Default = Task.FromResult(default(TSagaData));
+        readonly Type type;
+        readonly string propertyName;
+        readonly object propertyValue;
     }
+}
+
+static class CachedSagaDataTask<TSagaData>
+    where TSagaData : IContainSagaData
+{
+    public static Task<TSagaData> Default = Task.FromResult(default(TSagaData));
 }
