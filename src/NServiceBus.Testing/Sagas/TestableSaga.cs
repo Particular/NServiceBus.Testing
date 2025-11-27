@@ -66,7 +66,7 @@
         /// <summary>
         /// Mocks the given finder type.
         /// </summary>
-        public void AddMockFinder<TMessage>(Func<TMessage, TSagaData> mockingFunc) where TMessage : class => finderMocks[typeof(TMessage)] = new FinderMock<TMessage>(mockingFunc);
+        public void MockFinder<TFinder, TMessage>(Func<TMessage, TSagaData> mockingFunc) where TFinder : ISagaFinder<TSagaData,TMessage> => finderMocks[typeof(TFinder)] = new FinderMock<TMessage>(mockingFunc);
 
         /// <summary>
         /// <c>true</c> if there are any queued messages.
@@ -253,7 +253,7 @@
         /// </returns>
         public async Task<HandleResult[]> AdvanceTime(TimeSpan timeToAdvance, Func<OutgoingMessage<object, SendOptions>, TestableMessageHandlerContext> provideContext = null, CancellationToken cancellationToken = default)
         {
-            var contextFactory = provideContext ?? new Func<OutgoingMessage<object, SendOptions>, TestableMessageHandlerContext>(timeout => new TestableMessageHandlerContext());
+            var contextFactory = provideContext ?? (_ => new TestableMessageHandlerContext());
             var advanceToTime = CurrentTime + timeToAdvance;
 
             var due = storedTimeouts.Where(t => t.At <= advanceToTime).OrderBy(t => t.At).ToArray();

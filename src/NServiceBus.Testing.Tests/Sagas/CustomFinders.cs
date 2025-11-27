@@ -16,9 +16,9 @@ public class CustomFinders
     {
         var testableSaga = new TestableSaga<FinderSaga, FinderSaga.FinderSagaData>();
 
-        testableSaga.AddMockFinder<FinderMessage>(m => new FinderSaga.FinderSagaData { CorrId = m.PartA + m.PartB });
+        testableSaga.MockFinder<StartMessageFinder, StartMessage>(_ => null);
 
-        var finderMessage = new FinderMessage
+        var finderMessage = new StartMessage
         {
             PartA = Guid.NewGuid().ToString().Substring(0, 8),
             PartB = Guid.NewGuid().ToString().Substring(0, 8)
@@ -34,8 +34,13 @@ public class CustomFinders
         });
     }
 
+    class StartMessageFinder : ISagaFinder<FinderSaga.FinderSagaData, StartMessage>
+    {
+        public Task<FinderSaga.FinderSagaData> FindBy(StartMessage message, ISynchronizedStorageSession storageSession, IReadOnlyContextBag context, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    }
+
     public class FinderSaga : Saga<FinderSaga.FinderSagaData>,
-        IAmStartedByMessages<FinderMessage>
+        IAmStartedByMessages<StartMessage>
     {
         public class FinderSagaData : ContainSagaData
         {
@@ -43,22 +48,16 @@ public class CustomFinders
             public bool MessageReceived { get; set; }
         }
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<FinderSagaData> mapper) => mapper.ConfigureFinderMapping<FinderMessage, CustomFinder>();
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<FinderSagaData> mapper) => mapper.ConfigureFinderMapping<StartMessage, StartMessageFinder>();
 
-        public Task Handle(FinderMessage message, IMessageHandlerContext context)
+        public Task Handle(StartMessage message, IMessageHandlerContext context)
         {
             Data.MessageReceived = true;
             return Task.CompletedTask;
         }
-
-        class CustomFinder : ISagaFinder<FinderSagaData, FinderMessage>
-        {
-            public Task<FinderSagaData> FindBy(FinderMessage message, ISynchronizedStorageSession storageSession, IReadOnlyContextBag context, CancellationToken cancellationToken = default) =>
-                Task.FromResult(new FinderSagaData { CorrId = message.PartA + message.PartB });
-        }
     }
 
-    public class FinderMessage : ICommand
+    public class StartMessage : ICommand
     {
         public string PartA { get; set; }
         public string PartB { get; set; }
