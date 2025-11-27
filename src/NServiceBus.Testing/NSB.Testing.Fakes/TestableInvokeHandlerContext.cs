@@ -1,66 +1,65 @@
-﻿namespace NServiceBus.Testing
+﻿namespace NServiceBus.Testing;
+
+using System.Collections.Generic;
+using Persistence;
+using Pipeline;
+using Unicast.Messages;
+
+/// <summary>
+/// A testable implementation of <see cref="IInvokeHandlerContext" />.
+/// </summary>
+public partial class TestableInvokeHandlerContext : TestableIncomingContext, IInvokeHandlerContext
 {
-    using System.Collections.Generic;
-    using Persistence;
-    using Pipeline;
-    using Unicast.Messages;
+    /// <summary>
+    /// Creates a new instance of <see cref="TestableInvokeHandlerContext" />.
+    /// </summary>
+    public TestableInvokeHandlerContext(IMessageCreator messageCreator = null) : base(messageCreator)
+    {
+    }
 
     /// <summary>
-    /// A testable implementation of <see cref="IInvokeHandlerContext" />.
+    /// Indicates if <see cref="IMessageHandlerContext.DoNotContinueDispatchingCurrentMessageToHandlers" /> has been called.
     /// </summary>
-    public partial class TestableInvokeHandlerContext : TestableIncomingContext, IInvokeHandlerContext
+    public bool DoNotContinueDispatchingCurrentMessageToHandlersWasCalled { get; set; }
+
+    /// <summary>
+    /// Tells the endpoint to stop dispatching the current message to additional
+    /// handlers.
+    /// </summary>
+    public void DoNotContinueDispatchingCurrentMessageToHandlers() => DoNotContinueDispatchingCurrentMessageToHandlersWasCalled = true;
+
+    /// <summary>
+    /// Gets the synchronized storage session for processing the current message. NServiceBus makes sure the changes made
+    /// via this session will be persisted before the message receive is acknowledged.
+    /// </summary>
+    public ISynchronizedStorageSession SynchronizedStorageSession { get; set; }
+
+    /// <summary>
+    /// The current <see cref="T:NServiceBus.IHandleMessages`1" /> being executed.
+    /// </summary>
+    public MessageHandler MessageHandler { get; set; } = new()
     {
-        /// <summary>
-        /// Creates a new instance of <see cref="TestableInvokeHandlerContext" />.
-        /// </summary>
-        public TestableInvokeHandlerContext(IMessageCreator messageCreator = null) : base(messageCreator)
-        {
-        }
+        HandlerType = typeof(object)
+    };
 
-        /// <summary>
-        /// Indicates if <see cref="IMessageHandlerContext.DoNotContinueDispatchingCurrentMessageToHandlers" /> has been called.
-        /// </summary>
-        public bool DoNotContinueDispatchingCurrentMessageToHandlersWasCalled { get; set; }
+    /// <summary>
+    /// Message headers.
+    /// </summary>
+    public Dictionary<string, string> Headers { get; set; } = [];
 
-        /// <summary>
-        /// Tells the endpoint to stop dispatching the current message to additional
-        /// handlers.
-        /// </summary>
-        public void DoNotContinueDispatchingCurrentMessageToHandlers() => DoNotContinueDispatchingCurrentMessageToHandlersWasCalled = true;
+    /// <summary>
+    /// The message instance being handled.
+    /// </summary>
+    public object MessageBeingHandled { get; set; } = new();
 
-        /// <summary>
-        /// Gets the synchronized storage session for processing the current message. NServiceBus makes sure the changes made
-        /// via this session will be persisted before the message receive is acknowledged.
-        /// </summary>
-        public ISynchronizedStorageSession SynchronizedStorageSession { get; set; }
+    /// <summary>
+    /// <code>true</code> if
+    /// <see cref="M:NServiceBus.IMessageHandlerContext.DoNotContinueDispatchingCurrentMessageToHandlers" /> has been called.
+    /// </summary>
+    public bool HandlerInvocationAborted => DoNotContinueDispatchingCurrentMessageToHandlersWasCalled;
 
-        /// <summary>
-        /// The current <see cref="T:NServiceBus.IHandleMessages`1" /> being executed.
-        /// </summary>
-        public MessageHandler MessageHandler { get; set; } = new()
-        {
-            HandlerType = typeof(object)
-        };
-
-        /// <summary>
-        /// Message headers.
-        /// </summary>
-        public Dictionary<string, string> Headers { get; set; } = [];
-
-        /// <summary>
-        /// The message instance being handled.
-        /// </summary>
-        public object MessageBeingHandled { get; set; } = new();
-
-        /// <summary>
-        /// <code>true</code> if
-        /// <see cref="M:NServiceBus.IMessageHandlerContext.DoNotContinueDispatchingCurrentMessageToHandlers" /> has been called.
-        /// </summary>
-        public bool HandlerInvocationAborted => DoNotContinueDispatchingCurrentMessageToHandlersWasCalled;
-
-        /// <summary>
-        /// Metadata for the incoming message.
-        /// </summary>
-        public MessageMetadata MessageMetadata { get; set; } = new(typeof(object));
-    }
+    /// <summary>
+    /// Metadata for the incoming message.
+    /// </summary>
+    public MessageMetadata MessageMetadata { get; set; } = new(typeof(object));
 }

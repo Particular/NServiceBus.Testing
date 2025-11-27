@@ -1,83 +1,80 @@
-﻿namespace NServiceBus.Testing.Tests.Sagas
+﻿namespace NServiceBus.Testing.Tests.Sagas;
+
+using System.Threading.Tasks;
+using NUnit.Framework;
+
+[TestFixture]
+public class TwoSagas
 {
-    using System.Threading.Tasks;
-    using NUnit.Framework;
-
-    [TestFixture]
-    public class TwoSagas
+    [Test]
+    public async Task TestWithDifferentCorrelationIds()
     {
-        [Test]
-        public async Task TestWithDifferentCorrelationIds()
+        var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>();
+
+        var placeResultA = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
+        var billedResultB = await testableSaga.Handle(new OrderBilled { OrderId = "def" });
+
+        Assert.Multiple(() =>
         {
-            var testableSaga = new TestableSaga<ShippingPolicy, ShippingPolicyData>();
+            Assert.That(placeResultA.Completed, Is.False);
+            Assert.That(billedResultB.Completed, Is.False);
+            Assert.That(placeResultA.SagaId, Is.Not.EqualTo(billedResultB.SagaId));
+        });
 
-            var placeResultA = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
-            var billedResultB = await testableSaga.Handle(new OrderBilled { OrderId = "def" });
+        var billedResultA = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
+        var shipped = billedResultA.FindPublishedMessage<OrderShipped>();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(placeResultA.Completed, Is.False);
-                Assert.That(billedResultB.Completed, Is.False);
-                Assert.That(placeResultA.SagaId, Is.Not.EqualTo(billedResultB.SagaId));
-            });
+        Assert.That(shipped.OrderId, Is.EqualTo("abc"));
+    }
 
-            var billedResultA = await testableSaga.Handle(new OrderBilled { OrderId = "abc" });
-            var shipped = billedResultA.FindPublishedMessage<OrderShipped>();
+    public class ShippingPolicy : Saga<ShippingPolicyData>,
+        IAmStartedByMessages<OrderPlaced>,
+        IAmStartedByMessages<OrderBilled>
+    {
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ShippingPolicyData> mapper) =>
+            mapper.MapSaga(saga => saga.OrderId)
+                .ToMessage<OrderPlaced>(msg => msg.OrderId)
+                .ToMessage<OrderBilled>(msg => msg.OrderId);
 
-            Assert.That(shipped.OrderId, Is.EqualTo("abc"));
+        public Task Handle(OrderPlaced message, IMessageHandlerContext context)
+        {
+            Data.Placed = true;
+            return TimeToShip(context);
         }
-
-        public class ShippingPolicy : Saga<ShippingPolicyData>,
-            IAmStartedByMessages<OrderPlaced>,
-            IAmStartedByMessages<OrderBilled>
+        public Task Handle(OrderBilled message, IMessageHandlerContext context)
         {
-            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<ShippingPolicyData> mapper)
+            Data.Billed = true;
+            return TimeToShip(context);
+        }
+        public async Task TimeToShip(IMessageHandlerContext context)
+        {
+            if (Data.Placed && Data.Billed)
             {
-                mapper.MapSaga(saga => saga.OrderId)
-                    .ToMessage<OrderPlaced>(msg => msg.OrderId)
-                    .ToMessage<OrderBilled>(msg => msg.OrderId);
-            }
-
-            public Task Handle(OrderPlaced message, IMessageHandlerContext context)
-            {
-                Data.Placed = true;
-                return TimeToShip(context);
-            }
-            public Task Handle(OrderBilled message, IMessageHandlerContext context)
-            {
-                Data.Billed = true;
-                return TimeToShip(context);
-            }
-            public async Task TimeToShip(IMessageHandlerContext context)
-            {
-                if (Data.Placed && Data.Billed)
-                {
-                    await context.Publish(new OrderShipped { OrderId = Data.OrderId });
-                }
+                await context.Publish(new OrderShipped { OrderId = Data.OrderId });
             }
         }
+    }
 
-        public class ShippingPolicyData : ContainSagaData
-        {
-            public string OrderId { get; set; }
-            public bool Placed { get; set; }
-            public bool Billed { get; set; }
-            public bool HeaderMessageReceived { get; set; }
-        }
+    public class ShippingPolicyData : ContainSagaData
+    {
+        public string OrderId { get; set; }
+        public bool Placed { get; set; }
+        public bool Billed { get; set; }
+        public bool HeaderMessageReceived { get; set; }
+    }
 
-        public class OrderPlaced : IEvent
-        {
-            public string OrderId { get; set; }
-        }
+    public class OrderPlaced : IEvent
+    {
+        public string OrderId { get; set; }
+    }
 
-        public class OrderBilled : IEvent
-        {
-            public string OrderId { get; set; }
-        }
+    public class OrderBilled : IEvent
+    {
+        public string OrderId { get; set; }
+    }
 
-        public class OrderShipped : IEvent
-        {
-            public string OrderId { get; set; }
-        }
+    public class OrderShipped : IEvent
+    {
+        public string OrderId { get; set; }
     }
 }

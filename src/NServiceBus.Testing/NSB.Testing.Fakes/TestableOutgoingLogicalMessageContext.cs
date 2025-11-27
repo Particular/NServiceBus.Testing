@@ -1,31 +1,27 @@
-﻿namespace NServiceBus.Testing
+﻿namespace NServiceBus.Testing;
+
+using System;
+using System.Collections.Generic;
+using Pipeline;
+using Routing;
+
+/// <summary>
+/// A testable implementation of <see cref="IOutgoingLogicalMessageContext" />.
+/// </summary>
+public partial class TestableOutgoingLogicalMessageContext : TestableOutgoingContext, IOutgoingLogicalMessageContext
 {
-    using System;
-    using System.Collections.Generic;
-    using Pipeline;
-    using Routing;
+    /// <summary>
+    /// Updates the message instance.
+    /// </summary>
+    public virtual void UpdateMessage(object newInstance) => Message = new OutgoingLogicalMessage(newInstance.GetType(), newInstance);
 
     /// <summary>
-    /// A testable implementation of <see cref="IOutgoingLogicalMessageContext" />.
+    /// The outgoing message.
     /// </summary>
-    public partial class TestableOutgoingLogicalMessageContext : TestableOutgoingContext, IOutgoingLogicalMessageContext
-    {
-        /// <summary>
-        /// Updates the message instance.
-        /// </summary>
-        public virtual void UpdateMessage(object newInstance)
-        {
-            Message = new OutgoingLogicalMessage(newInstance.GetType(), newInstance);
-        }
+    public OutgoingLogicalMessage Message { get; set; } = new OutgoingLogicalMessage(typeof(object), new object());
 
-        /// <summary>
-        /// The outgoing message.
-        /// </summary>
-        public OutgoingLogicalMessage Message { get; set; } = new OutgoingLogicalMessage(typeof(object), new object());
-
-        /// <summary>
-        /// The routing strategies for this message.
-        /// </summary>
-        public IReadOnlyCollection<RoutingStrategy> RoutingStrategies { get; set; } = Array.Empty<RoutingStrategy>();
-    }
+    /// <summary>
+    /// The routing strategies for this message.
+    /// </summary>
+    public IReadOnlyCollection<RoutingStrategy> RoutingStrategies { get; set; } = Array.Empty<RoutingStrategy>();
 }

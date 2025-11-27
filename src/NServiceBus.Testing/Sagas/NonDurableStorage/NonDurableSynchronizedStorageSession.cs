@@ -1,88 +1,78 @@
-﻿namespace NServiceBus.Testing
+﻿namespace NServiceBus.Testing;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Transactions;
+using Extensibility;
+using Outbox;
+using Persistence;
+using Transport;
+
+class NonDurableSynchronizedStorageSession : ICompletableSynchronizedStorageSession
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Transactions;
-    using Extensibility;
-    using Outbox;
-    using Persistence;
-    using Transport;
+    public NonDurableTransaction Transaction { get; private set; }
 
-    class NonDurableSynchronizedStorageSession : ICompletableSynchronizedStorageSession
+    public void Dispose() => Transaction = null;
+
+    public ValueTask DisposeAsync()
     {
-        public NonDurableTransaction Transaction { get; private set; }
+        Transaction = null;
 
-        public void Dispose()
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException("Outbox transactions are not supported in the testing framework.");
+
+    public ValueTask<bool> TryOpen(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException("Transport transactions are not supported in the testing framework.");
+
+    public Task Open(ContextBag contextBag, CancellationToken cancellationToken = new CancellationToken())
+    {
+        Transaction = new NonDurableTransaction();
+        ownsTransaction = true;
+        return Task.CompletedTask;
+    }
+
+    public Task CompleteAsync(CancellationToken cancellationToken = default)
+    {
+        if (ownsTransaction)
         {
-            Transaction = null;
+            Transaction.Commit();
         }
+        return Task.CompletedTask;
+    }
 
-        public ValueTask DisposeAsync()
+    public void Enlist(Action action) => Transaction.Enlist(action);
+
+    bool ownsTransaction;
+
+    class EnlistmentNotification2 : IEnlistmentNotification
+    {
+        public EnlistmentNotification2(NonDurableTransaction transaction) => this.transaction = transaction;
+
+        public void Prepare(PreparingEnlistment preparingEnlistment)
         {
-            Transaction = null;
-
-            return ValueTask.CompletedTask;
-        }
-
-        public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = new CancellationToken())
-        {
-            throw new NotImplementedException("Outbox transactions are not supported in the testing framework.");
-        }
-
-        public ValueTask<bool> TryOpen(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = new CancellationToken())
-        {
-            throw new NotImplementedException("Transport transactions are not supported in the testing framework.");
-        }
-
-        public Task Open(ContextBag contextBag, CancellationToken cancellationToken = new CancellationToken())
-        {
-            Transaction = new NonDurableTransaction();
-            ownsTransaction = true;
-            return Task.CompletedTask;
-        }
-
-        public Task CompleteAsync(CancellationToken cancellationToken = default)
-        {
-            if (ownsTransaction)
+            try
             {
-                Transaction.Commit();
+                transaction.Commit();
+                preparingEnlistment.Prepared();
             }
-            return Task.CompletedTask;
+            catch (Exception ex)
+            {
+                preparingEnlistment.ForceRollback(ex);
+            }
         }
 
-        public void Enlist(Action action) => Transaction.Enlist(action);
+        public void Commit(Enlistment enlistment) => enlistment.Done();
 
-        bool ownsTransaction;
-
-        class EnlistmentNotification2 : IEnlistmentNotification
+        public void Rollback(Enlistment enlistment)
         {
-            public EnlistmentNotification2(NonDurableTransaction transaction) => this.transaction = transaction;
-
-            public void Prepare(PreparingEnlistment preparingEnlistment)
-            {
-                try
-                {
-                    transaction.Commit();
-                    preparingEnlistment.Prepared();
-                }
-                catch (Exception ex)
-                {
-                    preparingEnlistment.ForceRollback(ex);
-                }
-            }
-
-            public void Commit(Enlistment enlistment) => enlistment.Done();
-
-            public void Rollback(Enlistment enlistment)
-            {
-                transaction.Rollback();
-                enlistment.Done();
-            }
-
-            public void InDoubt(Enlistment enlistment) => enlistment.Done();
-
-            readonly NonDurableTransaction transaction;
+            transaction.Rollback();
+            enlistment.Done();
         }
+
+        public void InDoubt(Enlistment enlistment) => enlistment.Done();
+
+        readonly NonDurableTransaction transaction;
     }
 }

@@ -1,29 +1,22 @@
-﻿namespace NServiceBus
+﻿namespace NServiceBus;
+
+using System;
+using System.Collections.Generic;
+
+class NonDurableTransaction
 {
-    using System;
-    using System.Collections.Generic;
+    public void Enlist(Action action) => actions.Add(action);
 
-    class NonDurableTransaction
+    public void Commit()
     {
-        public void Enlist(Action action)
+        foreach (var action in actions)
         {
-            actions.Add(action);
+            action();
         }
-
-        public void Commit()
-        {
-            foreach (var action in actions)
-            {
-                action();
-            }
-            actions.Clear();
-        }
-
-        public void Rollback()
-        {
-            actions.Clear();
-        }
-
-        List<Action> actions = [];
+        actions.Clear();
     }
+
+    public void Rollback() => actions.Clear();
+
+    List<Action> actions = [];
 }

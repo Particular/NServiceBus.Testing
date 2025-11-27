@@ -1,19 +1,12 @@
-﻿namespace NServiceBus.Testing
+﻿namespace NServiceBus.Testing;
+
+using System.IO;
+
+class TextWriterLogger
 {
-    using System.IO;
+    public TextWriterLogger(TextWriter textWriter) => writer = textWriter;
 
-    class TextWriterLogger
-    {
-        public TextWriterLogger(TextWriter textWriter)
-        {
-            writer = textWriter;
-        }
+    public void Write(string message) => writer.WriteLine(message);
 
-        public void Write(string message)
-        {
-            writer.WriteLine(message);
-        }
-
-        TextWriter writer;
-    }
+    TextWriter writer;
 }
