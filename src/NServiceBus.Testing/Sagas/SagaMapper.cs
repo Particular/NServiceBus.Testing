@@ -12,10 +12,10 @@ using NServiceBus.Sagas;
 
 class SagaMapper
 {
-    static readonly ConcurrentDictionary<Type, SagaMapper> sagaMappers = new ConcurrentDictionary<Type, SagaMapper>();
+    static readonly ConcurrentDictionary<Type, SagaMapper> sagaMappers = new();
 
     readonly SagaMetadata metadata;
-    readonly IReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>> mappings;
+    readonly IReadOnlyDictionary<Type, SagaMapping> mappings;
     readonly SagaMetadata.CorrelationPropertyMetadata correlationProperty;
     readonly PropertyInfo correlationPropertyInfo;
     readonly ConcurrentDictionary<(Type messageType, string methodName), MethodInfo> handlerMethods;
@@ -65,12 +65,17 @@ class SagaMapper
 
     public object GetMessageMappedValue(QueuedSagaMessage message)
     {
-        if (mappings.TryGetValue(message.Type, out var mapping))
+        if (!mappings.TryGetValue(message.Type, out var mapping))
         {
-            return mapping(message);
+            throw new Exception("No mapped value found from message, could not look up saga data.");
         }
 
-        throw new Exception("No mapped value found from message, could not look up saga data.");
+        if (mapping.IsCustomFinder)
+        {
+            throw new NotSupportedException("Testing saga invocations with a custom saga finder is not supported");
+        }
+
+        return mapping.Map(message);
     }
 
     public void SetCorrelationPropertyValue(IContainSagaData sagaEntity, object value)
@@ -89,15 +94,15 @@ class SagaMapper
         return invokeTask;
     }
 
-    class MappingReader : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders
+    class MappingReader : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders, IConfigureHowToFindSagaWithFinder
     {
-        readonly Dictionary<Type, Func<QueuedSagaMessage, object>> mappings = [];
+        readonly Dictionary<Type, SagaMapping> mappings = [];
 
         void IConfigureHowToFindSagaWithMessage.ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, Expression<Func<TMessage, object>> messageProperty)
         {
             Func<TMessage, object> compiledExpression = messageProperty.Compile();
             object GetValueFromMessage(QueuedSagaMessage message) => compiledExpression((TMessage)message.Message);
-            mappings.Add(typeof(TMessage), GetValueFromMessage);
+            mappings.Add(typeof(TMessage), new SagaMapping(GetValueFromMessage, false));
         }
 
         void IConfigureHowToFindSagaWithMessageHeaders.ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, string headerName)
@@ -105,10 +110,14 @@ class SagaMapper
             object GetValueFromMessage(QueuedSagaMessage message)
                 => message.Headers.GetValueOrDefault(headerName);
 
-            mappings.Add(typeof(TMessage), GetValueFromMessage);
+            mappings.Add(typeof(TMessage), new SagaMapping(GetValueFromMessage, false));
         }
 
-        public IReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>> GetMappings() =>
-            new ReadOnlyDictionary<Type, Func<QueuedSagaMessage, object>>(mappings);
+        void IConfigureHowToFindSagaWithFinder.ConfigureMapping<TSagaEntity, TMessage, TFinder>() => mappings.Add(typeof(TMessage), new SagaMapping(null, true));
+
+        public IReadOnlyDictionary<Type, SagaMapping> GetMappings() =>
+            new ReadOnlyDictionary<Type, SagaMapping>(mappings);
     }
+
+    record SagaMapping(Func<QueuedSagaMessage, object> Map, bool IsCustomFinder);
 }
