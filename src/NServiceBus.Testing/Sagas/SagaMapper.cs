@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -73,15 +72,14 @@ class SagaMapper
         return mapping.IsCustomFinder ? throw new NotSupportedException("Testing saga invocations with a custom saga finder is currently not supported") : mapping.Map(message);
     }
 
-    public void SetCorrelationPropertyValue(IContainSagaData sagaEntity, object value)
-        => correlationPropertyInfo.SetValue(sagaEntity, value);
+    public void SetCorrelationPropertyValue(IContainSagaData sagaEntity, object value) => correlationPropertyInfo.SetValue(sagaEntity, value);
 
     public Task InvokeHandlerMethod<TSaga>(TSaga saga, string methodName, QueuedSagaMessage message, TestableMessageHandlerContext context)
     {
         var key = (message.Type, methodName);
         var handlerMethodInfo = handlerMethods.GetOrAdd(key, newKey =>
         {
-            var handlerTypes = new Type[] { newKey.messageType, typeof(IMessageHandlerContext) };
+            var handlerTypes = new[] { newKey.messageType, typeof(IMessageHandlerContext) };
             return typeof(TSaga).GetMethod(newKey.methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, handlerTypes, null);
         });
 
@@ -102,16 +100,13 @@ class SagaMapper
 
         void IConfigureHowToFindSagaWithMessageHeaders.ConfigureMapping<TSagaEntity, TMessage>(Expression<Func<TSagaEntity, object>> sagaEntityProperty, string headerName)
         {
-            object GetValueFromMessage(QueuedSagaMessage message)
-                => message.Headers.GetValueOrDefault(headerName);
-
+            object GetValueFromMessage(QueuedSagaMessage message) => message.Headers.GetValueOrDefault(headerName);
             mappings.Add(typeof(TMessage), new SagaMapping(GetValueFromMessage, false));
         }
 
         void IConfigureHowToFindSagaWithFinder.ConfigureMapping<TSagaEntity, TMessage, TFinder>() => mappings.Add(typeof(TMessage), new SagaMapping(null, true));
 
-        public IReadOnlyDictionary<Type, SagaMapping> GetMappings() =>
-            new ReadOnlyDictionary<Type, SagaMapping>(mappings);
+        public IReadOnlyDictionary<Type, SagaMapping> GetMappings() => mappings.AsReadOnly();
     }
 
     record SagaMapping(Func<QueuedSagaMessage, object> Map, bool IsCustomFinder);
