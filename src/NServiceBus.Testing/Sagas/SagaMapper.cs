@@ -70,12 +70,7 @@ class SagaMapper
             throw new Exception("No mapped value found from message, could not look up saga data.");
         }
 
-        if (mapping.IsCustomFinder)
-        {
-            throw new NotSupportedException("Testing saga invocations with a custom saga finder is not supported");
-        }
-
-        return mapping.Map(message);
+        return mapping.IsCustomFinder ? throw new NotSupportedException("Testing saga invocations with a custom saga finder is currently not supported") : mapping.Map(message);
     }
 
     public void SetCorrelationPropertyValue(IContainSagaData sagaEntity, object value)
