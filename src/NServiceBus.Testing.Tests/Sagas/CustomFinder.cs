@@ -12,50 +12,81 @@ using Persistence;
 public class CustomFinder
 {
     [Test]
-    public async Task TestSagaWithCustomFinder()
+    public void TestSagaWithCustomFinderForMessageStartingTheSaga()
     {
-        var testableSaga = new TestableSaga<SagaWithCustomFinder, CustomFinderSagaData>();
+        var exception = Assert.Throws<Exception>(() => new TestableSaga<SagaWithCustomFinderStarting, SagaWithCustomFinderStarting.SagaData>());
+
+        Assert.That(exception?.Message, Contains.Substring("Message type OrderBilled can start the saga SagaWithCustomFinderStarting (the saga implements IAmStartedByMessages<OrderBilled>) but does not map that message to saga data"));
+    }
+
+    [Test]
+    public async Task TestSagaWithCustomFinderForMessageNotStartingTheSaga()
+    {
+        var testableSaga = new TestableSaga<SagaWithCustomFinderNotStarting, SagaWithCustomFinderNotStarting.SagaData>();
 
         var placeResult = await testableSaga.Handle(new OrderPlaced { OrderId = "abc" });
 
-        var exception = Assert.ThrowsAsync<NotSupportedException>(async () => await testableSaga.Handle(new OrderBilled { OrderId = "abc" }));
+        var exception = Assert.ThrowsAsync<Exception>(async () => await testableSaga.Handle(new OrderBilled { OrderId = "abc" }));
 
         Assert.Multiple(() =>
         {
             Assert.That(placeResult.Completed, Is.False);
             Assert.That(placeResult.SagaDataSnapshot.Placed, Is.True);
             Assert.That(placeResult.SagaDataSnapshot.Billed, Is.False);
-            Assert.That(exception?.Message, Contains.Substring("custom saga finder"));
+            Assert.That(exception?.Message, Contains.Substring("No mapped value found from message, could not look up saga data"));
         });
     }
 
-    public class SagaWithCustomFinder : Saga<CustomFinderSagaData>,
+    public class SagaWithCustomFinderStarting : Saga<SagaWithCustomFinderStarting.SagaData>,
         IAmStartedByMessages<OrderPlaced>,
 #pragma warning disable NSB0006
         IAmStartedByMessages<OrderBilled>
 #pragma warning restore NSB0006
     {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<CustomFinderSagaData> mapper)
-        {
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) =>
             mapper.MapSaga(saga => saga.OrderId)
                 .ToMessage<OrderPlaced>(msg => msg.OrderId);
-        }
 
-        public class MyFinder : ISagaFinder<CustomFinderSagaData, OrderBilled>
+        public class MyFinder : ISagaFinder<SagaData, OrderBilled>
         {
-            public Task<CustomFinderSagaData> FindBy(OrderBilled message, ISynchronizedStorageSession storageSession, IReadOnlyContextBag context, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException();
+            public Task<SagaData> FindBy(OrderBilled message, ISynchronizedStorageSession storageSession, IReadOnlyContextBag context, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException();
         }
 
         public Task Handle(OrderPlaced message, IMessageHandlerContext context) => Task.FromResult(Data.Placed = true);
 
         public Task Handle(OrderBilled message, IMessageHandlerContext context) => Task.FromResult(Data.Billed = true);
+
+        public class SagaData : ContainSagaData
+        {
+            public string OrderId { get; set; }
+            public bool Placed { get; set; }
+            public bool Billed { get; set; }
+        }
     }
 
-    public class CustomFinderSagaData : ContainSagaData
+    public class SagaWithCustomFinderNotStarting : Saga<SagaWithCustomFinderNotStarting.SagaData>,
+        IAmStartedByMessages<OrderPlaced>,
+        IHandleMessages<OrderBilled>
     {
-        public string OrderId { get; set; }
-        public bool Placed { get; set; }
-        public bool Billed { get; set; }
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper) =>
+            mapper.MapSaga(saga => saga.OrderId)
+                .ToMessage<OrderPlaced>(msg => msg.OrderId);
+
+        public class MyFinder : ISagaFinder<SagaData, OrderBilled>
+        {
+            public Task<SagaData> FindBy(OrderBilled message, ISynchronizedStorageSession storageSession, IReadOnlyContextBag context, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException();
+        }
+
+        public Task Handle(OrderPlaced message, IMessageHandlerContext context) => Task.FromResult(Data.Placed = true);
+
+        public Task Handle(OrderBilled message, IMessageHandlerContext context) => Task.FromResult(Data.Billed = true);
+
+        public class SagaData : ContainSagaData
+        {
+            public string OrderId { get; set; }
+            public bool Placed { get; set; }
+            public bool Billed { get; set; }
+        }
     }
 
     public class OrderPlaced : IEvent
