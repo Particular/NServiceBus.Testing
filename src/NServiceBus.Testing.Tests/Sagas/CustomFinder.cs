@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Testing.Tests.Sagas;
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Extensibility;

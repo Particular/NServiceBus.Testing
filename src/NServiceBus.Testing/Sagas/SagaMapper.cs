@@ -87,7 +87,7 @@ class SagaMapper
         return invokeTask;
     }
 
-    class MappingReader : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders, IConfigureHowToFindSagaWithFinder
+    class MappingReader : IConfigureHowToFindSagaWithMessage, IConfigureHowToFindSagaWithMessageHeaders, IConfigureHowToFindSagaWithFinder, IConfigureSagaNotFoundHandler
     {
         readonly Dictionary<Type, SagaMapping> mappings = [];
 
@@ -105,6 +105,11 @@ class SagaMapper
         }
 
         void IConfigureHowToFindSagaWithFinder.ConfigureMapping<TSagaEntity, TMessage, TFinder>() => mappings.Add(typeof(TMessage), new SagaMapping(null, true));
+
+        public void ConfigureSagaNotFoundHandler<TNotFoundHandler>() where TNotFoundHandler : ISagaNotFoundHandler
+        {
+            // Do nothing, framework doesn't explicitly test not found handlers
+        }
 
         public IReadOnlyDictionary<Type, SagaMapping> GetMappings() => mappings.AsReadOnly();
     }
