@@ -2,7 +2,13 @@ namespace NServiceBus.Testing;
 
 using System;
 using Logging;
+using Particular.Obsoletes;
 
+[ObsoleteMetadata(
+    Message = "Implement a custom logger using Microsoft.Extensions.Logging.ILoggerProvider instead",
+    TreatAsErrorFromVersion = "11",
+    RemoveInVersion = "12")]
+[Obsolete("Implement a custom logger using Microsoft.Extensions.Logging.ILoggerProvider instead. Will be treated as an error from version 11.0.0. Will be removed in version 12.0.0.", false)]
 class NamedLogger : ILog
 {
     public NamedLogger(string name) => this.name = name;
