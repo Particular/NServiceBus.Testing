@@ -6,6 +6,7 @@ using NServiceBus.Logging;
 using NUnit.Framework;
 
 [TestFixture]
+[Obsolete("Tests for obsolete types", false)]
 public class LoggingTests
 {
     [TearDown]

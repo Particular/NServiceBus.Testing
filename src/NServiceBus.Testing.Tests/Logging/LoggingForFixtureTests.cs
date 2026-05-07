@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 [TestFixture]
 [Parallelizable]
+[Obsolete("Tests for obsolete types", false)]
 public class LoggingForFixtureTests
 {
     StringWriter writer;

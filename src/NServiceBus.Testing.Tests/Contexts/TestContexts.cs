@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Testing.Tests.Contexts;
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +44,7 @@ public class TestContexts
     public async Task RunTestableMessageSession() => await RunTestableMessageSessionInternal(new TestableMessageSession(), CancellationToken.None);
 
     [Test]
+    [Obsolete("Test for obsolete types", false)]
     public async Task RunTestableEndpointInstance()
     {
         var context = new TestableEndpointInstance();
