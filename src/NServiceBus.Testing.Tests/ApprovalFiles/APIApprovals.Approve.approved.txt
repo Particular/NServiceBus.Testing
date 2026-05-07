@@ -74,6 +74,9 @@ namespace NServiceBus.Testing
         public TestableDispatchContext() { }
         public System.Collections.Generic.IList<NServiceBus.Transport.TransportOperation> Operations { get; set; }
     }
+    [System.Obsolete("This is a testable implementation of a type that is being removed from NServiceBu" +
+        "s. Will be treated as an error from version 11.0.0. Will be removed in version 1" +
+        "2.0.0.", false)]
     public class TestableEndpointInstance : NServiceBus.Testing.TestableMessageSession, NServiceBus.IEndpointInstance, NServiceBus.IMessageSession
     {
         public TestableEndpointInstance() { }
@@ -272,6 +275,9 @@ namespace NServiceBus.Testing
         public static TMessage FindTimeoutMessage<TMessage>(this NServiceBus.Testing.TestableMessageSession context) { }
         public static TMessage FindTimeoutMessage<TMessage>(this NServiceBus.Testing.TestablePipelineContext context) { }
     }
+    [System.Obsolete("Implement a custom logger using Microsoft.Extensions.Logging.ILoggerProvider inst" +
+        "ead. Will be treated as an error from version 11.0.0. Will be removed in version" +
+        " 12.0.0.", false)]
     public class TestingLoggerFactory : NServiceBus.Logging.LoggingFactoryDefinition
     {
         public TestingLoggerFactory() { }
