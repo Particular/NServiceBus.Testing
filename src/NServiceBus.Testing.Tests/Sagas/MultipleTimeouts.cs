@@ -108,7 +108,7 @@ public class MultipleTimeouts
         }
 
         public Task Timeout(EarlyTimeout state, IMessageHandlerContext context) =>
-            Data.FailEarlyTimeout ? Task.FromException(new InvalidOperationException("Simulated failure")) : Task.CompletedTask;
+            Data.FailEarlyTimeout ? throw new InvalidOperationException("Simulated failure") : Task.CompletedTask;
 
         public Task Timeout(LateTimeout state, IMessageHandlerContext context) => Task.CompletedTask;
     }
