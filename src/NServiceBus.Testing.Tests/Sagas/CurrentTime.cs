@@ -32,21 +32,37 @@ public class CurrentTime
     }
 
     [Test]
+    [NonParallelizable]
+    [Platform(Exclude = "Win", Reason = "Windows ignores the TZ environment variable")]
     public async Task InitialCurrentTimeWithUnspecifiedKindShouldNotBeShifted()
     {
-        // Only detects a local time conversion on machines that are not set to UTC
-        var startTime = new DateTime(2026, 1, 1, 8, 0, 0, DateTimeKind.Unspecified);
-        var testableSaga = new TestableSaga<MySaga, MyData>(initialCurrentTime: startTime);
+        // A local time conversion is invisible on UTC machines like CI agents, so force a non-UTC local time zone
+        var originalTimeZone = Environment.GetEnvironmentVariable("TZ");
+        Environment.SetEnvironmentVariable("TZ", "Asia/Kolkata");
+        TimeZoneInfo.ClearCachedData();
 
-        await testableSaga.Handle(new Start { CorrId = "abc" });
+        try
+        {
+            Assume.That(TimeZoneInfo.Local.BaseUtcOffset, Is.Not.EqualTo(TimeSpan.Zero));
 
-        Assert.That(testableSaga.CurrentTime, Is.EqualTo(startTime));
+            var startTime = new DateTime(2026, 1, 1, 8, 0, 0, DateTimeKind.Unspecified);
+            var testableSaga = new TestableSaga<MySaga, MyData>(initialCurrentTime: startTime);
 
-        var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(14));
-        Assert.That(noResults, Has.Length.EqualTo(0));
+            await testableSaga.Handle(new Start { CorrId = "abc" });
 
-        var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(1));
-        Assert.That(timeoutResults, Has.Length.EqualTo(1));
+            Assert.That(testableSaga.CurrentTime, Is.EqualTo(startTime));
+
+            var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(14));
+            Assert.That(noResults, Has.Length.EqualTo(0));
+
+            var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(1));
+            Assert.That(timeoutResults, Has.Length.EqualTo(1));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("TZ", originalTimeZone);
+            TimeZoneInfo.ClearCachedData();
+        }
     }
 
     [Test]
