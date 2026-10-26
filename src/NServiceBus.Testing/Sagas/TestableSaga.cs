@@ -249,7 +249,6 @@ public class TestableSaga<TSaga, TSagaData>
         var advanceToTime = CurrentTime + timeToAdvance;
 
         var due = storedTimeouts.Where(t => t.At <= advanceToTime).OrderBy(t => t.At).ToArray();
-        _ = storedTimeouts.RemoveAll(t => t.At <= advanceToTime);
 
         var results = new List<HandleResult>();
 
@@ -257,6 +256,8 @@ public class TestableSaga<TSaga, TSagaData>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            // Removed one at a time so a cancelled or failed call keeps the timeouts it did not get to
+            _ = storedTimeouts.Remove(storedTimeout);
             CurrentTime = storedTimeout.At;
             var context = contextFactory(storedTimeout.Timeout);
             using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, cancellationToken))
