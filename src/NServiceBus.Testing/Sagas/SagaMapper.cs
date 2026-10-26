@@ -83,7 +83,7 @@ class SagaMapper
             return typeof(TSaga).GetMethod(newKey.methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, handlerTypes, null);
         });
 
-        var invokeTask = handlerMethodInfo.Invoke(saga, [message.Message, context]) as Task;
+        var invokeTask = handlerMethodInfo.Invoke(saga, BindingFlags.DoNotWrapExceptions, null, [message.Message, context], null) as Task;
         return invokeTask;
     }
 
