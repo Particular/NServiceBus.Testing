@@ -25,8 +25,11 @@ public class TestableSaga<TSaga, TSagaData>
     readonly Queue<QueuedSagaMessage> queue;
     readonly ISagaPersister persister;
     readonly SagaMapper sagaMapper;
-    readonly List<(DateTime At, OutgoingMessage<object, SendOptions> Timeout)> storedTimeouts;
+    readonly PriorityQueue<OutgoingMessage<object, SendOptions>, (DateTime At, long Sequence)> storedTimeouts;
     readonly Dictionary<Type, List<(Type, Func<object, object>)>> replySimulators;
+    long timeoutSequence;
+
+    const int MaxTimeoutsHandledWithoutTimeMovingForward = 1000;
 
     /// <summary>
     /// Create a tester for a saga.
@@ -68,7 +71,7 @@ public class TestableSaga<TSaga, TSagaData>
 
         queue = new Queue<QueuedSagaMessage>();
         persister = new NonDurableSagaPersister();
-        storedTimeouts = [];
+        storedTimeouts = new();
         replySimulators = [];
 
         sagaMapper = SagaMapper.Get<TSaga, TSagaData>(this.sagaFactory);
@@ -262,7 +265,8 @@ public class TestableSaga<TSaga, TSagaData>
 
 
     /// <summary>
-    /// Advance the <see cref="CurrentTime"/> for the saga and handle any timeouts due during <paramref name="timeToAdvance"/>.
+    /// Advance the <see cref="CurrentTime"/> for the saga and handle any timeouts due during <paramref name="timeToAdvance"/>,
+    /// in due time order. This includes timeouts requested while handling earlier timeouts in the same call.
     /// </summary>
     /// <param name="timeToAdvance">Amount of time to advance the <see cref="CurrentTime"/>.</param>
     /// <param name="provideContext">A factory to provide a custom <see cref="TestableMessageHandlerContext"/> for each handled timeout if needed.</param>
@@ -279,22 +283,34 @@ public class TestableSaga<TSaga, TSagaData>
         var contextFactory = provideContext ?? new Func<OutgoingMessage<object, SendOptions>, TestableMessageHandlerContext>(timeout => new TestableMessageHandlerContext());
         var advanceToTime = CurrentTime + timeToAdvance;
 
-        var due = storedTimeouts.Where(t => t.At <= advanceToTime).OrderBy(t => t.At).ToArray();
-
         var results = new List<HandleResult>();
+        var lastHandledAt = DateTime.MinValue;
+        var handledWithoutTimeMovingForward = 0;
 
-        foreach (var storedTimeout in due)
+        // Timeouts requested while handling are queued too, so they are handled in this call when due by the target
+        while (storedTimeouts.TryPeek(out var timeout, out var due) && due.At <= advanceToTime)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            // Removed one at a time so a cancelled or failed call keeps the timeouts it did not get to
-            _ = storedTimeouts.Remove(storedTimeout);
-            AdvanceTimeProviderTo(storedTimeout.At);
-            var context = contextFactory(storedTimeout.Timeout);
+            var handleAt = due.At > CurrentTime ? due.At : CurrentTime;
+            if (handleAt != lastHandledAt)
+            {
+                lastHandledAt = handleAt;
+                handledWithoutTimeMovingForward = 0;
+            }
+            else if (++handledWithoutTimeMovingForward >= MaxTimeoutsHandledWithoutTimeMovingForward)
+            {
+                throw new InvalidOperationException($"AdvanceTime handled {MaxTimeoutsHandledWithoutTimeMovingForward} timeouts at {handleAt:O} without time moving forward. A timeout handler is probably requesting a timeout that is already due, for example with a zero delay.");
+            }
+
+            // Dequeued one at a time so a cancelled or failed call keeps the timeouts it did not get to
+            _ = storedTimeouts.Dequeue();
+            AdvanceTimeProviderTo(due.At);
+            var context = contextFactory(timeout);
             using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, cancellationToken))
             {
                 context.CancellationToken = linkedTokenSource.Token;
-                var result = await HandleTimeout(storedTimeout.Timeout, context).ConfigureAwait(false);
+                var result = await HandleTimeout(timeout, context).ConfigureAwait(false);
 
                 // Swallowed messages (such as a timeout after saga completion) result in null
                 if (result != null)
@@ -308,6 +324,9 @@ public class TestableSaga<TSaga, TSagaData>
 
         return results.ToArray();
     }
+
+    // Sequence keeps timeouts due at the same time in request order
+    void StoreTimeout(DateTime at, OutgoingMessage<object, SendOptions> timeout) => storedTimeouts.Enqueue(timeout, (at, timeoutSequence++));
 
     // The provider cannot go backwards, so overdue timeouts are handled at the current time
     void AdvanceTimeProviderTo(DateTime time)
@@ -406,11 +425,11 @@ public class TestableSaga<TSaga, TSagaData>
             if (timeout.Within.HasValue)
             {
                 var targetTime = now + timeout.Within.Value;
-                storedTimeouts.Add((targetTime, timeout));
+                StoreTimeout(targetTime, timeout);
             }
             else if (timeout.At.HasValue)
             {
-                storedTimeouts.Add((timeout.At.Value.UtcDateTime, timeout));
+                StoreTimeout(timeout.At.Value.UtcDateTime, timeout);
             }
             else
             {
@@ -435,11 +454,11 @@ public class TestableSaga<TSaga, TSagaData>
                 if (deliveryDelay.HasValue)
                 {
                     var targetTime = now + deliveryDelay.Value;
-                    storedTimeouts.Add((targetTime, message));
+                    StoreTimeout(targetTime, message);
                 }
                 else if (deliverAt.HasValue)
                 {
-                    storedTimeouts.Add((deliverAt.Value.UtcDateTime, message));
+                    StoreTimeout(deliverAt.Value.UtcDateTime, message);
                 }
                 else
                 {

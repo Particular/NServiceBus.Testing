@@ -22,6 +22,28 @@ public class MultipleTimeouts
     }
 
     [Test]
+    public async Task TimeoutsDueAtSameTimeShouldBeHandledInRequestOrder()
+    {
+        var testableSaga = new TestableSaga<MySaga, MyData>();
+
+        await testableSaga.Handle(new StartSimultaneous { CorrId = "abc", Count = 20, DueTimes = 1 });
+        var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromHours(1));
+
+        Assert.That(timeoutResults.Select(r => ((NumberedTimeout)r.HandledMessage.Message).Number), Is.EqualTo(Enumerable.Range(0, 20)));
+    }
+
+    [Test]
+    public async Task ManyTimeoutsDueAtSeveralTimesShouldBeHandledInOneCall()
+    {
+        var testableSaga = new TestableSaga<MySaga, MyData>();
+
+        await testableSaga.Handle(new StartSimultaneous { CorrId = "abc", Count = 600, DueTimes = 2 });
+        var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromHours(1));
+
+        Assert.That(timeoutResults, Has.Length.EqualTo(1200));
+    }
+
+    [Test]
     public async Task ProvidedContextShouldBeUsedForEachTimeout()
     {
         var testableSaga = new TestableSaga<MySaga, MyData>();
@@ -91,12 +113,15 @@ public class MultipleTimeouts
 
     public class MySaga : Saga<MyData>,
         IAmStartedByMessages<Start>,
+        IAmStartedByMessages<StartSimultaneous>,
         IHandleTimeouts<EarlyTimeout>,
-        IHandleTimeouts<LateTimeout>
+        IHandleTimeouts<LateTimeout>,
+        IHandleTimeouts<NumberedTimeout>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyData> mapper) =>
             mapper.MapSaga(saga => saga.CorrId)
-                .ToMessage<Start>(msg => msg.CorrId);
+                .ToMessage<Start>(msg => msg.CorrId)
+                .ToMessage<StartSimultaneous>(msg => msg.CorrId);
 
         public async Task Handle(Start message, IMessageHandlerContext context)
         {
@@ -111,6 +136,19 @@ public class MultipleTimeouts
             Data.FailEarlyTimeout ? throw new InvalidOperationException("Simulated failure") : Task.CompletedTask;
 
         public Task Timeout(LateTimeout state, IMessageHandlerContext context) => Task.CompletedTask;
+
+        public async Task Handle(StartSimultaneous message, IMessageHandlerContext context)
+        {
+            for (var dueTime = 1; dueTime <= message.DueTimes; dueTime++)
+            {
+                for (var number = 0; number < message.Count; number++)
+                {
+                    await RequestTimeout(context, TimeSpan.FromMinutes(10 * dueTime), new NumberedTimeout { Number = number });
+                }
+            }
+        }
+
+        public Task Timeout(NumberedTimeout state, IMessageHandlerContext context) => Task.CompletedTask;
     }
 
     public class MyData : ContainSagaData
@@ -125,7 +163,19 @@ public class MultipleTimeouts
         public bool FailEarlyTimeout { get; set; }
     }
 
+    public class StartSimultaneous : ICommand
+    {
+        public string CorrId { get; set; }
+        public int Count { get; set; }
+        public int DueTimes { get; set; }
+    }
+
     public class EarlyTimeout { }
+
+    public class NumberedTimeout
+    {
+        public int Number { get; set; }
+    }
 
     public class LateTimeout { }
 }

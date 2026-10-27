@@ -29,20 +29,20 @@ public class ChainedTimeouts
     }
 
     [Test]
-    public async Task ChainedTimeoutDueWithinAdvanceTimeShouldNotBeHandledInSameCall()
+    public async Task ChainedTimeoutDueWithinAdvanceTimeShouldBeHandledInSameCall()
     {
         var startTime = new DateTime(2026, 1, 1, 8, 0, 0, DateTimeKind.Utc);
         var testableSaga = new TestableSaga<MySaga, MyData>(initialCurrentTime: startTime);
 
         await testableSaga.Handle(new Start { CorrId = "abc" });
 
-        var firstResults = await testableSaga.AdvanceTime(TimeSpan.FromHours(1));
-        var secondResults = await testableSaga.AdvanceTime(TimeSpan.Zero);
+        var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromHours(1));
+        var noResults = await testableSaga.AdvanceTime(TimeSpan.Zero);
 
         Assert.Multiple(() =>
         {
-            Assert.That(firstResults.Single().HandledMessage.Type, Is.EqualTo(typeof(FirstTimeout)));
-            Assert.That(secondResults.Single().HandledMessage.Type, Is.EqualTo(typeof(SecondTimeout)));
+            Assert.That(timeoutResults.Select(r => r.HandledMessage.Type), Is.EqualTo(new[] { typeof(FirstTimeout), typeof(SecondTimeout) }));
+            Assert.That(noResults, Has.Length.Zero);
             Assert.That(testableSaga.CurrentTime, Is.EqualTo(startTime.AddHours(1)));
         });
     }
