@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Time.Testing;
 using NServiceBus.Extensibility;
 using NServiceBus.Persistence;
 using NServiceBus.Sagas;
@@ -40,9 +41,30 @@ public class TestableSaga<TSaga, TSagaData>
     /// If not supplied, the default is <see cref="DateTime.UtcNow"/>.
     /// </param>
     public TestableSaga(Func<TSaga> sagaFactory = null, DateTime? initialCurrentTime = null)
+        : this(CreateTimeProvider(initialCurrentTime), sagaFactory is null ? _ => Activator.CreateInstance<TSaga>() : _ => sagaFactory())
     {
-        this.sagaFactory = sagaFactory ?? Activator.CreateInstance<TSaga>;
-        CurrentTime = initialCurrentTime ?? DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Create a tester for a saga that depends on a <see cref="System.TimeProvider"/>.
+    /// </summary>
+    /// <param name="sagaFactory">
+    /// A factory to create saga instances. It receives <see cref="TimeProvider"/> so the saga reads the same
+    /// time that <see cref="AdvanceTime"/> moves. This delegate is called multiple times.
+    /// </param>
+    /// <param name="timeProvider">
+    /// The time provider backing <see cref="CurrentTime"/>. Pass one to share it with other fakes in the test.
+    /// If not supplied, a <see cref="FakeTimeProvider"/> starting at <see cref="DateTimeOffset.UtcNow"/> is created.
+    /// </param>
+    public TestableSaga(Func<System.TimeProvider, TSaga> sagaFactory, FakeTimeProvider timeProvider = null)
+        : this(timeProvider ?? new FakeTimeProvider(DateTimeOffset.UtcNow), sagaFactory ?? throw new ArgumentNullException(nameof(sagaFactory)))
+    {
+    }
+
+    TestableSaga(FakeTimeProvider timeProvider, Func<System.TimeProvider, TSaga> sagaFactory)
+    {
+        TimeProvider = timeProvider;
+        this.sagaFactory = () => sagaFactory(timeProvider);
 
         queue = new Queue<QueuedSagaMessage>();
         persister = new NonDurableSagaPersister();
@@ -53,13 +75,20 @@ public class TestableSaga<TSaga, TSagaData>
     }
 
     /// <summary>
-    /// Shows the "current time" of the saga.
+    /// Shows the "current time" of the saga, as read from <see cref="TimeProvider"/>.
     /// The initial time defaults to <see cref="DateTime.UtcNow"/>.
-    /// This can be changed by passing an initial current time in the <see cref="TestableSaga{TSaga,TSagaData}"/> constructor.
+    /// This can be changed by passing an initial current time or a time provider in the <see cref="TestableSaga{TSaga,TSagaData}"/> constructor.
     /// The current time may be advanced by calling <see cref="AdvanceTime"/>,
     /// which also handle any timeouts due during the specified <see cref="TimeSpan"/>.
     /// </summary>
-    public DateTime CurrentTime { get; private set; }
+    public DateTime CurrentTime => TimeProvider.GetUtcNow().UtcDateTime;
+
+    /// <summary>
+    /// The time provider backing <see cref="CurrentTime"/>. <see cref="AdvanceTime"/> advances it, including to the due time
+    /// of each timeout while that timeout is handled. Time advanced directly on the provider is picked up by the next
+    /// <see cref="AdvanceTime"/> call, for example <c>AdvanceTime(TimeSpan.Zero)</c>.
+    /// </summary>
+    public FakeTimeProvider TimeProvider { get; }
 
     /// <summary>
     /// <c>true</c> if there are any queued messages.
@@ -245,6 +274,8 @@ public class TestableSaga<TSaga, TSagaData>
     /// </returns>
     public async Task<HandleResult[]> AdvanceTime(TimeSpan timeToAdvance, Func<OutgoingMessage<object, SendOptions>, TestableMessageHandlerContext> provideContext = null, CancellationToken cancellationToken = default)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(timeToAdvance, TimeSpan.Zero);
+
         var contextFactory = provideContext ?? new Func<OutgoingMessage<object, SendOptions>, TestableMessageHandlerContext>(timeout => new TestableMessageHandlerContext());
         var advanceToTime = CurrentTime + timeToAdvance;
 
@@ -258,7 +289,7 @@ public class TestableSaga<TSaga, TSagaData>
 
             // Removed one at a time so a cancelled or failed call keeps the timeouts it did not get to
             _ = storedTimeouts.Remove(storedTimeout);
-            CurrentTime = storedTimeout.At;
+            AdvanceTimeProviderTo(storedTimeout.At);
             var context = contextFactory(storedTimeout.Timeout);
             using (var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, cancellationToken))
             {
@@ -273,10 +304,24 @@ public class TestableSaga<TSaga, TSagaData>
             }
         }
 
-        CurrentTime = advanceToTime;
+        AdvanceTimeProviderTo(advanceToTime);
 
         return results.ToArray();
     }
+
+    // The provider cannot go backwards, so overdue timeouts are handled at the current time
+    void AdvanceTimeProviderTo(DateTime time)
+    {
+        var target = new DateTimeOffset(time, TimeSpan.Zero);
+        if (target > TimeProvider.GetUtcNow())
+        {
+            TimeProvider.SetUtcNow(target);
+        }
+    }
+
+    // Kind is ignored so an unspecified or local time keeps its value, like before the time provider existed
+    static FakeTimeProvider CreateTimeProvider(DateTime? initialCurrentTime) =>
+        new(initialCurrentTime.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(initialCurrentTime.Value, DateTimeKind.Utc)) : DateTimeOffset.UtcNow);
 
     async Task<HandleResult> HandleTimeout(OutgoingMessage<object, SendOptions> timeoutMessage, TestableMessageHandlerContext context)
     {
@@ -354,11 +399,13 @@ public class TestableSaga<TSaga, TSagaData>
 
     void EnqueueMessagesAndTimeouts(TestableMessageHandlerContext context, Guid sagaId)
     {
+        var now = CurrentTime;
+
         foreach (var timeout in context.TimeoutMessages)
         {
             if (timeout.Within.HasValue)
             {
-                var targetTime = CurrentTime + timeout.Within.Value;
+                var targetTime = now + timeout.Within.Value;
                 storedTimeouts.Add((targetTime, timeout));
             }
             else if (timeout.At.HasValue)
@@ -387,7 +434,7 @@ public class TestableSaga<TSaga, TSagaData>
                 var deliverAt = message.Options.GetDeliveryDate();
                 if (deliveryDelay.HasValue)
                 {
-                    var targetTime = CurrentTime + deliveryDelay.Value;
+                    var targetTime = now + deliveryDelay.Value;
                     storedTimeouts.Add((targetTime, message));
                 }
                 else if (deliverAt.HasValue)

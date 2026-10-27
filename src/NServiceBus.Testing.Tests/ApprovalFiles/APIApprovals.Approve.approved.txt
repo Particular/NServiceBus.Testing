@@ -224,9 +224,11 @@ namespace NServiceBus.Testing
         where TSagaData :  class, NServiceBus.IContainSagaData, new ()
     {
         public TestableSaga(System.Func<TSaga> sagaFactory = null, System.DateTime? initialCurrentTime = default) { }
+        public TestableSaga(System.Func<System.TimeProvider, TSaga> sagaFactory, Microsoft.Extensions.Time.Testing.FakeTimeProvider timeProvider = null) { }
         public System.DateTime CurrentTime { get; }
         public bool HasQueuedMessages { get; }
         public int QueueLength { get; }
+        public Microsoft.Extensions.Time.Testing.FakeTimeProvider TimeProvider { get; }
         public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult[]> AdvanceTime(System.TimeSpan timeToAdvance, System.Func<NServiceBus.Testing.OutgoingMessage<object, NServiceBus.SendOptions>, NServiceBus.Testing.TestableMessageHandlerContext> provideContext = null, System.Threading.CancellationToken cancellationToken = default) { }
         public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> Handle<TMessage>(TMessage message, NServiceBus.Testing.TestableMessageHandlerContext context = null, System.Collections.Generic.IReadOnlyDictionary<string, string> messageHeaders = null) { }
         public System.Threading.Tasks.Task<NServiceBus.Testing.TestableSaga<TSaga, TSagaData>.HandleResult> HandleQueuedMessage(NServiceBus.Testing.TestableMessageHandlerContext context = null) { }
