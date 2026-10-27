@@ -17,7 +17,7 @@ public class AbsoluteTimeouts
         await testableSaga.Handle(new StartWithTimeout { CorrId = "abc", TimeoutAt = startTime.AddMinutes(20) });
 
         var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(19));
-        Assert.That(noResults, Has.Length.EqualTo(0));
+        Assert.That(noResults, Has.Length.Zero);
 
         var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(1));
         Assert.That(timeoutResults.Single().HandledMessage.Type, Is.EqualTo(typeof(MyTimeout)));
@@ -32,7 +32,7 @@ public class AbsoluteTimeouts
         await testableSaga.Handle(new StartWithDelayedCmd { CorrId = "abc", DeliverAt = startTime.AddMinutes(20) });
 
         var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(19));
-        Assert.That(noResults, Has.Length.EqualTo(0));
+        Assert.That(noResults, Has.Length.Zero);
 
         var delayedCmdResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(1));
         Assert.That(delayedCmdResults.Single().SagaDataSnapshot.DelayedCommandReceived, Is.True);

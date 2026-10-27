@@ -28,7 +28,7 @@ public class BasicSaga
         });
 
         var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(10));
-        Assert.That(noResults.Length, Is.EqualTo(0));
+        Assert.That(noResults, Has.Length.Zero);
 
         var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromHours(1));
 

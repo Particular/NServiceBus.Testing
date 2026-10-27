@@ -23,7 +23,7 @@ public class ChainedTimeouts
         Assert.Multiple(() =>
         {
             Assert.That(firstResults.Single().HandledMessage.Type, Is.EqualTo(typeof(FirstTimeout)));
-            Assert.That(noResults, Has.Length.EqualTo(0));
+            Assert.That(noResults, Has.Length.Zero);
             Assert.That(secondResults.Single().HandledMessage.Type, Is.EqualTo(typeof(SecondTimeout)));
         });
     }

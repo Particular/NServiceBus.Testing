@@ -53,7 +53,7 @@ public class CurrentTime
             Assert.That(testableSaga.CurrentTime, Is.EqualTo(startTime));
 
             var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(14));
-            Assert.That(noResults, Has.Length.EqualTo(0));
+            Assert.That(noResults, Has.Length.Zero);
 
             var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(1));
             Assert.That(timeoutResults, Has.Length.EqualTo(1));
@@ -75,7 +75,7 @@ public class CurrentTime
 
         Assert.Multiple(() =>
         {
-            Assert.That(noResults, Has.Length.EqualTo(0));
+            Assert.That(noResults, Has.Length.Zero);
             Assert.That(testableSaga.CurrentTime, Is.EqualTo(startTime.AddMinutes(10)));
         });
     }
@@ -106,7 +106,7 @@ public class CurrentTime
         await testableSaga.Handle(new Start { CorrId = "abc" });
 
         var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(14));
-        Assert.That(noResults, Has.Length.EqualTo(0));
+        Assert.That(noResults, Has.Length.Zero);
 
         var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(1));
         Assert.That(timeoutResults.Single().SagaDataSnapshot.TimeoutReceived, Is.True);
