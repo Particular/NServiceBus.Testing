@@ -39,7 +39,7 @@ public class AbsoluteTimeouts
     }
 
     [Test]
-    public async Task TimeoutInThePastShouldBeHandledAtItsPastDueTime()
+    public async Task TimeoutInThePastShouldBeHandledAtCurrentTime()
     {
         var startTime = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
         var testableSaga = new TestableSaga<MySaga, MyData>(initialCurrentTime: startTime.UtcDateTime);
@@ -48,14 +48,16 @@ public class AbsoluteTimeouts
         await testableSaga.Handle(new StartWithTimeout { CorrId = "abc", TimeoutAt = startTime.AddMinutes(30) });
 
         var timeoutResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(1));
-        // The follow-up is due at 45 minutes because the timeout ran at its past due time of 30 minutes
-        var followUpResults = await testableSaga.AdvanceTime(TimeSpan.Zero);
+        // The follow-up is due at 75 minutes because the overdue timeout ran at the current time of 60 minutes
+        var noResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(13));
+        var followUpResults = await testableSaga.AdvanceTime(TimeSpan.FromMinutes(1));
 
         Assert.Multiple(() =>
         {
             Assert.That(timeoutResults.Single().HandledMessage.Type, Is.EqualTo(typeof(MyTimeout)));
+            Assert.That(noResults, Has.Length.Zero);
             Assert.That(followUpResults.Single().HandledMessage.Type, Is.EqualTo(typeof(FollowUpTimeout)));
-            Assert.That(testableSaga.CurrentTime, Is.EqualTo(startTime.AddMinutes(61).UtcDateTime));
+            Assert.That(testableSaga.CurrentTime, Is.EqualTo(startTime.AddMinutes(75).UtcDateTime));
         });
     }
 

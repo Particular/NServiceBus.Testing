@@ -66,6 +66,25 @@ public class CurrentTime
     }
 
     [Test]
+    public async Task AdvanceTimeShouldAdvanceTimeProvider()
+    {
+        var startTime = new DateTime(2026, 1, 1, 8, 0, 0, DateTimeKind.Utc);
+        var testableSaga = new TestableSaga<MySaga, MyData>(initialCurrentTime: startTime);
+
+        await testableSaga.AdvanceTime(TimeSpan.FromHours(1));
+
+        Assert.That(testableSaga.TimeProvider.GetUtcNow(), Is.EqualTo(new DateTimeOffset(startTime.AddHours(1))));
+    }
+
+    [Test]
+    public void AdvanceTimeShouldRejectNegativeTime()
+    {
+        var testableSaga = new TestableSaga<MySaga, MyData>();
+
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await testableSaga.AdvanceTime(TimeSpan.FromMinutes(-1)));
+    }
+
+    [Test]
     public async Task AdvanceTimeShouldMoveCurrentTimeWhenNothingIsDue()
     {
         var startTime = new DateTime(2026, 1, 1, 8, 0, 0, DateTimeKind.Utc);
