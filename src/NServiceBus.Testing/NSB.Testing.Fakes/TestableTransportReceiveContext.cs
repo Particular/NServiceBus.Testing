@@ -22,5 +22,5 @@ public partial class TestableTransportReceiveContext : TestableBehaviorContext, 
     /// <summary>
     /// The physical message being processed.
     /// </summary>
-    public IncomingMessage Message { get; set; } = new IncomingMessage(Guid.NewGuid().ToString(), [], Array.Empty<byte>());
+    public IncomingMessage Message { get; set; } = new IncomingMessage(DefaultMessageHeaders.MessageId, DefaultMessageHeaders.Create(), Array.Empty<byte>());
 }

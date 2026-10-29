@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 public partial class TestableMessageProcessingContext : TestablePipelineContext, IMessageProcessingContext
 {
     /// <summary>
-    /// Creates a new instance of <see cref="TestableMessageProcessingContext" />.
+    /// Creates a new instance of <see cref="TestableMessageProcessingContext" /> with deterministic default message headers.
     /// </summary>
     public TestableMessageProcessingContext(IMessageCreator messageCreator = null) : base(messageCreator)
     {
@@ -29,9 +29,18 @@ public partial class TestableMessageProcessingContext : TestablePipelineContext,
     public virtual string[] ForwardedMessages => forwardedMessages.ToArray();
 
     /// <summary>
-    /// Gets the list of key/value pairs found in the header of the message.
+    /// Gets or replaces the message headers. Dictionary implementations other than
+    /// <see cref="Dictionary{TKey,TValue}"/> are copied.
     /// </summary>
-    public IDictionary<string, string> MessageHeaders { get; set; } = new Dictionary<string, string>();
+    public IDictionary<string, string> MessageHeaders
+    {
+        get => IncomingMessageHeaders;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            IncomingMessageHeaders = value as Dictionary<string, string> ?? new Dictionary<string, string>(value);
+        }
+    }
 
     /// <summary>
     /// Sends the message to the endpoint which sent the message currently being handled.
@@ -64,14 +73,24 @@ public partial class TestableMessageProcessingContext : TestablePipelineContext,
     }
 
     /// <summary>
-    /// The Id of the currently processed message.
+    /// The ID in the message headers, or <c>null</c> if the header is absent.
     /// </summary>
-    public string MessageId { get; set; } = Guid.NewGuid().ToString();
+    public string MessageId
+    {
+        get => IncomingMessageHeaders.GetValueOrDefault(Headers.MessageId);
+        set => IncomingMessageHeaders[Headers.MessageId] = value;
+    }
 
     /// <summary>
-    /// The address of the endpoint that sent the current message being handled.
+    /// The reply address in the message headers, or <c>null</c> if the header is absent.
     /// </summary>
-    public string ReplyToAddress { get; set; } = "reply address";
+    public string ReplyToAddress
+    {
+        get => IncomingMessageHeaders.GetValueOrDefault(Headers.ReplyToAddress);
+        set => IncomingMessageHeaders[Headers.ReplyToAddress] = value;
+    }
+
+    internal virtual Dictionary<string, string> IncomingMessageHeaders { get; set; } = DefaultMessageHeaders.Create();
 
     IReadOnlyDictionary<string, string> IMessageProcessingContext.MessageHeaders => new ReadOnlyDictionary<string, string>(MessageHeaders);
     ConcurrentQueue<string> forwardedMessages = new ConcurrentQueue<string>();

@@ -6,7 +6,7 @@ namespace NServiceBus.Testing;
 public partial class TestableMessageHandlerContext : TestableInvokeHandlerContext
 {
     /// <summary>
-    /// Creates a new instance of a <see cref="TestableMessageHandlerContext" />.
+    /// Creates a new instance of a <see cref="TestableMessageHandlerContext" /> with deterministic default message headers.
     /// </summary>
     public TestableMessageHandlerContext(IMessageCreator messageCreator = null) : base(messageCreator)
     {

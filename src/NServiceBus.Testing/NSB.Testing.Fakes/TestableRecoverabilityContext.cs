@@ -13,7 +13,7 @@ public partial class TestableRecoverabilityContext : TestableBehaviorContext, IR
     /// <summary>
     /// The message that failed processing.
     /// </summary>
-    public IncomingMessage FailedMessage { get; set; } = new IncomingMessage(Guid.NewGuid().ToString(), [], ReadOnlyMemory<byte>.Empty);
+    public IncomingMessage FailedMessage { get; set; } = new IncomingMessage(DefaultMessageHeaders.MessageId, DefaultMessageHeaders.Create(), ReadOnlyMemory<byte>.Empty);
 
     /// <summary>
     /// The exception that caused processing to fail.

@@ -24,7 +24,11 @@ public partial class TestableIncomingLogicalMessageContext : TestableIncomingCon
     /// <summary>
     /// Headers for the incoming message.
     /// </summary>
-    public Dictionary<string, string> Headers { get; set; } = [];
+    public Dictionary<string, string> Headers
+    {
+        get => IncomingMessageHeaders;
+        set => MessageHeaders = value;
+    }
 
     /// <summary>
     /// Tells if the message has been handled.

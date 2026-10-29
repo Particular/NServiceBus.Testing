@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Testing;
 
 using System;
+using System.Collections.Generic;
 using Pipeline;
 using Transport;
 
@@ -12,7 +13,7 @@ public partial class TestableIncomingPhysicalMessageContext : TestableIncomingCo
     /// <summary>
     /// Creates a new instance of <see cref="TestableIncomingPhysicalMessageContext"/>.
     /// </summary>
-    public TestableIncomingPhysicalMessageContext() => Message = new IncomingMessage(Guid.NewGuid().ToString(), [], Array.Empty<byte>());
+    public TestableIncomingPhysicalMessageContext() => Message = new IncomingMessage(DefaultMessageHeaders.MessageId, base.IncomingMessageHeaders, Array.Empty<byte>());
 
     /// <summary>
     /// Updates the message with the given body.
@@ -23,4 +24,10 @@ public partial class TestableIncomingPhysicalMessageContext : TestableIncomingCo
     /// The physical message being processed.
     /// </summary>
     public IncomingMessage Message { get; set; }
+
+    internal override Dictionary<string, string> IncomingMessageHeaders
+    {
+        get => Message.Headers;
+        set => Message = new IncomingMessage(Message.NativeMessageId, value, Message.Body, Message.ReceiveProperties);
+    }
 }

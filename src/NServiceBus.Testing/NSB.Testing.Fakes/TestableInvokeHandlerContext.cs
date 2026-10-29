@@ -45,7 +45,11 @@ public partial class TestableInvokeHandlerContext : TestableIncomingContext, IIn
     /// <summary>
     /// Message headers.
     /// </summary>
-    public Dictionary<string, string> Headers { get; set; } = [];
+    public Dictionary<string, string> Headers
+    {
+        get => IncomingMessageHeaders;
+        set => MessageHeaders = value;
+    }
 
     /// <summary>
     /// The message instance being handled.
