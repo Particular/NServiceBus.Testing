@@ -7,9 +7,9 @@ using Particular.Obsoletes;
 
 [ObsoleteMetadata(
     Message = "Implement a custom logger using Microsoft.Extensions.Logging.ILoggerProvider instead",
-    TreatAsErrorFromVersion = "11",
-    RemoveInVersion = "12")]
-[Obsolete("Implement a custom logger using Microsoft.Extensions.Logging.ILoggerProvider instead. Will be treated as an error from version 11.0.0. Will be removed in version 12.0.0.", false)]
+    TreatAsErrorFromVersion = "12",
+    RemoveInVersion = "13")]
+[Obsolete("Implement a custom logger using Microsoft.Extensions.Logging.ILoggerProvider instead. Will be treated as an error from version 12.0.0. Will be removed in version 13.0.0.", false)]
 class DefaultTestingLoggerFactory : ILoggerFactory
 {
     public static bool IsDebugEnabled => FilterLevel <= LogLevel.Debug;
