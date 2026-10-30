@@ -11,9 +11,9 @@ using Particular.Obsoletes;
 /// </summary>
 [ObsoleteMetadata(
     Message = "Convert to logging using Microsoft.Extensions.Logging.ILogger and then use a testable implementation of ILogger for log-based tests",
-    TreatAsErrorFromVersion = "11",
-    RemoveInVersion = "12")]
-[Obsolete("Convert to logging using Microsoft.Extensions.Logging.ILogger and then use a testable implementation of ILogger for log-based tests. Will be treated as an error from version 11.0.0. Will be removed in version 12.0.0.", false)]
+    TreatAsErrorFromVersion = "12",
+    RemoveInVersion = "13")]
+[Obsolete("Convert to logging using Microsoft.Extensions.Logging.ILogger and then use a testable implementation of ILogger for log-based tests. Will be treated as an error from version 12.0.0. Will be removed in version 13.0.0.", false)]
 public class TestingLoggerFactory : LoggingFactoryDefinition
 {
     /// <summary>
