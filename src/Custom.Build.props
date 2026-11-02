@@ -1,8 +1,8 @@
-﻿<Project>
+<Project>
 
   <PropertyGroup>
     <MinVerMinimumMajorMinor>11.0</MinVerMinimumMajorMinor>
-    <MinVerAutoIncrement>minor</MinVerAutoIncrement>
+    <MinVerAutoIncrement>patch</MinVerAutoIncrement>
   </PropertyGroup>
 
 </Project>
